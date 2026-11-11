@@ -587,6 +587,104 @@ const REGRAS_CONTEXTUAIS = [
     sugestao: () => 'Especificar agentes institucionais, meios de execução (orçamento, fiscalização, currículo) e finalidade concreta.',
     justificativa: 'Substitui o senso comum por encaminhamento analítico e exequível.'
   },
+  {
+    id: 'g-regencia-visar',
+    severidade: 'erro_confirmado',
+    categoria: 'Regência Verbal',
+    re: /\b(visando|visa|visam|visava|visavam)\s+(o|os|a|as)\s+([a-záàâãéêíóôõúç]+)\b/gi,
+    validarContexto: (match, frase) => {
+      const partes = match[0].split(/\s+/);
+      if(partes.length < 3) return false;
+      const palavraSeguinte = norm(partes[2].toLowerCase());
+      if(/^(garantir|promover|assegurar|ampliar|proteger|reduzir|combater|fortalecer|atender|cumprir|estabelecer|efetivar|mitigar)$/.test(palavraSeguinte)) return false;
+      return true;
+    },
+    diagnostico: 'Regência incorreta do verbo "visar" no sentido de almejar / ter como meta.',
+    explicacao: 'No sentido de almejar ou ter por objetivo, o verbo "visar" é transitivo indireto e exige a preposição "a". Antes de substantivo masculino emprega-se "ao/aos"; antes de feminino com artigo, ocorre crase obrigatória ("à/às").',
+    sugestao: (m) => {
+      const match = m.match(/\b(visando|visa|visam|visava|visavam)\s+(o|os|a|as)\s+([a-záàâãéêíóôõúç]+)\b/i);
+      if(!match) return 'visar a / ao / à';
+      const v = match[1];
+      const art = match[2].toLowerCase();
+      const subs = match[3];
+      const prep = (art === 'o') ? 'ao' : (art === 'os' ? 'aos' : (art === 'a' ? 'à' : 'às'));
+      return `${v} ${prep} ${subs}`;
+    },
+    justificativa: 'Item de regência verbal de alto rigor nos editais Cebraspe, AOCP e Vunesp.'
+  },
+  {
+    id: 'g-regencia-obedecer',
+    severidade: 'erro_confirmado',
+    categoria: 'Regência Verbal',
+    re: /\b(obedece|obedecem|obedecer|desobedece|desobedecem|desobedecer|obedecendo|desobedecendo)\s+(o|os|a|as)\s+([a-záàâãéêíóôõúç]+)\b/gi,
+    diagnostico: 'Regência do verbo "obedecer" / "desobedecer" sem preposição obrigatória "a".',
+    explicacao: 'Os verbos "obedecer" e "desobedecer" são transitivos indiretos pela norma culta e regem a preposição "a". Com artigo feminino há crase obrigatória ("obedecer à lei", "obedecer às ordens"); com masculino, "ao/aos".',
+    sugestao: (m) => {
+      const match = m.match(/\b(obedece|obedecem|obedecer|desobedece|desobedecem|desobedecer|obedecendo|desobedecendo)\s+(o|os|a|as)\s+([a-záàâãéêíóôõúç]+)\b/i);
+      if(!match) return 'obedecer a / ao / à';
+      const v = match[1];
+      const art = match[2].toLowerCase();
+      const subs = match[3];
+      const prep = (art === 'o') ? 'ao' : (art === 'os' ? 'aos' : (art === 'a' ? 'à' : 'às'));
+      return `${v} ${prep} ${subs}`;
+    },
+    justificativa: 'Correção indispensável para a nota máxima de modalidade culta da língua escrita.'
+  },
+  {
+    id: 'g-regencia-chegar-em',
+    severidade: 'erro_confirmado',
+    categoria: 'Regência Verbal',
+    re: /\b(chega|chegam|chegou|chegaram|chegando|chegar|vai chegar|ir[aá] chegar)\s+(no|na|nos|nas)\s+([a-záàâãéêíóôõúç]+)\b/gi,
+    diagnostico: 'Uso da preposição "em" com o verbo "chegar" em lugar da regência culta com "a".',
+    explicacao: 'Verbos de movimento e destino, como "chegar" e "ir", regem a preposição "a" e não "em". Portanto, deve-se empregar "chegar ao local", "chegar à conclusão", "chegar aos índices".',
+    sugestao: (m) => {
+      const mapa = { no: 'ao', na: 'à', nos: 'aos', nas: 'às' };
+      return m.replace(/\s+(no|na|nos|nas)\s+/i, (f, p) => ` ${mapa[p.toLowerCase()] || 'a'} `);
+    },
+    justificativa: 'Elimina vício da oralidade informal nas redações de concursos públicos.'
+  },
+  {
+    id: 'g-concordancia-se-passivo',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância Verbal & Voz Passiva Sintética',
+    re: /\b(observa-se|constata-se|verifica-se|nota-se|percebe-se|identifica-se)\s+([a-záàâãéêíóôõúç]+s)\b/gi,
+    validarContexto: (match, frase) => {
+      const partes = match[0].split(/\s+/);
+      if(partes.length < 2) return false;
+      const subs = norm(partes[1].toLowerCase());
+      const substantivosPlurais = new Set([
+        'problemas','falhas','lacunas','desafios','prejuizos','avancos','obstaculos',
+        'divergencias','irregularidades','inconstitucionalidades','dificuldades','demandas',
+        'conflitos','ameacas','crises','violacoes','desvios','erros','fraudes','impactos'
+      ]);
+      return substantivosPlurais.has(subs);
+    },
+    diagnostico: 'Falta de concordância verbal com sujeito paciente plural na voz passiva sintética (com "se").',
+    explicacao: 'Na voz passiva sintética (VTD + partícula apassivadora "se"), o termo que se segue é o sujeito da oração. Se o sujeito for plural ("problemas", "lacunas", "falhas"), o verbo deve concordar obrigatoriamente no plural: "observam-se problemas", "constatam-se falhas".',
+    sugestao: (m) => {
+      const match = m.match(/\b(observa|constata|verifica|nota|percebe|identifica)-se\s+([a-záàâãéêíóôõúç]+)\b/i);
+      if(match) return `${match[1]}m-se ${match[2]}`;
+      return 'Flexionar o verbo no plural concordando com o sujeito paciente';
+    },
+    justificativa: 'Erro clássico de concordância verbal de altíssima incidência em espelhos Cebraspe e AOCP.'
+  },
+  {
+    id: 'f-cliche-concurso',
+    severidade: 'fragilidade_argumentativa',
+    categoria: 'Precisão Dissertativa & Ausência de Clichês',
+    re: /\b(nos dias de hoje|fechar com chave de ouro|botar em pr[aá]tica|fazer a diferen[cç]a|tapar o sol com a peneira|dar a volta por cima)\b/gi,
+    diagnostico: 'Emprego de expressão clichê / coloquial na dissertação formal.',
+    explicacao: 'Expressões cristalizadas do senso comum ("nos dias de hoje", "fazer a diferença", "fechar com chave de ouro") empobrecem a maturidade dissertativa e denotam limitação vocabular.',
+    sugestao: (m) => {
+      const lower = m.toLowerCase();
+      if(lower.includes('nos dias de hoje')) return 'no cenário contemporâneo / na conjuntura atual';
+      if(lower.includes('fechar com chave de ouro')) return 'concluir de maneira exitosa';
+      if(lower.includes('botar em prática')) return 'efetivar / operacionalizar';
+      if(lower.includes('fazer a diferença')) return 'gerar impacto substancial / produzir melhorias concretas';
+      return 'Substituir por vocabulário técnico e dissertativo formal';
+    },
+    justificativa: 'Elimina clichês e oralidades expressamente combatidos por examinadores de bancas.'
+  },
 
   /* --- SUGESTÕES ESTILÍSTICAS (SEM DESCONTO NA NOTA GRAMATICAL — REGRA 4.2) --- */
   {
@@ -911,6 +1009,30 @@ function analisarParagrafosDetalhadamente(paragrafos, tema, bancaKey, repertorio
 /* =====================================================================
    5. CÁLCULO CONTEXTUAL DE NOTAS POR BANCA E CAMADA DE VALIDAÇÃO (SEÇÃO 4.3 & 6)
    ===================================================================== */
+const getFaixaNivelAocp = (pts) => {
+  if(pts >= 6.6) return { nivel: 'Nível IV (Pleno / Excelente)', sigla: 'N4', cor: '#15803d' };
+  if(pts >= 4.6) return { nivel: 'Nível III (Bom / Satisfatório)', sigla: 'N3', cor: '#0369a1' };
+  if(pts >= 2.1) return { nivel: 'Nível II (Regular / Fragilizado)', sigla: 'N2', cor: '#d97706' };
+  return { nivel: 'Nível I (Insuficiente)', sigla: 'N1', cor: '#b91c1c' };
+};
+
+const getFaixaNivelCebraspe = (pts, max) => {
+  const ratio = max > 0 ? (pts / max) : 0;
+  if(ratio >= 0.85) return { nivel: 'Nível 3 (Abordagem Plena e Fundamentada)', sigla: 'N3', cor: '#15803d' };
+  if(ratio >= 0.55) return { nivel: 'Nível 2 (Abordagem Intermediária com Lacunas)', sigla: 'N2', cor: '#0369a1' };
+  if(ratio >= 0.25) return { nivel: 'Nível 1 (Abordagem Rudimentar / Tangencial)', sigla: 'N1', cor: '#d97706' };
+  return { nivel: 'Nível 0 (Não Atendeu ao Aspecto Solicitado)', sigla: 'N0', cor: '#b91c1c' };
+};
+
+const getFaixaNivelVunesp = (pts, max) => {
+  const pct = max > 0 ? (pts / max) : 0;
+  if(pct >= 0.90) return { nivel: 'Nível 5 (Excelente - Faixa Máxima)', sigla: 'N5', cor: '#15803d' };
+  if(pct >= 0.75) return { nivel: 'Nível 4 (Bom - Adequado)', sigla: 'N4', cor: '#0369a1' };
+  if(pct >= 0.50) return { nivel: 'Nível 3 (Regular - No Limite)', sigla: 'N3', cor: '#d97706' };
+  if(pct >= 0.25) return { nivel: 'Nível 2 (Insuficiente)', sigla: 'N2', cor: '#b91c1c' };
+  return { nivel: 'Nível 1 (Muito Baixo / Tangenciamento)', sigla: 'N1', cor: '#7f1d1d' };
+};
+
 function calcularNotasPorRubrica(dadosAnalise){
   const {
     bancaKey,
@@ -1023,11 +1145,15 @@ function calcularNotasPorRubrica(dadosAnalise){
 
     spec.criteriaList.forEach((cr, i) => {
       const nota = notasArray[i];
+      const faixaObj = getFaixaNivelAocp(nota);
       espelhoCriterios.push({
         id: cr.id,
         nome: cr.title,
         max: cr.pts,
         nota,
+        faixaNivel: faixaObj.nivel,
+        faixaSigla: faixaObj.sigla,
+        faixaCor: faixaObj.cor,
         justificativa: listaJust[i],
         evidencias: listaEvid[i],
         positivos: nota >= 6.4 ? 'Critério bem atendido, demonstrando segurança técnica.' : 'Apresenta base compreensível que pode ser lapidada.',
@@ -1040,7 +1166,25 @@ function calcularNotasPorRubrica(dadosAnalise){
       });
     });
 
-    detalhesEspecificos = { tipo: 'aocp', notas: { c1, c2, c3, c4, c5 } };
+    const conformidadeFolha = linhasEstimadas < spec.zeroMinLines
+      ? `Eliminação sumária: extensão de ${linhasEstimadas} linhas é inferior ao mínimo eliminatório (${spec.zeroMinLines} linhas).`
+      : (linhasEstimadas < spec.minLines
+          ? `Alerta documental da banca: redação elaborada com ${linhasEstimadas} linhas (mínimo obrigatório: 15 linhas). Penalidade de extensão aplicada no Critério 3.`
+          : (linhasEstimadas > spec.maxLines
+              ? `Atenção: extensão de ${linhasEstimadas} linhas ultrapassa o limite máximo (20 linhas). Linhas excedentes são desconsideradas pela comissão examinadora.`
+              : `Extensão em estrita conformidade com o Edital AOCP (${linhasEstimadas} linhas no intervalo oficial de 15 a 20 linhas).`));
+
+    detalhesEspecificos = {
+      tipo: 'aocp',
+      banca: 'Instituto AOCP',
+      notas: { c1, c2, c3, c4, c5 },
+      conformidadeFolha,
+      linhasEscritas: linhasEstimadas,
+      totalErrosMicro: errosConfirmados.length,
+      notaTotalAocp: notaTotalCalculada,
+      situacaoOficial: (!anulacao.anulada && notaTotalCalculada >= spec.minPass) ? 'CLASSIFICADO NA DISCURSIVA' : 'REPROVADO NA DISCURSIVA',
+      memoriaCalculoTexto: `Soma dos 5 critérios (5 × 8,0 pts) = ${c1.toFixed(1)} + ${c2.toFixed(1)} + ${c3.toFixed(1)} + ${c4.toFixed(1)} + ${c5.toFixed(1)} = ${notaTotalCalculada.toFixed(1)} / 40,0 pts`
+    };
   }
 
   /* -------------------------------------------------------------------
@@ -1077,11 +1221,15 @@ function calcularNotasPorRubrica(dadosAnalise){
     const notasMacro = [apres, top1, top2, top3];
     spec.criteriaList.forEach((cr, i) => {
       const nota = notasMacro[i];
+      const faixaObj = getFaixaNivelCebraspe(nota, cr.pts);
       espelhoCriterios.push({
         id: cr.id,
         nome: cr.title,
         max: cr.pts,
         nota,
+        faixaNivel: faixaObj.nivel,
+        faixaSigla: faixaObj.sigla,
+        faixaCor: faixaObj.cor,
         justificativa: i === 0
           ? `Estrutura em ${numPar} parágrafo(s) e ${linhasEstimadas} linha(s) efetivamente escritas (TL = ${tl}).`
           : (i === 1 ? aderencia.diagnostico : (i === 2 ? repertorio.resumoGeral : 'Avaliação dos encaminhamentos institucionais e fechamento analítico do texto.')),
@@ -1096,13 +1244,24 @@ function calcularNotasPorRubrica(dadosAnalise){
       });
     });
 
+    const resumoMicro = {
+      errosGrafia: errosConfirmados.filter(e => e.categoria.includes('Ortografia') || e.categoria.includes('Acentuação')).length,
+      errosMorfossintaxe: errosConfirmados.filter(e => e.categoria.includes('Concordância') || e.categoria.includes('Regência') || e.categoria.includes('Crase') || e.categoria.includes('Colocação')).length,
+      errosPontuacao: errosConfirmados.filter(e => e.categoria.includes('Pontuação') || e.categoria.includes('Construção')).length,
+      errosPropriedade: errosConfirmados.filter(e => e.categoria.includes('Propriedade') || e.categoria.includes('Coesão')).length,
+      totalErros: ne
+    };
+
     detalhesEspecificos = {
       tipo: 'cebraspe',
       nc,
       ne,
       tl,
       penalidade,
-      notasMacro: { apres, top1, top2, top3 }
+      notasMacro: { apres, top1, top2, top3 },
+      resumoMicro,
+      memoriaCalculoTexto: `NPD = NC - (2 × NE ÷ TL) = ${nc.toFixed(2)} - (2 × ${ne} ÷ ${tl}) = ${notaTotalCalculada.toFixed(2)} / 30,00 pts`,
+      situacaoOficial: (!anulacao.anulada && notaTotalCalculada >= spec.minPass) ? 'CLASSIFICADO NA DISCURSIVA' : 'REPROVADO NA DISCURSIVA'
     };
   }
 
@@ -1144,11 +1303,15 @@ function calcularNotasPorRubrica(dadosAnalise){
     const notasMacro = [apres, top1, top2, top3];
     spec.criteriaList.forEach((cr, i) => {
       const nota = notasMacro[i];
+      const faixaObj = getFaixaNivelCebraspe(nota, cr.pts);
       espelhoCriterios.push({
         id: cr.id,
         nome: cr.title,
         max: cr.pts,
         nota,
+        faixaNivel: faixaObj.nivel,
+        faixaSigla: faixaObj.sigla,
+        faixaCor: faixaObj.cor,
         justificativa: i === 0
           ? `Apresentação em ${numPar} parágrafo(s) e ${linhasEstimadas} linha(s) efetivamente escritas (TL = ${tl}).`
           : (i === 1 ? aderencia.diagnostico : (i === 2 ? repertorio.resumoGeral : 'Avaliação dos encaminhamentos e propostas em conformidade com a LEP e direitos fundamentais.')),
@@ -1163,13 +1326,24 @@ function calcularNotasPorRubrica(dadosAnalise){
       });
     });
 
+    const resumoMicroPppe = {
+      errosGrafia: errosConfirmados.filter(e => e.categoria.includes('Ortografia') || e.categoria.includes('Acentuação')).length,
+      errosMorfossintaxe: errosConfirmados.filter(e => e.categoria.includes('Concordância') || e.categoria.includes('Regência') || e.categoria.includes('Crase') || e.categoria.includes('Colocação')).length,
+      errosPontuacao: errosConfirmados.filter(e => e.categoria.includes('Pontuação') || e.categoria.includes('Construção')).length,
+      errosPropriedade: errosConfirmados.filter(e => e.categoria.includes('Propriedade') || e.categoria.includes('Coesão')).length,
+      totalErros: ne
+    };
+
     detalhesEspecificos = {
       tipo: 'cebraspe',
       nc,
       ne,
       tl,
       penalidade,
-      notasMacro: { apres, top1, top2, top3 }
+      notasMacro: { apres, top1, top2, top3 },
+      resumoMicro: resumoMicroPppe,
+      memoriaCalculoTexto: `NPD = NC - (2 × NE ÷ TL) = ${nc.toFixed(2)} - (2 × ${ne} ÷ ${tl}) = ${notaTotalCalculada.toFixed(2)} / 10,00 pts`,
+      situacaoOficial: (!anulacao.anulada && notaTotalCalculada >= spec.minPass) ? 'CLASSIFICADO NA DISCURSIVA' : 'REPROVADO NA DISCURSIVA'
     };
   }
 
@@ -1204,11 +1378,15 @@ function calcularNotasPorRubrica(dadosAnalise){
 
     spec.criteriaList.forEach((cr, i) => {
       const nota = arrVunesp[i];
+      const faixaObj = getFaixaNivelVunesp(nota, cr.pts);
       espelhoCriterios.push({
         id: cr.id,
         nome: cr.title,
         max: cr.pts,
         nota,
+        faixaNivel: faixaObj.nivel,
+        faixaSigla: faixaObj.sigla,
+        faixaCor: faixaObj.cor,
         justificativa: i === 0 ? aderencia.diagnostico : (i === 1 ? repertorio.resumoGeral : `Foram identificados ${errosConfirmados.length} desvio(s) gramatical(is) e ${totalConectivosDistintos} operador(es) coesivo(s).`),
         evidencias: i === 0
           ? `Núcleos do tema presentes: "${aderencia.nucleosEncontrados.slice(0, 5).join(', ') || 'nenhum'}".`
@@ -1222,9 +1400,14 @@ function calcularNotasPorRubrica(dadosAnalise){
       });
     });
 
+    const conceitoGeralVunesp = notaTotalCalculada >= 85 ? 'Conceito A (Excelente)' : (notaTotalCalculada >= 70 ? 'Conceito B (Bom)' : (notaTotalCalculada >= 50 ? 'Conceito C (Regular - Aprovado)' : 'Conceito D/E (Insuficiente - Reprovado)'));
     detalhesEspecificos = {
       tipo: 'vunesp',
-      notas: { crA, crB, crC }
+      banca: 'Fundação Vunesp',
+      notas: { crA, crB, crC },
+      conceitoGeral: conceitoGeralVunesp,
+      situacaoOficial: (!anulacao.anulada && notaTotalCalculada >= spec.minPass) ? 'CLASSIFICADO NA DISCURSIVA' : 'REPROVADO NA DISCURSIVA',
+      memoriaCalculoTexto: `Soma dos Critérios A (30), B (40) e C (30) = ${crA} + ${crB} + ${crC} = ${notaTotalCalculada} / 100 pts (${conceitoGeralVunesp})`
     };
   }
 
@@ -1648,6 +1831,24 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
     aprovado: !resultadoCalculo.anulacao.anulada && total >= spec.minPass,
     anulacao: resultadoCalculo.anulacao,
     validacao,
+    espelhoOficialBanca: {
+      protocolo: 'DISC-' + bancaKey.toUpperCase() + '-' + Date.now().toString(36).toUpperCase(),
+      orgaoOficial: spec.name,
+      bancaOficial: spec.banca,
+      rubrica: spec.rubricaVersion,
+      linhasEfetivas: linhasEstimadas,
+      palavrasEfetivas: palavras,
+      paragrafosEfetivos: paragrafos.length,
+      notaFinal: total,
+      notaMaxima: max,
+      notaCorte: spec.minPass,
+      aprovado: !resultadoCalculo.anulacao.anulada && total >= spec.minPass,
+      situacaoOficial: (!resultadoCalculo.anulacao.anulada && total >= spec.minPass) ? 'CLASSIFICADO NA PROVA DISCURSIVA' : 'REPROVADO / ELIMINADO',
+      motivoEliminacao: resultadoCalculo.anulacao.anulada ? resultadoCalculo.anulacao.motivo : (total < spec.minPass ? `Nota final inferior ao corte mínimo do edital (${total.toFixed(bancaKey === 'pcpe' || bancaKey === 'pppe' ? 2 : 1)} < ${spec.minPass.toFixed(bancaKey === 'pcpe' || bancaKey === 'pppe' ? 2 : 1)} pts).` : null),
+      tipoBanca: bancaKey,
+      criteriosOficiais: resultadoCalculo.espelhoCriterios,
+      detalhes: resultadoCalculo.detalhesEspecificos
+    },
     palavras,
     linhas: linhasEstimadas,
     numParagrafos: paragrafos.length,
@@ -1728,4 +1929,4 @@ global.MotorCorrecao = {
   norm
 };
 
-})(window);
+})(typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this));

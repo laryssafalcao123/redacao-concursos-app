@@ -265,7 +265,7 @@ function executarSuiteTestes(){
     assert(
       'Sanitização contra XSS (HTML/Script/Attribute Injection) em entradas do usuário',
       'Segurança (XSS)',
-      seguro && !window.__xss_triggered,
+      seguro && !(typeof window !== 'undefined' ? window.__xss_triggered : global.__xss_triggered),
       `Saída sanitizada: ${escapado}`
     );
 
@@ -384,4 +384,4 @@ if(typeof window !== 'undefined' && window.location && window.location.search.in
   });
 }
 
-})(window);
+})(typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this));

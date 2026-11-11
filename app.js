@@ -711,7 +711,212 @@ function renderizarResultado(res, nome, tema, bancaKey){
     `;
   };
 
+  const protocoloGerado = res.espelhoOficialBanca?.protocolo || ('DISC-' + bancaKey.toUpperCase() + '-' + Date.now().toString(36).toUpperCase());
+  const situacaoAprovado = !res.anulacao?.anulada && res.total >= spec.minPass;
+
+  let painelCalculoBanca = '';
+  if(bancaKey === 'pcpe' || bancaKey === 'pppe'){
+    const ncVal = (res.nc !== undefined ? res.nc : (res.detalhesEspecificos?.nc || 0)).toFixed(2);
+    const neVal = res.ne !== undefined ? res.ne : (res.detalhesEspecificos?.ne !== undefined ? res.detalhesEspecificos.ne : errosConfirmados.length);
+    const tlVal = res.tl || res.linhas || 1;
+    const penVal = (res.penalidade !== undefined ? res.penalidade : (res.detalhesEspecificos?.penalidade || 0)).toFixed(2);
+    painelCalculoBanca = `
+      <div class="espelho-banca-box">
+        <div class="espelho-box-title">
+          <span>📐 MEMÓRIA DE CÁLCULO OFICIAL DA FÓRMULA LÍQUIDA CEBRASPE</span>
+          <span class="badge" style="background:#0284c7;color:#fff">Edital Oficial</span>
+        </div>
+        <div class="espelho-formula-grid">
+          <div class="formula-item">
+            <span class="formula-label">Fórmula do Edital</span>
+            <span class="formula-val" style="font-family:'JetBrains Mono',monospace;color:#0369a1">NPD = NC − 2 × (NE ÷ TL)</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">NC · Domínio do Conteúdo</span>
+            <span class="formula-val" style="color:#15803d">${ncVal} / ${spec.maxScore.toFixed(2)} pts</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">NE · Erros de Microestrutura</span>
+            <span class="formula-val" style="color:#b91c1c">${neVal} desvio(s)</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">TL · Linhas Escritas</span>
+            <span class="formula-val" style="color:#475569">${tlVal} linha(s)</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">Penalidade (2 × NE ÷ TL)</span>
+            <span class="formula-val" style="color:#b91c1c">−${penVal} pts</span>
+          </div>
+          <div class="formula-item highlight">
+            <span class="formula-label">Nota Final Líquida (NPD)</span>
+            <span class="formula-val" style="color:#1e3a8a;font-weight:800">${res.total.toFixed(2)} / ${spec.maxScore.toFixed(2)} pts</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(bancaKey === 'pmpe' || bancaKey === 'cbmpe'){
+    const conformidadeFolhaTexto = res.linhas < 15
+      ? `⚠️ Alerta de Edital: ${res.linhas} linha(s) escritas. O edital AOCP exige estritamente entre 15 e 20 linhas. Foi aplicada penalidade de estrutura.`
+      : (res.linhas > 20
+          ? `⚠️ Atenção: ${res.linhas} linhas escritas. As linhas além da linha 20 são desconsideradas pela comissão examinadora.`
+          : `✅ Extensão em estrita conformidade com o Edital AOCP (${res.linhas} linhas no intervalo oficial de 15 a 20 linhas).`);
+    painelCalculoBanca = `
+      <div class="espelho-banca-box">
+        <div class="espelho-box-title">
+          <span>📋 PARECER OFICIAL DE CONFORMIDADE — INSTITUTO AOCP</span>
+          <span class="badge" style="background:#166534;color:#fff">5 Critérios Oficiais · 40,0 Pts</span>
+        </div>
+        <div class="espelho-formula-grid">
+          <div class="formula-item" style="grid-column: span 2">
+            <span class="formula-label">Folha Padrão AOCP (15 a 20 linhas)</span>
+            <span class="formula-val" style="font-size:13px">${conformidadeFolhaTexto}</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">Distribuição de Pontos</span>
+            <span class="formula-val" style="color:#0369a1">5 Critérios × 8,0 pts = 40,0 pts</span>
+          </div>
+          <div class="formula-item highlight">
+            <span class="formula-label">Nota Total Obtida</span>
+            <span class="formula-val" style="color:#166534;font-weight:800">${res.total.toFixed(1)} / 40,0 pts</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if(bancaKey === 'pmsp'){
+    const concVunesp = res.detalhesEspecificos?.conceitoGeral || (res.total >= 85 ? 'Conceito A (Excelente)' : (res.total >= 70 ? 'Conceito B (Bom)' : (res.total >= 50 ? 'Conceito C (Regular - Aprovado)' : 'Conceito D/E (Insuficiente)')));
+    painelCalculoBanca = `
+      <div class="espelho-banca-box">
+        <div class="espelho-box-title">
+          <span>🏛️ PARECER EXAMINADOR OFICIAL — FUNDAÇÃO VUNESP</span>
+          <span class="badge" style="background:#1e3a8a;color:#fff">Critérios A, B e C · 100,0 Pts</span>
+        </div>
+        <div class="espelho-formula-grid">
+          <div class="formula-item">
+            <span class="formula-label">Conceito Global</span>
+            <span class="formula-val" style="color:#0284c7;font-weight:800">${concVunesp}</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">Pertinência Temática</span>
+            <span class="formula-val" style="color:${res.anulacao?.anulada ? '#b91c1c' : '#15803d'}">${res.anulacao?.anulada ? 'Fuga ao Tema' : (res.aderencia?.status === 'tangenciamento' ? 'Tangenciamento' : 'Tema Plenamente Atendido')}</span>
+          </div>
+          <div class="formula-item">
+            <span class="formula-label">Extensão da Folha</span>
+            <span class="formula-val">${res.linhas} linha(s) manuscritas</span>
+          </div>
+          <div class="formula-item highlight">
+            <span class="formula-label">Nota Final VUNESP</span>
+            <span class="formula-val" style="color:#1e3a8a;font-weight:800">${res.total.toFixed(0)} / 100 pts</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  const blocoEspelhoOficial = `
+    <!-- ================= ESPELHO OFICIAL DA BANCA EXAMINADORA ================= -->
+    <div class="espelho-oficial-wrapper" id="espelhoOficialDiscursiva">
+      <div class="espelho-oficial-header">
+        <div class="espelho-brasao-box">
+          ${renderLogoImg(bancaKey, 'espelho-logo-img')}
+        </div>
+        <div class="espelho-header-text">
+          <span class="espelho-gov-tag">${bancaKey === 'pmsp' ? 'GOVERNO DO ESTADO DE SÃO PAULO · SECRETARIA DA SEGURANÇA PÚBLICA' : 'GOVERNO DO ESTADO DE PERNAMBUCO · SECRETARIA DE DEFESA SOCIAL'}</span>
+          <h2 class="espelho-orgao-title">${esc(spec.name.toUpperCase())}</h2>
+          <h3 class="espelho-concurso-sub">COMISSÃO EXAMINADORA OFICIAL · BANCA: <b>${esc(spec.banca.toUpperCase())}</b></h3>
+          <div class="espelho-doc-badge">DOCUMENTO PERICIAL DE RESPOSTA DISCURSIVA · ESPELHO DE NOTAS</div>
+        </div>
+        <div class="espelho-protocolo-box">
+          <div>PROTOCOLO: <b>${esc(protocoloGerado)}</b></div>
+          <div>EMISSÃO: <b>${esc(dataFormatada)}</b></div>
+          <button type="button" class="btn btn-light btn-sm no-print" id="btnPrintEspelho" style="margin-top:6px;width:100%;font-size:12px">
+            🖨️ Imprimir Espelho (PDF)
+          </button>
+        </div>
+      </div>
+
+      <!-- DADOS DE IDENTIFICAÇÃO DO CANDIDATO -->
+      <div class="espelho-candidato-grid">
+        <div><b>Candidato(a):</b> <span>${esc(nome || 'Candidato(a) Concurseiro(a)')}</span></div>
+        <div><b>Cargo / Concurso:</b> <span>${esc(spec.short)} (${esc(spec.name)})</span></div>
+        <div><b>Banca Organizadora:</b> <span>${esc(spec.banca)}</span></div>
+        <div><b>Métricas da Folha:</b> <span>${res.palavras} palavras · ${res.linhas} linha(s) efetivas · ${res.numParagrafos} parágrafo(s)</span></div>
+      </div>
+
+      <!-- BANNER DE STATUS OFICIAL -->
+      <div class="espelho-status-banner ${res.anulacao?.anulada ? 'status-reprovado' : (situacaoAprovado ? 'status-aprovado' : 'status-reprovado')}">
+        <div class="espelho-status-icon">${res.anulacao?.anulada ? '🚫' : (situacaoAprovado ? '🎖️' : '⚠️')}</div>
+        <div style="flex:1">
+          <div class="espelho-status-title">
+            ${res.anulacao?.anulada
+              ? 'CANDIDATO(A) ELIMINADO(A) POR CONDIÇÃO DE ANULAÇÃO'
+              : (situacaoAprovado
+                  ? 'CANDIDATO(A) CLASSIFICADO(A) / APTO(A) NA PROVA DISCURSIVA'
+                  : 'CANDIDATO(A) NÃO CLASSIFICADO(A) / ABAIXO DO CORTE MÍNIMO')}
+          </div>
+          <div class="espelho-status-desc">
+            ${res.anulacao?.anulada
+              ? esc(res.anulacao.motivo)
+              : (situacaoAprovado
+                  ? `Pontuação obtida: <b>${res.total.toFixed(casasDecimais)} pts</b> (${res.percentual.toFixed(1)}%) · Exigência mínima para aprovação no edital: <b>${spec.minPass.toFixed(casasDecimais)} pts</b>.`
+                  : `Pontuação obtida: <b>${res.total.toFixed(casasDecimais)} pts</b> · Nota mínima exigida para classificação no certame: <b>${spec.minPass.toFixed(casasDecimais)} pts</b>.`)}
+          </div>
+        </div>
+        <div class="espelho-status-score">
+          <div class="score-num">${res.total.toFixed(casasDecimais)}</div>
+          <div class="score-max">de ${res.max.toFixed(casasDecimais)} pts</div>
+        </div>
+      </div>
+
+      ${painelCalculoBanca}
+
+      <!-- TABELA OFICIAL DE PONTUAÇÃO POR CRITÉRIO -->
+      <div class="espelho-tabela-box">
+        <div style="font-size:13.5px;font-weight:800;color:var(--ink);margin-bottom:8px">
+          📊 ESPELHO DE NOTAS DETALHADO POR CRITÉRIO DA BANCA EXAMINADORA
+        </div>
+        <div class="table-responsive">
+          <table class="espelho-tabela">
+            <thead>
+              <tr>
+                <th style="width:28%">Quesito / Critério Oficial</th>
+                <th style="width:14%;text-align:center">Pontuação</th>
+                <th style="width:20%">Nível / Faixa da Banca</th>
+                <th style="width:38%">Parecer Pericial do Examinador</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${res.espelhoCriterios.map(cr => `
+                <tr>
+                  <td>
+                    <b>${esc(cr.nome)}</b>
+                    <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${esc(cr.evidencias || '')}</div>
+                  </td>
+                  <td style="text-align:center;font-weight:700">
+                    <span class="pill ${cr.nota / cr.max >= 0.7 ? 'ok' : (cr.nota / cr.max < 0.4 ? 'bad' : '')}" style="font-size:12px">
+                      ${cr.nota.toFixed(casasDecimais)} / ${cr.max.toFixed(casasDecimais)}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge" style="background:${cr.faixaCor || 'var(--th-primary)'}15;color:${cr.faixaCor || 'var(--th-primary)'};border-color:${cr.faixaCor || 'var(--th-primary)'}40;font-size:11.5px;font-weight:700">
+                      ${esc(cr.faixaNivel || (cr.nota / cr.max >= 0.75 ? 'Excelente / Pleno' : (cr.nota / cr.max >= 0.5 ? 'Bom / Regular' : 'Insuficiente')))}
+                    </span>
+                  </td>
+                  <td style="font-size:12.5px;line-height:1.55">
+                    <div>${esc(cr.justificativa)}</div>
+                    <div style="margin-top:4px;color:var(--ink-light);font-size:11.5px"><b>Ação recomendada:</b> ${esc(cr.acaoRecomendada || 'Aprimorar a fundamentação.')}</div>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  `;
+
   box.innerHTML = `
+    ${blocoEspelhoOficial}
+
     <!-- ================= FOLHA CORRIGIDA COM GRIFOS DINÂMICOS ================= -->
     <div class="report-section" id="sec-glau" style="margin-bottom:24px">
       <div class="glau-interactive-container">
@@ -1014,6 +1219,15 @@ function renderizarResultado(res, nome, tema, bancaKey){
   const btnPrint = $('#btnPrintResult');
   if(btnPrint){
     btnPrint.onclick = () => {
+      document.body.classList.add('print-result');
+      window.print();
+      setTimeout(() => document.body.classList.remove('print-result'), 500);
+    };
+  }
+
+  const btnPrintEspelho = $('#btnPrintEspelho');
+  if(btnPrintEspelho){
+    btnPrintEspelho.onclick = () => {
       document.body.classList.add('print-result');
       window.print();
       setTimeout(() => document.body.classList.remove('print-result'), 500);

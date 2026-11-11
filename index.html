@@ -1028,6 +1028,225 @@ html, body {
   }
 }
 
+/* =====================================================================
+   ESPELHO OFICIAL DE RESPOSTA DA BANCA EXAMINADORA (DOCUMENTO OFICIAL)
+   ===================================================================== */
+.espelho-oficial-wrapper {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  color: #0f172a;
+}
+.espelho-oficial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.espelho-brasao-box {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 4px;
+}
+.espelho-brasao-box img {
+  max-width: 56px;
+  max-height: 56px;
+  object-fit: contain;
+}
+.espelho-header-text {
+  flex: 1;
+  min-width: 240px;
+}
+.espelho-gov-tag {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  text-transform: uppercase;
+  display: block;
+}
+.espelho-orgao-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 2px 0;
+  letter-spacing: -0.3px;
+}
+.espelho-concurso-sub {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+}
+.espelho-doc-badge {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0284c7;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 3px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-top: 5px;
+  letter-spacing: 0.4px;
+}
+.espelho-protocolo-box {
+  text-align: right;
+  font-size: 11.5px;
+  color: #64748b;
+  min-width: 180px;
+}
+.espelho-candidato-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px 16px;
+  background: #f8fafc;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.espelho-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.espelho-status-banner.status-aprovado {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 2px solid #86efac;
+  color: #166534;
+}
+.espelho-status-banner.status-reprovado {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border: 2px solid #fca5a5;
+  color: #991b1b;
+}
+.espelho-status-icon {
+  font-size: 34px;
+}
+.espelho-status-title {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.espelho-status-desc {
+  font-size: 13px;
+  margin-top: 3px;
+  opacity: 0.95;
+}
+.espelho-status-score {
+  text-align: right;
+  min-width: 100px;
+}
+.espelho-status-score .score-num {
+  font-size: 28px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1;
+}
+.espelho-status-score .score-max {
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  opacity: 0.8;
+  margin-top: 2px;
+}
+.espelho-banca-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+}
+.espelho-box-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.espelho-formula-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+}
+.formula-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.formula-item.highlight {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+.formula-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.formula-val {
+  font-size: 14px;
+  font-weight: 700;
+}
+.espelho-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  background: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+.espelho-tabela th {
+  background: #0f172a;
+  color: #ffffff;
+  padding: 10px 14px;
+  font-weight: 700;
+  text-align: left;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.espelho-tabela td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+}
+.espelho-tabela tr:nth-child(even) td {
+  background: #f8fafc;
+}
+.espelho-tabela tr:hover td {
+  background: #f1f5f9;
+}
+
 @media print {
   body.print-result > *:not(main), body.print-result .topbar, body.print-result footer,
   body.print-result .no-print, body.print-result .view:not(#v-escrever),

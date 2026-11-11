@@ -2710,4 +2710,4 @@ global.RedacaoDados = {
   QUIZ_BANCA
 };
 
-})(window);
+})(typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this));

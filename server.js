@@ -201,6 +201,23 @@ function construirPromptBanca({ texto, tema, comando, bancaKey, spec }) {
   - TL = Total de Linhas efetivamente escritas.
   - Penalidade proporcional: (2 * NE / TL).`,
 
+    pppe: `BANCA ORGANIZADORA: CEBRASPE (Polícia Penal de Pernambuco - PPPE - Edital 2026)
+- Gênero: Texto Dissertativo em prosa com atendimento a aspectos temáticos do comando.
+- Extensão Oficial: Até 30 linhas (folha oficial Cebraspe). Menos de 7 linhas = anulação sumária.
+- Pontuação Máxima: 10,00 pontos.
+- Nota Mínima para Aprovação: 5,00 pontos (NPD < 5,00 = reprovação).
+- FÓRMULA OFICIAL DO EDITAL PPPE 2026:
+  NPD = NC - (2 * NE / TL)
+  Onde:
+  - NC = Domínio do Conteúdo (Macroestrutura, até 10,00 pontos):
+    * 1. Apresentação, estrutura textual e legibilidade: até 1,00 pt (respeito às margens, paragrafação, ausência de rasuras)
+    * 2. Desenvolvimento do tema e conhecimento do assunto: até 3,00 pts (domínio sobre segurança pública, sistema penitenciário e execução penal)
+    * 3. Qualidade e consistência dos argumentos: até 3,00 pts (fundamentação na Lei de Execução Penal - LEP nº 7.210/84, CF/88, dados e doutrina)
+    * 4. Progressão temática e propostas de encaminhamento: até 3,00 pts (respeito aos direitos humanos, atuação técnica da Polícia Penal e integração ao SUSP)
+  - NE = Número de Erros gramaticais confirmados na Microestrutura (grafia, acentuação, morfossintaxe, pontuação, propriedade vocabular).
+  - TL = Total de Linhas efetivamente escritas.
+  - Penalidade proporcional da banca: (2 * NE / TL).`,
+
     pmsp: `BANCA ORGANIZADORA: FUNDAÇÃO VUNESP (Polícia Militar de São Paulo - PMSP)
 - Gênero: Texto Dissertativo-Argumentativo em prosa.
 - Extensão: Até 30 linhas (folha oficial Vunesp).
@@ -259,6 +276,7 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
       "nome": string,
       "max": number,
       "nota": number,
+      "faixaNivel": string,
       "justificativa": string,
       "evidencias": string,
       "positivos": string,
@@ -266,6 +284,10 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
       "acaoRecomendada": string
     }
   ],
+  "nc": number,
+  "ne": number,
+  "tl": number,
+  "penalidade": number,
   "diagnosticoGeral": {
     "pontosFortes": [string],
     "principaisProblemas": [string],
@@ -840,7 +862,7 @@ const server = http.createServer(async (req, res) => {
       if (!texto || String(texto).trim().length < 50) {
         return sendJson(res, 400, { error: 'A redação deve conter no mínimo 50 caracteres para avaliação.' });
       }
-      const BANCAS_PERMITIDAS = ['pmpe', 'pcpe', 'cbmpe', 'pmsp', 'enem'];
+      const BANCAS_PERMITIDAS = ['pmpe', 'pcpe', 'pppe', 'cbmpe', 'pmsp', 'enem'];
       const targetKey = BANCAS_PERMITIDAS.includes(bancaKey) ? bancaKey : 'pmpe';
       const spec = global.RedacaoDados?.BANCA_SPECS?.[targetKey] || {
         banca: targetKey.toUpperCase(),
