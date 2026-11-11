@@ -1,0 +1,22 @@
+{
+  "name": "redacao-concursos-app",
+  "version": "2.0.0",
+  "description": "Plataforma profissional de treino e correção de redações para concursos públicos e ENEM com IA",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node tests.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "redacao",
+    "concursos",
+    "enem",
+    "inteligencia-artificial",
+    "gemini"
+  ],
+  "author": "Redação Aprovada",
+  "license": "ISC"
+}

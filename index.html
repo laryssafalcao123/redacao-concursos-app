@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redação Aprovada 2.0 | Concursos Públicos & ENEM</title>
+<meta name="description" content="Plataforma profissional de correção e treino de redação especializada por banca organizadora: Instituto AOCP (PMPE/CBMPE), Cebraspe (PCPE), Vunesp (PMSP) e INEP (ENEM).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+/* =====================================================================
+   SISTEMA DE DESIGN MULTI-TEMA POR BANCA ORGANIZADORA
+   ===================================================================== */
+:root {
+  --th-name: "Portal Concursos & ENEM";
+  --th-banca: "Multi-Bancas";
+  --th-primary: #4f46e5;
+  --th-primary-dark: #3730a3;
+  --th-secondary: #06b6d4;
+  --th-accent: #f59e0b;
+  --th-hero-bg: linear-gradient(135deg, #1e1b4b 0%, #312e81 45%, #0f172a 100%);
+  --th-badge-bg: rgba(255, 255, 255, 0.15);
+  --th-badge-border: rgba(255, 255, 255, 0.25);
+  --th-card-border: #e2e8f0;
+  --th-card-highlight: #ede9fe;
+  --th-gradient: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  --th-btn-grad: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --th-sh: 0 10px 30px -10px rgba(79, 70, 229, 0.35);
+
+  --ink: #0f172a;
+  --ink-light: #334155;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --green: #10b981;
+  --red: #ef4444;
+  --gold: #f59e0b;
+  --lh: 32px;
+}
+
+/* TEMA PMPE - POLÍCIA MILITAR DE PERNAMBUCO (INSTITUTO AOCP) */
+body[data-target="pmpe"] {
+  --th-name: "Polícia Militar de Pernambuco (PMPE)";
+  --th-banca: "Instituto AOCP";
+  --th-primary: #15803d;
+  --th-primary-dark: #166534;
+  --th-secondary: #d97706;
+  --th-accent: #eab308;
+  --th-hero-bg: linear-gradient(135deg, #052e16 0%, #14532d 45%, #1e3a2f 100%);
+  --th-badge-bg: rgba(234, 179, 8, 0.15);
+  --th-badge-border: rgba(234, 179, 8, 0.4);
+  --th-card-border: #dcfce7;
+  --th-card-highlight: #f0fdf4;
+  --th-gradient: linear-gradient(135deg, #15803d 0%, #ca8a04 100%);
+  --th-btn-grad: linear-gradient(135deg, #15803d 0%, #166534 50%, #b45309 100%);
+  --th-sh: 0 10px 30px -10px rgba(21, 128, 61, 0.4);
+}
+
+/* TEMA PCPE - POLÍCIA CIVIL DE PERNAMBUCO (CESPE / CEBRASPE) */
+body[data-target="pcpe"] {
+  --th-name: "Polícia Civil de Pernambuco (PCPE)";
+  --th-banca: "CESPE / CEBRASPE";
+  --th-primary: #0f172a;
+  --th-primary-dark: #020617;
+  --th-secondary: #ca8a04;
+  --th-accent: #eab308;
+  --th-hero-bg: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+  --th-badge-bg: rgba(234, 179, 8, 0.18);
+  --th-badge-border: rgba(234, 179, 8, 0.5);
+  --th-card-border: #e2e8f0;
+  --th-card-highlight: #fefce8;
+  --th-gradient: linear-gradient(135deg, #0f172a 0%, #ca8a04 100%);
+  --th-btn-grad: linear-gradient(135deg, #ca8a04 0%, #a16207 100%);
+  --th-sh: 0 10px 30px -10px rgba(202, 138, 4, 0.35);
+}
+
+/* TEMA CBMPE - CORPO DE BOMBEIROS MILITAR DE PE (INSTITUTO AOCP) */
+body[data-target="cbmpe"] {
+  --th-name: "Corpo de Bombeiros Militar de PE (CBMPE)";
+  --th-banca: "Instituto AOCP";
+  --th-primary: #b91c1c;
+  --th-primary-dark: #991b1b;
+  --th-secondary: #ea580c;
+  --th-accent: #f59e0b;
+  --th-hero-bg: linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #991b1b 100%);
+  --th-badge-bg: rgba(245, 158, 11, 0.2);
+  --th-badge-border: rgba(245, 158, 11, 0.45);
+  --th-card-border: #fee2e2;
+  --th-card-highlight: #fff1f2;
+  --th-gradient: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+  --th-btn-grad: linear-gradient(135deg, #b91c1c 0%, #ea580c 100%);
+  --th-sh: 0 10px 30px -10px rgba(185, 28, 28, 0.4);
+}
+
+/* TEMA PMSP - POLÍCIA MILITAR DE SÃO PAULO (VUNESP) */
+body[data-target="pmsp"] {
+  --th-name: "Polícia Militar de São Paulo (PMSP)";
+  --th-banca: "VUNESP";
+  --th-primary: #1e3a8a;
+  --th-primary-dark: #172554;
+  --th-secondary: #b91c1c;
+  --th-accent: #f59e0b;
+  --th-hero-bg: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #831843 100%);
+  --th-badge-bg: rgba(255, 255, 255, 0.15);
+  --th-badge-border: rgba(255, 255, 255, 0.35);
+  --th-card-border: #dbeafe;
+  --th-card-highlight: #eff6ff;
+  --th-gradient: linear-gradient(135deg, #1e3a8a 0%, #b91c1c 100%);
+  --th-btn-grad: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #b91c1c 100%);
+  --th-sh: 0 10px 30px -10px rgba(30, 58, 138, 0.4);
+}
+
+/* TEMA ENEM - EXAME NACIONAL DO ENSINO MÉDIO (INEP) */
+body[data-target="enem"] {
+  --th-name: "ENEM - Exame Nacional do Ensino Médio";
+  --th-banca: "INEP";
+  --th-primary: #6366f1;
+  --th-primary-dark: #4338ca;
+  --th-secondary: #0ea5e9;
+  --th-accent: #10b981;
+  --th-hero-bg: linear-gradient(135deg, #1e1b4b 0%, #3730a3 45%, #0369a1 100%);
+  --th-badge-bg: rgba(255, 255, 255, 0.15);
+  --th-badge-border: rgba(255, 255, 255, 0.3);
+  --th-card-border: #e0e7ff;
+  --th-card-highlight: #eef2ff;
+  --th-gradient: linear-gradient(135deg, #6366f1 0%, #0ea5e9 100%);
+  --th-btn-grad: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+  --th-sh: 0 10px 30px -10px rgba(99, 102, 241, 0.4);
+}
+
+/* RESET E BASE */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+button, select, input, textarea { font-family: inherit; }
+button { cursor: pointer; }
+a { color: var(--th-primary); text-decoration: none; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+/* LOGOTIPOS OFICIAIS (SEÇÃO 11 - REGRA CRÍTICA DE UI) */
+.inst-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #ffffff;
+  padding: 2px;
+  display: block;
+}
+.brand-logo-box {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: grid; place-items: center; background: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  overflow: hidden; flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+.brand:hover .brand-logo-box { transform: scale(1.05); }
+#heroCrestSvg {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: #ffffff; padding: 2px; overflow: hidden; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+#editorCrestSvg {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: #ffffff; border: 1px solid var(--line);
+  padding: 2px; overflow: hidden; flex-shrink: 0;
+}
+.criteria-logo-box {
+  width: 56px; height: 56px; border-radius: 14px;
+  background: #ffffff; border: 1px solid var(--line);
+  padding: 3px; overflow: hidden; flex-shrink: 0;
+}
+.choice-logo-box {
+  width: 50px; height: 50px; border-radius: 12px;
+  background: #ffffff; border: 1px solid var(--line);
+  padding: 3px; flex-shrink: 0; display: grid; place-items: center; overflow: hidden;
+}
+
+/* TOPBAR */
+.topbar {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(15, 23, 42, 0.96);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+.topbar .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; min-height: 72px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px;
+}
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  color: #fff; font-weight: 800; font-size: 18px;
+  letter-spacing: -0.3px; background: none; border: none; text-align: left;
+}
+.brand-info small {
+  display: block; font-size: 10.5px; font-weight: 800;
+  color: var(--th-accent); letter-spacing: 1.1px; text-transform: uppercase;
+}
+.brand-info span { font-size: 16.5px; font-weight: 800; color: #fff; }
+
+/* NAV */
+nav {
+  display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
+  align-items: center;
+}
+nav::-webkit-scrollbar { display: none; }
+nav button {
+  background: transparent; border: none; color: #cbd5e1;
+  font-weight: 600; font-size: 13px; padding: 8px 11px;
+  border-radius: 999px; white-space: nowrap; transition: 0.2s;
+}
+nav button:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+nav button.active {
+  color: #fff; background: var(--th-btn-grad);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+/* SELETOR DE CONCURSO E PERFIL NO TOPO */
+.target-pill-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff; padding: 6px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; transition: 0.2s;
+}
+.target-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--th-accent);
+}
+.target-pill-badge {
+  background: var(--th-accent); color: #000;
+  font-weight: 800; font-size: 10px; padding: 2px 6px;
+  border-radius: 999px; text-transform: uppercase;
+}
+.profile-select {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+}
+.profile-select option { color: #0f172a; background: #fff; }
+
+/* GOOGLE AUTH & USUÁRIO RECONHECIDO NO TOPO */
+.google-auth-btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #ffffff; color: #1f2937; border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.google-auth-btn:hover {
+  background: #f8fafc; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.google-auth-btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+.google-user-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 10px 4px 5px; border-radius: 999px; color: #fff; font-size: 12px;
+}
+.google-avatar-img {
+  width: 24px; height: 24px; border-radius: 50%; object-fit: cover;
+  border: 1.5px solid #22c55e;
+}
+.google-user-info { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
+.google-user-info b { font-size: 11.5px; font-weight: 700; max-width: 110px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.google-user-info small { font-size: 9.5px; color: #86efac; font-weight: 700; }
+.btn-logout-google {
+  background: none; border: none; color: #fca5a5; font-size: 11px; font-weight: 700;
+  cursor: pointer; padding: 2px 4px; margin-left: 2px; border-radius: 4px; transition: 0.2s;
+}
+.btn-logout-google:hover { color: #ef4444; background: rgba(255,255,255,0.1); }
+
+/* STATUS E CASCATA DE IA */
+.ai-status-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155;
+  padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+}
+.ai-pulse-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: #10b981;
+  box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  animation: pulse-green 2s infinite;
+}
+@keyframes pulse-green {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* BANNER DE PRIMEIRO LOGIN */
+.first-login-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+  color: #fff; border-radius: 16px; padding: 18px 22px; margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 10px 25px -5px rgba(49, 46, 129, 0.3);
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.first-login-banner-left { display: flex; align-items: center; gap: 14px; }
+.first-login-icon { font-size: 32px; flex-shrink: 0; }
+.first-login-banner h3 { font-size: 17px; font-weight: 800; margin-bottom: 3px; color: #fde047; }
+.first-login-banner p { font-size: 13.5px; opacity: 0.95; line-height: 1.5; margin: 0; }
+
+/* BOTÕES DE SALVAR ASSUNTOS NO BANCO DE TEMAS */
+.btn-save-topic {
+  display: inline-flex; align-items: center; gap: 5px;
+  border: 1px solid var(--line); background: #f8fafc; color: var(--ink);
+  font-size: 11.5px; font-weight: 700; padding: 4px 9px; border-radius: 6px;
+  cursor: pointer; transition: 0.2s;
+}
+.btn-save-topic:hover { background: #e2e8f0; }
+.btn-save-topic.saved { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
+.topic-practiced-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: #dcfce7; color: #15803d; font-size: 11px; font-weight: 800;
+  padding: 3px 8px; border-radius: 6px;
+}
+
+/* VIEWS */
+.view { display: none; padding: 32px 0 70px; animation: rise 0.35s ease; }
+.view.active { display: block; }
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.page-title { font-size: 32px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 6px; }
+.page-title span {
+  background: var(--th-gradient);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.page-sub { color: var(--muted); margin-bottom: 24px; max-width: 840px; line-height: 1.6; font-size: 15px; }
+
+/* HERO COM TEMA DINÂMICO */
+.hero {
+  background: var(--th-hero-bg); color: #fff;
+  border-radius: 26px; padding: 44px 38px; position: relative;
+  overflow: hidden; box-shadow: var(--th-sh); margin-bottom: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.hero::before, .hero::after {
+  content: ""; position: absolute; border-radius: 50%; filter: blur(35px); pointer-events: none;
+}
+.hero::before {
+  width: 420px; height: 420px; right: -80px; top: -120px;
+  background: radial-gradient(circle, var(--th-secondary) 0%, transparent 70%); opacity: 0.35;
+}
+.hero::after {
+  width: 320px; height: 320px; left: -80px; bottom: -120px;
+  background: radial-gradient(circle, var(--th-accent) 0%, transparent 70%); opacity: 0.25;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--th-badge-bg); border: 1px solid var(--th-badge-border);
+  padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+}
+.badge-gold { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fde68a; }
+.hero-crest-badge {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(0, 0, 0, 0.35); padding: 8px 16px; border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.hero-crest-text { line-height: 1.25; }
+.hero-crest-text b { font-size: 14px; display: block; color: #fff; }
+.hero-crest-text small { font-size: 11px; color: var(--th-accent); text-transform: uppercase; font-weight: 700; }
+.hero h1 {
+  font-size: clamp(26px, 4.2vw, 44px); line-height: 1.14; font-weight: 800;
+  letter-spacing: -1.1px; max-width: 840px; margin-bottom: 14px;
+}
+.hero h1 em {
+  font-style: normal;
+  background: linear-gradient(90deg, #fde68a, #ffffff, #93c5fd);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.hero p { max-width: 780px; color: #e2e8f0; font-size: 15.5px; line-height: 1.65; }
+.hero .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 24px; }
+
+/* BOTOES */
+.btn {
+  border: none; border-radius: 12px; padding: 11px 20px;
+  font-weight: 800; font-size: 14px; transition: 0.2s;
+  display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-primary { background: var(--th-btn-grad); color: #fff; box-shadow: var(--th-sh); }
+.btn-gold { background: linear-gradient(135deg, #d97706, #f59e0b); color: #000; font-weight: 800; }
+.btn-ghost { background: rgba(255, 255, 255, 0.12); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); }
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.2); }
+.btn-light { background: #fff; color: var(--ink); border: 2px solid var(--line); }
+.btn-light:hover { border-color: var(--th-primary); color: var(--th-primary); }
+.btn-green { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+.btn-sm { padding: 8px 14px; font-size: 12.5px; border-radius: 10px; }
+
+/* CARDS E GRIDS */
+.grid { display: grid; gap: 18px; }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.card {
+  background: var(--card); border-radius: 18px; padding: 22px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+  border: 1px solid var(--th-card-border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card h3 { font-size: 17px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.3px; }
+.card p, .card li { color: var(--ink-light); line-height: 1.6; font-size: 14.5px; }
+.section-title {
+  font-size: 21px; font-weight: 800; margin: 32px 0 16px;
+  letter-spacing: -0.4px; display: flex; align-items: center; gap: 10px;
+}
+.section-title::after {
+  content: ""; flex: 1; height: 2px;
+  background: linear-gradient(90deg, var(--line), transparent);
+}
+
+/* STATS CARDS */
+.stat { position: relative; overflow: hidden; color: #fff; border: none; padding: 20px; }
+.stat .n { font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.stat .l { font-size: 12px; font-weight: 700; opacity: 0.9; margin-top: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.s1 { background: var(--th-btn-grad); }
+.s2 { background: linear-gradient(135deg, #0ea5e9, #2563eb); }
+.s3 { background: linear-gradient(135deg, #059669, #10b981); }
+.s4 { background: linear-gradient(135deg, #d97706, #ea580c); }
+
+/* BANNER DE AVISO */
+.notice {
+  border-radius: 14px; padding: 14px 18px; font-size: 13.5px; line-height: 1.6; margin-bottom: 20px;
+  border: 1px solid;
+}
+.notice-gold { background: #fefce8; border-color: #fde047; color: #854d0e; }
+.notice-blue { background: #f0fdfa; border-color: #99f6e4; color: #115e59; }
+.notice-crimson { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.notice-militar { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+
+/* EDITOR DE REDAÇÃO */
+.sheet {
+  background: #fff; border-radius: 20px; padding: 26px;
+  box-shadow: var(--th-sh); border: 1px solid var(--th-card-border);
+}
+.banca-alert-bar {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  background: var(--th-card-highlight); border: 1px solid var(--th-card-border);
+  padding: 12px 18px; border-radius: 14px; margin-bottom: 18px;
+}
+.banca-alert-bar-left { display: flex; align-items: center; gap: 14px; }
+.banca-badge-tag {
+  background: var(--th-primary); color: #fff; font-weight: 800; font-size: 11px;
+  padding: 4px 9px; border-radius: 6px; text-transform: uppercase;
+}
+
+.hform { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.hform .full { grid-column: span 2; }
+.field {
+  display: flex; align-items: center; gap: 10px; background: #f8fafc;
+  border: 2px solid var(--line); padding: 9px 14px; border-radius: 12px;
+}
+.field:focus-within { border-color: var(--th-primary); background: #fff; }
+.field label { font-weight: 800; font-size: 11.5px; text-transform: uppercase; color: var(--th-primary); white-space: nowrap; }
+.field input, .field select { border: none; background: transparent; font: inherit; font-size: 14px; color: var(--ink); width: 100%; outline: none; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.timer {
+  font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px;
+  background: #0f172a; color: #38bdf8; padding: 7px 16px; border-radius: 10px;
+  min-width: 100px; text-align: center;
+}
+.timer.warn { color: #f87171; animation: pulse 1s infinite; }
+@keyframes pulse { 50% { opacity: 0.55; } }
+
+.editor-container {
+  display: flex; border: 2px solid var(--th-card-border); border-radius: 16px;
+  overflow: hidden; background: #fff;
+}
+.gutter {
+  width: 46px; background: #f8fafc; border-right: 2px solid var(--line);
+  padding: 10px 0; text-align: center; color: #94a3b8;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700;
+  -webkit-user-select: none; user-select: none; overflow: hidden; height: calc(var(--lh)*22 + 20px);
+}
+.gutter div { height: var(--lh); line-height: var(--lh); }
+.essay {
+  flex: 1; border: none; outline: none; resize: none; padding: 10px 16px;
+  font-family: inherit; font-size: 15.5px; line-height: var(--lh);
+  height: calc(var(--lh)*22 + 20px); overflow-y: auto; color: #1e293b;
+  background-image: repeating-linear-gradient(transparent, transparent calc(var(--lh) - 1px), #f1f5f9 calc(var(--lh) - 1px), #f1f5f9 var(--lh));
+  background-attachment: local;
+}
+
+.meter { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+.pill { background: #f1f5f9; color: var(--ink-light); font-weight: 800; font-size: 12px; padding: 5px 12px; border-radius: 999px; display: inline-flex; align-items: center; }
+.pill.bad { background: #fee2e2; color: #b91c1c; }
+.pill.ok { background: #dcfce7; color: #15803d; }
+.bar { height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; margin-bottom: 6px; }
+.bar > i { display: block; height: 100%; width: 0; background: var(--th-gradient); transition: 0.3s; }
+.bar > i.over { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+/* RELATÓRIO DE CORREÇÃO (SEÇÕES A–I) */
+#resultado { display: none; margin-top: 28px; animation: rise 0.4s ease; }
+.report-section { margin-bottom: 20px; }
+.section-header-tag {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--th-primary);
+  background: var(--th-card-highlight);
+  padding: 4px 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+.scorebox {
+  display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+  border-radius: 20px; padding: 26px; color: #fff; margin-bottom: 16px;
+}
+.scorebox.pass { background: linear-gradient(135deg, #059669 0%, #0d9488 100%); }
+.scorebox.fail { background: linear-gradient(135deg, #b91c1c 0%, #d97706 100%); }
+.ring {
+  width: 124px; height: 124px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18); display: grid; place-items: center;
+  border: 5px solid rgba(255, 255, 255, 0.75); flex-shrink: 0; text-align: center;
+}
+.ring b { font-size: 32px; line-height: 1; display: block; }
+.ring small { display: block; font-size: 11px; font-weight: 700; opacity: 0.92; margin-top: 4px; }
+
+.cebraspe-formula-box {
+  background: #0f172a; color: #f8fafc; border-radius: 14px; padding: 18px; margin: 12px 0;
+  font-family: 'JetBrains Mono', monospace; border-left: 5px solid #ca8a04;
+}
+.cebraspe-formula-box h4 { color: #fde047; font-size: 14px; margin-bottom: 8px; }
+
+.rep-issue-card {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.crit { margin: 12px 0; }
+.crit .row { display: flex; justify-content: space-between; font-weight: 700; font-size: 13.5px; margin-bottom: 4px; }
+
+.list { padding-left: 20px; }
+.list li { margin-bottom: 6px; }
+.mark-bad { background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; }
+.mark-good { background: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 700; }
+
+.rewrite-box {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 2px dashed var(--th-primary); border-radius: 16px; padding: 20px;
+}
+.rewrite-box h4 { color: var(--th-primary); font-size: 15.5px; margin-bottom: 6px; }
+
+/* CHIPS, TEMAS E PESQUISA */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chipbtn {
+  border: 1.5px solid var(--line); background: #fff; color: var(--ink-light);
+  padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 12.5px; transition: 0.2s;
+}
+.chipbtn:hover { border-color: var(--th-primary); color: var(--th-primary); }
+.chipbtn.on { background: var(--th-primary); border-color: var(--th-primary); color: #fff; }
+.tcard { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
+.tcard::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 6px;
+  background: var(--c, var(--th-primary));
+}
+.tcard .det { display: none; padding-left: 4px; font-size: 13.5px; line-height: 1.6; color: var(--ink-light); }
+.tcard.open .det { display: block; }
+.search {
+  width: 100%; padding: 12px 18px; border: 2px solid var(--line); border-radius: 12px;
+  font: inherit; font-size: 14.5px; outline: none; margin-bottom: 14px; background: #fff;
+}
+.search:focus { border-color: var(--th-primary); }
+
+/* ABAS DOS PDFS */
+.pdf-tab-nav { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 20px; padding-bottom: 4px; }
+.pdf-tab-btn {
+  background: #fff; border: 2px solid var(--line); padding: 10px 18px; border-radius: 12px;
+  font-weight: 700; font-size: 13.5px; color: var(--ink-light); white-space: nowrap; transition: 0.2s;
+}
+.pdf-tab-btn:hover { border-color: var(--th-primary); color: var(--th-primary); }
+.pdf-tab-btn.active {
+  background: var(--th-btn-grad); border-color: transparent; color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.pdf-module { display: none; }
+.pdf-module.active { display: block; animation: rise 0.3s ease; }
+
+.step-card {
+  display: flex; gap: 16px; background: #fff; border: 1px solid var(--line);
+  border-radius: 14px; padding: 18px; margin-bottom: 12px;
+}
+.step-num {
+  width: 38px; height: 38px; border-radius: 10px; background: var(--th-btn-grad);
+  color: #fff; font-weight: 800; font-size: 17px; display: grid; place-items: center; flex-shrink: 0;
+}
+
+/* MODAIS */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(15, 23, 42, 0.85); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  display: none; place-items: center; padding: 20px; animation: fadeIn 0.25s ease;
+}
+.modal-overlay.show { display: grid; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-card {
+  background: #fff; width: 100%; max-width: 700px; border-radius: 24px;
+  overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--line); position: relative; max-height: 92vh; overflow-y: auto;
+}
+.modal-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #fff; padding: 24px 28px; position: relative;
+}
+.modal-header h2 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+.modal-header p { color: #94a3b8; font-size: 13.5px; line-height: 1.5; }
+.modal-body { padding: 24px 28px; }
+.modal-close-btn {
+  position: absolute; right: 20px; top: 20px; background: rgba(255, 255, 255, 0.12);
+  border: none; color: #fff; width: 32px; height: 32px; border-radius: 8px;
+  font-size: 16px; display: grid; place-items: center;
+}
+.target-choice-grid { display: grid; gap: 12px; margin-top: 14px; }
+.target-choice-card {
+  display: flex; align-items: center; gap: 14px; padding: 13px 16px;
+  border: 2px solid var(--line); border-radius: 14px; cursor: pointer;
+  transition: 0.2s; background: #fff; text-align: left;
+}
+.target-choice-card:hover {
+  border-color: var(--th-primary); transform: translateX(4px);
+  background: #f8fafc;
+}
+.target-choice-card.selected {
+  border-color: var(--th-primary); background: var(--th-card-highlight);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+.choice-info b { font-size: 15px; color: var(--ink); display: block; margin-bottom: 2px; }
+.choice-info small { font-size: 12px; color: var(--muted); }
+.choice-banca-badge {
+  margin-left: auto; background: #0f172a; color: #fde047; font-size: 11px;
+  font-weight: 800; padding: 4px 10px; border-radius: 6px; text-transform: uppercase;
+}
+
+/* TOAST & FOOTER */
+#toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 40px);
+  background: #0f172a; color: #fff; padding: 12px 22px; border-radius: 14px;
+  font-weight: 700; font-size: 14px; opacity: 0; transition: 0.3s; z-index: 120;
+  pointer-events: none; box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+footer {
+  background: #0f172a; color: #94a3b8; padding: 36px 0; font-size: 13.5px;
+  line-height: 1.7; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+footer b { color: #fff; }
+
+/* RESPONSIVIDADE */
+@media (max-width: 960px) {
+  .g4 { grid-template-columns: repeat(2, 1fr); }
+  .g3 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  .hero { padding: 30px 20px; }
+  .hform { grid-template-columns: 1fr; }
+  .hform .full { grid-column: span 1; }
+  .page-title { font-size: 25px; }
+  .topbar .wrap { flex-direction: column; align-items: stretch; }
+  nav { width: 100%; justify-content: flex-start; }
+}
+
+@media print {
+  body.print-result > *:not(main), body.print-result .topbar, body.print-result footer,
+  body.print-result .no-print, body.print-result .view:not(#v-escrever),
+  body.print-result .sheet { display: none !important; }
+  body.print-result #resultado { display: block !important; margin-top: 0 !important; }
+}
+</style>
+</head>
+<body data-target="pmpe">
+
+<!-- ================= TOPBAR ================= -->
+<header class="topbar">
+  <div class="wrap">
+    <button type="button" class="brand" data-go="inicio" aria-label="Início">
+      <div class="brand-logo-box" id="topbarLogoBox">
+        <img src="4060864b87ab4736e6efeda0032a7a40.jpg" alt="Brasão PMPE" class="inst-logo-img">
+      </div>
+      <div class="brand-info">
+        <small id="topbarBancaTag">INSTITUTO AOCP</small>
+        <span id="topbarTitle">Redação Aprovada 2.0</span>
+      </div>
+    </button>
+
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <button type="button" class="target-pill-btn" id="btnOpenTargetModal" title="Trocar Concurso e Banca">
+        <span class="target-pill-badge" id="topbarPillTarget">PMPE</span>
+        <span id="topbarPillName">Instituto AOCP</span>
+        <span style="opacity:0.75;font-size:11px">🔄 Trocar</span>
+      </button>
+      <div id="googleAuthBox" style="display:inline-flex;align-items:center;gap:6px"></div>
+      <select id="profileSelect" class="profile-select" aria-label="Selecionar perfil de aluno" style="display:none"></select>
+      <button type="button" class="btn btn-light btn-sm" id="btnOpenAiConfig" title="Configurar Chaves de API das IAs (Google Gemini / OpenAI)" style="padding:5px 11px;font-size:12px;background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25)">⚙️ Chaves de IA</button>
+      <button type="button" class="btn btn-light btn-sm" id="btnOpenTests" title="Suíte de Testes Obrigatórios e Auditoria de Qualidade" style="padding:5px 11px;font-size:12px;background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25)">🧪 Testes</button>
+    </div>
+
+    <nav id="nav" aria-label="Navegação principal">
+      <button type="button" data-go="inicio">Início</button>
+      <button type="button" data-go="escrever">Folha & Corretor</button>
+      <button type="button" data-go="criterios">Critérios da Banca</button>
+      <button type="button" data-go="aulas">Aulas & Método PDF</button>
+      <button type="button" data-go="temas">Temas</button>
+      <button type="button" data-go="repertorio">Repertório</button>
+      <button type="button" data-go="portugues">Português</button>
+      <button type="button" data-go="evolucao">Evolução</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ================= INÍCIO ================= -->
+<section class="view" id="v-inicio"><div class="wrap">
+  <div class="hero">
+    <div class="hero-header">
+      <span class="badge" id="heroBadge">🎯 Foco Atual: Concursos & ENEM</span>
+      <div class="hero-crest-badge" id="heroCrestBadge">
+        <div id="heroCrestSvg">
+          <img src="4060864b87ab4736e6efeda0032a7a40.jpg" alt="Logotipo Institucional" class="inst-logo-img">
+        </div>
+        <div class="hero-crest-text">
+          <b id="heroCrestTitle">Polícia Militar de Pernambuco</b>
+          <small id="heroCrestBanca">Instituto AOCP · 40 Pontos</small>
+        </div>
+      </div>
+    </div>
+
+    <h1 id="heroHeadline">Domine a redação da sua banca com <em>rigor cirúrgico</em></h1>
+    <p id="heroSubtext">Motor contextual calibrado por rubricas versionadas: INEP para ENEM, Cebraspe para PCPE, Instituto AOCP para PMPE/CBMPE e VUNESP para PMSP. Relatório completo em 9 seções (A–I), biblioteca ampla de repertórios e histórico analítico.</p>
+
+    <div class="cta">
+      <button type="button" class="btn btn-primary" data-go="escrever">✍️ Escrever & Corrigir Agora</button>
+      <button type="button" class="btn btn-ghost" id="heroBtnChangeTarget">🎯 Trocar Concurso / Banca</button>
+      <button type="button" class="btn btn-ghost" data-go="repertorio">🏛️ Biblioteca de Repertórios</button>
+    </div>
+  </div>
+
+  <!-- BANNER DE RECONHECIMENTO DO ALUNO E CONTA GOOGLE -->
+  <div id="userWelcomeBanner"></div>
+
+  <!-- AVISO DA BANCA ATIVA -->
+  <div id="targetBannerNotice"></div>
+
+  <!-- ESTATÍSTICAS DO ALUNO -->
+  <div class="grid g4" id="homeStats"></div>
+
+  <!-- TEMA RECOMENDADO DO DIA -->
+  <h2 class="section-title">🔥 Proposta Recomendada para seu Objetivo</h2>
+  <div class="card daily" id="dailyCard"></div>
+
+  <!-- MÓDULOS ESSENCIAIS -->
+  <h2 class="section-title">🧭 Ecossistema Profissional de Estudos</h2>
+  <div class="grid g3">
+    <div class="card feat" data-go="escrever" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">📝</div>
+      <h3>Corretor Contextual (Relatório A–I)</h3>
+      <p>Avalia aderência semântica ao tema, tese, produtividade do repertório, coesão, gramática em contexto e gera espelho detalhado com reescrita orientada.</p>
+    </div>
+    <div class="card feat" data-go="criterios" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">⚖️</div>
+      <h3>Rubricas Documentadas por Banca</h3>
+      <p>Consulte os critérios versionados da AOCP (40 pts), Cebraspe (fórmula líquida NPD), Vunesp (100 pts) e Matriz INEP/ENEM (1000 pts).</p>
+    </div>
+    <div class="card feat" data-go="aulas" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">💡</div>
+      <h3>Método dos PDFs (3 Aulas)</h3>
+      <p>Pensar para Argumentar (Platão e método socrático), os 6 tipos de desenvolvimento argumentativo e a estrutura da conclusão.</p>
+    </div>
+    <div class="card feat" data-go="temas" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">🎯</div>
+      <h3>Banco de 36 Temas Completos</h3>
+      <p>Organizados por banca e eixo temático, com enunciado, comando da proposta, problema central, teses possíveis e repertórios pertinentes.</p>
+    </div>
+    <div class="card feat" data-go="repertorio" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">🏛️</div>
+      <h3>Biblioteca Ampla de Repertórios</h3>
+      <p>Acervo pesquisável de Filosofia, Sociologia, História, Direito, Educação, Saúde, Meio Ambiente, Economia, Tecnologia e Segurança Pública.</p>
+    </div>
+    <div class="card feat" data-go="portugues" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">🔤</div>
+      <h3>Português & Exercícios Reais</h3>
+      <p>Questões comentadas com regra e exemplo extra, conectivos clicáveis e exercícios gerados a partir dos erros reais das suas redações.</p>
+    </div>
+  </div>
+</div></section>
+
+<!-- ================= ESCREVER & CORRETOR ================= -->
+<section class="view" id="v-escrever"><div class="wrap">
+  <h1 class="page-title">Folha de <span>Redação & Correção Contextual</span></h1>
+  <p class="page-sub">Selecione o concurso, configure o tema e o comando da proposta e receba o relatório analítico completo (Seções A a I) calibrado pela rubrica da sua banca.</p>
+
+  <div class="sheet">
+    <!-- BARRA DE ALERTA DE BANCA -->
+    <div class="banca-alert-bar">
+      <div class="banca-alert-bar-left">
+        <div id="editorCrestSvg">
+          <img src="4060864b87ab4736e6efeda0032a7a40.jpg" alt="Logo Banca" class="inst-logo-img">
+        </div>
+        <div>
+          <b id="editorTargetName">Polícia Militar de Pernambuco</b>
+          <p style="font-size:12.5px;color:var(--muted)" id="editorBancaDesc">Critérios: Instituto AOCP · 5 Aspectos de Avaliação · Máximo: 40.0 pts</p>
+        </div>
+      </div>
+      <div>
+        <span class="banca-badge-tag" id="editorBancaBadge">AOCP</span>
+        <button type="button" class="btn btn-light btn-sm" id="btnChangeTargetFromEditor" style="margin-left:8px">Mudar Banca</button>
+      </div>
+    </div>
+
+    <div class="hform">
+      <div class="field"><label for="inNome">Aluno(a)</label><input id="inNome" type="text" placeholder="Seu nome completo" maxlength="60"></div>
+      <div class="field"><label for="inTarget">Banca / Concurso</label>
+        <select id="inTarget">
+          <option value="pmpe">PMPE · Instituto AOCP (15 a 20 linhas · 40 pts)</option>
+          <option value="cbmpe">CBMPE · Instituto AOCP (15 a 20 linhas · 40 pts)</option>
+          <option value="pcpe">PCPE · Cebraspe / CESPE (Até 30 linhas · 30 pts)</option>
+          <option value="pmsp">PMSP / VUNESP (Até 30 linhas · 100 pts)</option>
+          <option value="enem">INEP / ENEM (8 a 30 linhas · 1000 pts)</option>
+        </select>
+      </div>
+      <div class="field full"><label for="inTema">Tema da Redação</label><input id="inTema" type="text" placeholder="Digite o tema ou escolha no Banco de Temas" maxlength="260"></div>
+      <div class="field full"><label for="inComando">Comando / Tópicos</label><input id="inComando" type="text" placeholder="Opcional: recorte específico ou tópicos exigidos pela proposta" maxlength="400"></div>
+    </div>
+
+    <div class="toolbar no-print">
+      <button type="button" class="btn btn-light btn-sm" id="btnRandom">🎲 Sortear tema da banca</button>
+      <button type="button" class="btn btn-light btn-sm" data-go="temas">📚 Banco de temas</button>
+      <button type="button" class="btn btn-light btn-sm" data-go="repertorio">🏛️ Consultar Repertório</button>
+      <select id="timerPreset" aria-label="Duração do simulado" class="field" style="width:auto;margin:0;padding:6px 12px;font-size:13px">
+        <option value="0">Cronômetro livre</option>
+        <option value="30">Simulado 30 min</option>
+        <option value="45">Simulado 45 min</option>
+        <option value="60" selected>Simulado 60 min (Padrão)</option>
+        <option value="90">Simulado 90 min</option>
+      </select>
+      <span class="timer" id="timer">60:00</span>
+      <button type="button" class="btn btn-green btn-sm" id="btnTimer">▶ Iniciar</button>
+      <button type="button" class="btn btn-light btn-sm" id="btnTimerReset" aria-label="Reiniciar cronômetro">↺</button>
+    </div>
+
+    <!-- FOLHA PAUTADA -->
+    <div class="editor-container">
+      <div class="gutter" id="gutter"></div>
+      <textarea class="essay" id="essay" aria-label="Texto da redação" spellcheck="true" placeholder="Escreva aqui sua redação dissertativo-argumentativa. Estruture introdução (com tese), desenvolvimento (com repertório explicado e conectado ao tema) e conclusão..."></textarea>
+    </div>
+
+    <div class="meter">
+      <span class="pill" id="pWords">0 palavras</span>
+      <span class="pill" id="pPar">0 parágrafos</span>
+      <span class="pill" id="pLines">≈ 0 / 20 linhas (15 a 20 linhas)</span>
+      <span class="pill" id="pSave">Rascunho vazio</span>
+    </div>
+    <div class="bar"><i id="barLines"></i></div>
+    <small style="color:var(--muted)" id="linesRuleTip">Extensão na folha (PMPE · Instituto AOCP): 15 a 20 linhas. Estimativa combinada de linhas manuscritas (≈ 11 palavras / 68 caracteres por linha).</small>
+
+    <div class="toolbar no-print" style="margin-top:18px;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div class="toolbar" style="margin:0">
+        <button type="button" class="btn btn-light btn-sm" id="btnCopy">📋 Copiar texto</button>
+        <button type="button" class="btn btn-light btn-sm" id="btnClear">🗑️ Limpar folha</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <div class="ai-status-pill" id="aiStatusPill" title="Avaliação via Inteligência Artificial com cascata multi-modelo automática">
+          <span class="ai-pulse-dot"></span>
+          <span id="aiStatusText">IA Multi-Modelo: <b>Gemini Pro/Flash ➔ OpenAI ➔ Motor Local</b></span>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnEval">📝 Avaliar Redação & Gerar Relatório (Seções A–I)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADO DA CORREÇÃO COMPLETA (SEÇÕES A–I) -->
+  <div id="resultado"></div>
+</div></section>
+
+<!-- ================= CRITÉRIOS POR BANCA ================= -->
+<section class="view" id="v-criterios"><div class="wrap">
+  <h1 class="page-title">Critérios Documentados da <span>Banca Organizadora</span></h1>
+  <p class="page-sub">Rubricas independentes e versionadas. Conheça os pesos, limites, fórmulas e condições de anulação de cada certame.</p>
+
+  <div class="chips" id="criteriaChips">
+    <button type="button" class="chipbtn on" data-target-tab="pmpe">PMPE (Instituto AOCP)</button>
+    <button type="button" class="chipbtn" data-target-tab="pcpe">PCPE (CESPE/Cebraspe)</button>
+    <button type="button" class="chipbtn" data-target-tab="cbmpe">CBMPE (Instituto AOCP)</button>
+    <button type="button" class="chipbtn" data-target-tab="pmsp">PMSP (VUNESP)</button>
+    <button type="button" class="chipbtn" data-target-tab="enem">ENEM (INEP)</button>
+  </div>
+
+  <div id="criteriaContentBox"></div>
+</div></section>
+
+<!-- ================= AULAS & MÉTODO PDFS ================= -->
+<section class="view" id="v-aulas"><div class="wrap">
+  <h1 class="page-title">Método dos PDFs | <span>Pensar para Argumentar</span></h1>
+  <p class="page-sub">Conteúdo pedagógico integral das 3 aulas: raciocínio filosófico e socrático, os 6 tipos de desenvolvimento com exemplos práticos e as 5 maneiras de concluir o texto dissertativo.</p>
+
+  <div class="pdf-tab-nav">
+    <button type="button" class="pdf-tab-btn active" data-pdf="pensar">🧠 Aula 1: Pensar para Argumentar (Filosofia & Método)</button>
+    <button type="button" class="pdf-tab-btn" data-pdf="desenv">⚖️ Aula 2: Desenvolvimento & Tipos de Argumento</button>
+    <button type="button" class="pdf-tab-btn" data-pdf="concl">🏁 Aula 3: Conclusão no Texto Dissertativo</button>
+  </div>
+
+  <!-- MÓDULO 1: PENSAR PARA ARGUMENTAR -->
+  <div class="pdf-module active" id="pdf-pensar">
+    <div class="grid g2" style="margin-bottom:20px">
+      <div class="card" style="border-left:5px solid var(--th-primary)">
+        <h3>🏛️ A Filosofia no Pensamento Argumentativo</h3>
+        <p>A filosofia não é mera teoria abstrata: ela é a ferramenta para enxergar a verdade, compreender dilemas sociais e estruturar argumentos consistentes.</p>
+        <ul class="list" style="margin-top:10px">
+          <li><b>Enxergar a existência:</b> Compreender melhor a vida e as relações humanas.</li>
+          <li><b>Entender dilemas sociais:</b> Perceber a raiz dos problemas cotidianos e institucionais.</li>
+          <li><b>Refletir racionalmente:</b> Trocar achismos por análise lógica fundamentada.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-left:5px solid var(--gold)">
+        <h3>✍️ Antes de escrever bem, pense bem!</h3>
+        <p><i>"A clareza do texto nasce antes da primeira palavra, nasce no pensamento."</i></p>
+        <p style="margin-top:8px">Um texto gramaticalmente correto pode ser fraco se as ideias estiverem confusas. Escrever bem é organizar pensamentos, não apenas usar vocabulário rebuscado.</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">🔍 O Método Socrático: Questione Tudo</h2>
+    <div class="grid g3">
+      <div class="card">
+        <h4>1. A Afirmação Inicial</h4>
+        <p>Exemplo: <i>"A internet prejudicou o pensamento das pessoas."</i> — Soa convincente até ser questionada.</p>
+      </div>
+      <div class="card">
+        <h4>2. As Perguntas Essenciais</h4>
+        <p>Sempre? Em que condições? O que significa "prejudicar"? Quem é mais afetado?</p>
+      </div>
+      <div class="card">
+        <h4>3. Refinar para Convencer</h4>
+        <p>Qual a contraposição? Como reformular a tese para torná-la precisa, defensável e consistente?</p>
+      </div>
+    </div>
+
+    <h2 class="section-title">🕯️ A Alegoria da Caverna de Platão: Leitura Contemporânea</h2>
+    <div class="card" style="margin-bottom:20px">
+      <p>Prisioneiros acorrentados veem apenas sombras projetadas e as tomam como a única realidade. Ao saírem para a luz, sentem desconforto; ao voltarem, sofrem resistência dos que preferem a ignorância confortável.</p>
+      <div class="grid g3" style="margin-top:16px">
+        <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
+          <b style="color:var(--red)">📱 Desinformação:</b> Representações falsas tomadas como verdades absolutas — as sombras do século XXI.
+        </div>
+        <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
+          <b style="color:#0284c7">🌐 Redes Sociais:</b> Ambientes algorítmicos que limitam e distorcem a percepção do mundo real.
+        </div>
+        <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
+          <b style="color:var(--green)">🎓 Educação:</b> A verdadeira saída da caverna: ampliação da consciência crítica e emancipação cidadã.
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">🌉 O Método "Referência → Ponte → O que ela Prova"</h2>
+    <div class="card" style="background:var(--th-card-highlight);border:2px solid var(--th-card-border)">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+        <span class="badge badge-gold">REGRA DE OURO DOS REPERTÓRIOS</span>
+        <b>Citar um filósofo não basta. A referência precisa trabalhar para a sua tese!</b>
+      </div>
+      <div class="grid g2">
+        <div class="card" style="border-left:4px solid var(--red)">
+          <b style="color:var(--red)">❌ Erro Comum (Uso Decorativo):</b>
+          <p>Citar Platão ou Hobbes e passar imediatamente para outro assunto sem explicar o conceito e sem vinculá-lo ao problema do tema.</p>
+        </div>
+        <div class="card" style="border-left:4px solid var(--green)">
+          <b style="color:var(--green)">✅ Uso Produtivo (Nota Máxima):</b>
+          <p>Explicar o conceito do autor, estabelecer a ponte direta com o tema proposto e demonstrar o que ele comprova na realidade brasileira.</p>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">🪜 Anatomia do Raciocínio Argumentativo (5 Passos)</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
+      <div class="step-card"><div class="step-num">1</div><div><b>Afirmação:</b><br><small>O que estou defendendo?</small></div></div>
+      <div class="step-card"><div class="step-num">2</div><div><b>Razão:</b><br><small>Por que acredito nisso?</small></div></div>
+      <div class="step-card"><div class="step-num">3</div><div><b>Fundamentação:</b><br><small>O que sustenta essa razão?</small></div></div>
+      <div class="step-card"><div class="step-num">4</div><div><b>Explicação:</b><br><small>Por que essa evidência é relevante?</small></div></div>
+      <div class="step-card"><div class="step-num">5</div><div><b>Inferência:</b><br><small>O que posso concluir disso?</small></div></div>
+    </div>
+
+    <h2 class="section-title">🎯 O Verbo Muda o Grau de Certeza</h2>
+    <div class="card">
+      <table style="width:100%;border-collapse:collapse">
+        <thead>
+          <tr style="text-align:left;border-bottom:2px solid var(--line)"><th style="padding:10px">Tipo</th><th style="padding:10px">Exemplo</th><th style="padding:10px">Efeito no Avaliador</th></tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--line)"><td style="padding:10px"><b>Categórico</b></td><td style="padding:10px"><i>"A inteligência artificial prejudica o aprendizado."</i></td><td style="padding:10px">Afirmação absoluta, exige prova sólida.</td></tr>
+          <tr style="border-bottom:1px solid var(--line)"><td style="padding:10px"><b>Cauteloso</b></td><td style="padding:10px"><i>"A inteligência artificial <u>pode prejudicar</u> o aprendizado."</i></td><td style="padding:10px">Abre espaço para nuances, condições e maturidade argumentativa.</td></tr>
+          <tr><td style="padding:10px"><b>Necessidade</b></td><td style="padding:10px"><i>"O Estado <u>deve</u> buscar soluções."</i></td><td style="padding:10px">Indica obrigação institucional, imperativo ético ou legal.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MÓDULO 2: DESENVOLVIMENTO & TIPOS DE ARGUMENTO -->
+  <div class="pdf-module" id="pdf-desenv">
+    <div class="card" style="margin-bottom:20px;border-left:5px solid var(--th-primary)">
+      <h3>O Coração da Redação Dissertativo-Argumentativa</h3>
+      <p>Se a introdução situa o tema e apresenta a tese, <b>o desenvolvimento é a própria defesa desse ponto de vista</b>. É a parte responsável por demonstrar ao avaliador que sua tese é fundamentada.</p>
+      <div class="notice notice-crimson" style="margin-top:14px;margin-bottom:0">
+        <b>⚠️ Erro nº 1: Opinar sem provar!</b> Lembre-se: opinião solta não é argumento. É indispensável fundamentar suas afirmações com dados, fatos históricos, normas ou raciocínios lógicos.
+      </div>
+    </div>
+
+    <h2 class="section-title">📚 Os 6 Tipos de Argumento (Com Exemplos Práticos do PDF)</h2>
+    <div class="grid g2">
+      <div class="card">
+        <span class="badge" style="background:#e0e7ff;color:#4338ca">1. Comparação</span>
+        <h4 style="margin:8px 0">Confronto entre Realidades</h4>
+        <p>Estabelece confronto entre duas realidades distintas no tempo, espaço ou características, demonstrando perspectivas comparadas.</p>
+        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
+          <b>Exemplo do PDF:</b> <i>"Numa lista de 82 países pesquisados pela ICAP em Washington, a lei seca brasileira com limite de 2 decigramas é mais rígida que 63 nações, iguala-se a 5 e é mais tolerante que 13..."</i>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge" style="background:#fef3c7;color:#b45309">2. Alusão Histórica</span>
+        <h4 style="margin:8px 0">O Poder da Ponte Temporal</h4>
+        <p>Retoma acontecimentos do passado para explicar a gênese e os contornos dos problemas contemporâneos.</p>
+        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
+          <b>Exemplo do PDF:</b> <i>"Há exatos 150 anos, na Sociedade Lineana de Londres, naturalistas anunciavam a teoria de evolução da seleção natural de Darwin e Wallace, alterando o modo de compreender a variedade de vida..."</i>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge" style="background:#dcfce7;color:#15803d">3. Provas Concretas</span>
+        <h4 style="margin:8px 0">Dados Estatísticos e Fatos Objetivos</h4>
+        <p>Apresentação de pesquisas, relatórios oficiais e cifras comprovadas. São argumentos objetivos de alta densidade informativa.</p>
+        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
+          <b>Exemplo do PDF:</b> <i>"Segundo a Cepal, estudo realizado na América Latina mostrou que o Brasil gasta 17% com os 20% mais pobres e 27% com os 20% mais ricos em educação, demonstrando a má distribuição..."</i>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge" style="background:#fee2e2;color:#b91c1c">4. Argumentos Consensuais</span>
+        <h4 style="margin:8px 0">Verdades Socialmente Aceitas</h4>
+        <p>Afirmações que representam valores universais da sociedade (ex: todo ser humano precisa de saúde e segurança).</p>
+        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
+          <b>Atenção do PDF:</b> Usar apenas argumentos consensuais empobrece a redação. É vital combiná-los com provas concretas ou autoridade!
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge" style="background:#f3e8ff;color:#7e22ce">5. Autoridade ou Exemplo</span>
+        <h4 style="margin:8px 0">Citação de Especialistas</h4>
+        <p>Apresenta a perspectiva ou estudos de cientistas, juristas, filósofos e pensadores reconhecidos, em discurso direto ou indireto.</p>
+        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
+          <b>Exemplo do PDF:</b> <i>"Montaigne, em seus Ensaios, reflete sobre a intimidade sem reservas na amizade, lançando luz sobre o individualismo da sociedade ocidental contemporânea..."</i>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge" style="background:#ccfbf1;color:#0f766e">6. Argumentos de Presença</span>
+        <h4 style="margin:8px 0">Ilustração e Narrativas de Impacto</h4>
+        <p>Ilustra com exemplos concretos ou analogias a tese defendida, tornando o texto claro e aproximando o leitor do contexto fático.</p>
+        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
+          <b>Exemplo do PDF:</b> <i>"Nossas avós casavam-se aos 15 anos e procriavam sem estranheza, revelando como os contextos culturais redefinem comportamentos sociais ao longo das décadas."</i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MÓDULO 3: CONCLUSÃO NO TEXTO DISSERTATIVO -->
+  <div class="pdf-module" id="pdf-concl">
+    <div class="grid g2" style="margin-bottom:20px">
+      <div class="card" style="border-left:5px solid var(--green)">
+        <h3>A Estrutura Básica da Conclusão (4 Elementos)</h3>
+        <ol class="list" style="margin-top:10px">
+          <li><b>Conectivo Conclusivo:</b> <i>Portanto, Desse modo, Assim sendo, Em suma.</i></li>
+          <li><b>Retomada da Tese:</b> Reafirme o ponto de vista sem copiar literalmente a introdução.</li>
+          <li><b>Síntese dos Argumentos:</b> Resumo conciso dos eixos desenvolvidos.</li>
+          <li><b>Fechamento / Proposta:</b> Desfecho analítico ou proposta de intervenção detalhada.</li>
+        </ol>
+      </div>
+
+      <div class="card" style="border-left:5px solid var(--red)">
+        <h3>🚫 7 Erros Capitais na Conclusão</h3>
+        <ul class="list" style="margin-top:10px;font-size:13.5px">
+          <li><b>1. Apresentar argumento novo:</b> Lugar de argumento novo é no desenvolvimento.</li>
+          <li><b>2. Copiar a introdução:</b> Repetição literal demonstra pobreza vocabular.</li>
+          <li><b>3. Terminar de forma abrupta:</b> O texto necessita de fechamento estruturado.</li>
+          <li><b>4. Frases vagas e clichês:</b> "Cada um deve fazer sua parte" enfraquece o desfecho.</li>
+          <li><b>5. Contradizer a tese:</b> Jamais invalide seu posicionamento no último parágrafo.</li>
+          <li><b>6. Citação desconexa:</b> Inserir pensador sem relação com o fechamento.</li>
+          <li><b>7. Pergunta aberta sem resposta:</b> Demonstra hesitação argumentativa.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2 class="section-title">5 Maneiras de Concluir Seu Texto</h2>
+    <div class="grid g3">
+      <div class="card"><b>01. Por Síntese:</b><p>Resume os aspectos abordados no desenvolvimento de forma integrada e concisa.</p></div>
+      <div class="card"><b>02. Por Agregação:</b><p>Finaliza elevando o debate para uma reflexão cidadã ou constitucional abrangente.</p></div>
+      <div class="card"><b>03. Por Proposta (Intervenção):</b><p>Apresenta ações concretas com Agente, Ação, Meio, Detalhamento e Finalidade (obrigatória no ENEM).</p></div>
+      <div class="card"><b>04. Por Pergunta Retórica:</b><p>Pergunta provocativa cuja resposta já foi demonstrada e fundamentada ao longo do texto.</p></div>
+      <div class="card"><b>05. Por Fechamento Cíclico:</b><p>Retoma o repertório ou imagem da introdução para demonstrar a superação do problema.</p></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- ================= BANCO DE TEMAS ================= -->
+<section class="view" id="v-temas"><div class="wrap">
+  <h1 class="page-title">Banco de <span>Temas por Banca & Eixo</span></h1>
+  <p class="page-sub">36 temas estruturados com enunciado, banca associada, eixo temático, problema central, comando da proposta, possíveis teses e repertórios pertinentes.</p>
+
+  <input class="search" id="tSearch" aria-label="Buscar tema" placeholder="🔎 Pesquisar tema por palavra-chave, banca (AOCP, Cebraspe, Vunesp, ENEM), filósofo ou lei...">
+  <div class="chips" id="tChips"></div>
+  <div class="grid g2" id="tGrid"></div>
+</div></section>
+
+<!-- ================= REPERTÓRIO (BIBLIOTECA AMPLA E PESQUISÁVEL) ================= -->
+<section class="view" id="v-repertorio"><div class="wrap">
+  <h1 class="page-title">Biblioteca de <span>Repertório Sociocultural</span></h1>
+  <p class="page-sub">Acervo amplo, verificável e pesquisável organizado por eixos temáticos: Filosofia, Sociologia, Constituição & Legislação, História, Educação, Saúde Pública, Meio Ambiente, Economia, Tecnologia e Segurança Pública.</p>
+
+  <input class="search" id="repSearch" aria-label="Pesquisar repertório" placeholder="🔎 Buscar por autor (Hobbes, Bauman, Freire, Milton Santos, Han...), lei, artigo da CF/88 ou tema...">
+  <div class="chips" id="repChips"></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px" id="repCountInfo"></p>
+
+  <div class="grid g2" id="repGrid"></div>
+</div></section>
+
+<!-- ================= PORTUGUÊS ================= -->
+<section class="view" id="v-portugues"><div class="wrap">
+  <h1 class="page-title">Treino de <span>Língua Portuguesa & Revisão</span></h1>
+  <p class="page-sub">Domine a microestrutura e os mecanismos coesivos: conectivos clicáveis, questões comentadas com regra e exemplo extra e exercícios gerados a partir dos erros reais das suas redações.</p>
+
+  <h2 class="section-title" style="margin-top:0">🎯 Exercícios Personalizados (Seus Erros Reais nas Redações)</h2>
+  <div class="card" id="customErrorsExercises" style="margin-bottom:26px"></div>
+
+  <div class="grid g2" style="margin-bottom:28px">
+    <div>
+      <h2 class="section-title" style="margin-top:0">🧪 Bateria Comentada de Gramática das Bancas</h2>
+      <div class="card" id="quiz"></div>
+    </div>
+    <div>
+      <h2 class="section-title" style="margin-top:0">✅ Checklist de Revisão Pré-Entrega</h2>
+      <div class="card" id="checklist"></div>
+    </div>
+  </div>
+
+  <h2 class="section-title">🔗 Conectivos de Alta Performance (Clique para Copiar)</h2>
+  <div class="grid g2" id="connGrid"></div>
+</div></section>
+
+<!-- ================= EVOLUÇÃO & HISTÓRICO ================= -->
+<section class="view" id="v-evolucao"><div class="wrap">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+    <div>
+      <h1 class="page-title" style="margin-bottom:4px">Painel de <span>Evolução & Histórico</span></h1>
+      <p class="page-sub" style="margin-bottom:0">Acompanhe sua nota por redação, média por período, evolução por critério e frequência de erros. Abra qualquer redação corrigida para consultar o relatório completo.</p>
+    </div>
+    <div class="chips" style="margin-bottom:0">
+      <button type="button" class="chipbtn on" data-hist-period="all">Todo o Período</button>
+      <button type="button" class="chipbtn" data-hist-period="30d">Últimos 30 dias</button>
+      <button type="button" class="chipbtn" data-hist-period="7d">Últimos 7 dias</button>
+    </div>
+  </div>
+
+  <div class="grid g4" id="evStats"></div>
+
+  <h2 class="section-title">📈 Curva de Desempenho por Redação</h2>
+  <div class="card" id="chartBox"></div>
+
+  <div class="grid g2" style="margin-top:24px">
+    <div class="card">
+      <h3>📊 Evolução Média por Critério (Banca Ativa)</h3>
+      <div id="critEvolutionBox" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h3>🔍 Frequência de Erros e Fragilidades</h3>
+      <div id="errorFreqBox" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <h2 class="section-title">🗂️ Histórico Completo de Redações Corrigidas</h2>
+  <div class="card" style="padding:0">
+    <div style="overflow-x:auto" id="histBox"></div>
+  </div>
+  <div style="margin-top:16px" class="no-print">
+    <button type="button" class="btn btn-light btn-sm" id="btnHistClear">🗑️ Limpar Histórico do Perfil Ativo</button>
+  </div>
+</div></section>
+</main>
+
+<!-- ================= MODAL DE SELEÇÃO DE OBJETIVO (COM LOGOTIPOS OFICIAIS <img>) ================= -->
+<div class="modal-overlay" id="targetModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <button type="button" class="modal-close-btn" id="btnCloseTargetModal" aria-label="Fechar">✕</button>
+      <h2>🎯 Diagnóstico do Aluno: Qual seu Concurso?</h2>
+      <p>Personalize a rubrica versionada da banca organizadora, a pontuação máxima, a fórmula de avaliação e a identidade institucional.</p>
+    </div>
+
+    <div class="modal-body">
+      <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">
+        SELECIONE A SUA CORPORAÇÃO OU EXAME
+      </div>
+
+      <div class="target-choice-grid">
+        <!-- OPÇÃO PMPE -->
+        <div class="target-choice-card" data-set-target="pmpe">
+          <div class="choice-logo-box">
+            <img src="4060864b87ab4736e6efeda0032a7a40.jpg" alt="Brasão PMPE" class="inst-logo-img">
+          </div>
+          <div class="choice-info">
+            <b>PMPE · Polícia Militar de Pernambuco</b>
+            <small>Rubrica Instituto AOCP · 15 a 20 linhas · 40,0 pts</small>
+          </div>
+          <span class="choice-banca-badge">AOCP</span>
+        </div>
+
+        <!-- OPÇÃO PCPE -->
+        <div class="target-choice-card" data-set-target="pcpe">
+          <div class="choice-logo-box">
+            <img src="images (1).jfif" alt="Brasão PCPE" class="inst-logo-img">
+          </div>
+          <div class="choice-info">
+            <b>PCPE · Polícia Civil de Pernambuco</b>
+            <small>Rubrica CESPE / CEBRASPE · Até 30 linhas · 30,00 pts</small>
+          </div>
+          <span class="choice-banca-badge" style="background:#ca8a04;color:#000">CEBRASPE</span>
+        </div>
+
+        <!-- OPÇÃO CBMPE -->
+        <div class="target-choice-card" data-set-target="cbmpe">
+          <div class="choice-logo-box">
+            <img src="logo_cbmpe.png" alt="Brasão CBMPE" class="inst-logo-img">
+          </div>
+          <div class="choice-info">
+            <b>CBMPE · Corpo de Bombeiros Militar de PE</b>
+            <small>Rubrica Instituto AOCP · 15 a 20 linhas · 40,0 pts</small>
+          </div>
+          <span class="choice-banca-badge" style="background:#b91c1c;color:#fff">AOCP</span>
+        </div>
+
+        <!-- OPÇÃO PMSP -->
+        <div class="target-choice-card" data-set-target="pmsp">
+          <div class="choice-logo-box">
+            <img src="Logo_PMESP.jpg" alt="Brasão PMSP" class="inst-logo-img">
+          </div>
+          <div class="choice-info">
+            <b>PMSP · Polícia Militar de São Paulo (VUNESP)</b>
+            <small>Rubrica Fundação VUNESP · Até 30 linhas · 100 pts</small>
+          </div>
+          <span class="choice-banca-badge" style="background:#1e3a8a;color:#fff">VUNESP</span>
+        </div>
+
+        <!-- OPÇÃO ENEM -->
+        <div class="target-choice-card" data-set-target="enem">
+          <div class="choice-logo-box">
+            <img src="images.png" alt="Logotipo ENEM" class="inst-logo-img">
+          </div>
+          <div class="choice-info">
+            <b>ENEM · Exame Nacional do Ensino Médio</b>
+            <small>Matriz INEP / ENEM · 8 a 30 linhas · 1000 pts</small>
+          </div>
+          <span class="choice-banca-badge" style="background:#6366f1;color:#fff">INEP</span>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;display:flex;justify-content:flex-end">
+        <button type="button" class="btn btn-primary" id="btnConfirmTarget">Confirmar Escolha e Ir para a Folha ➔</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE AUDITORIA E TESTES AUTOMATIZADOS (SEÇÃO 13) ================= -->
+<div class="modal-overlay" id="testModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <button type="button" class="modal-close-btn" id="btnCloseTestsModal" aria-label="Fechar">✕</button>
+      <h2>🧪 Suíte de Testes Obrigatórios & Auditoria de Qualidade</h2>
+      <p>Verificação automatizada em tempo real de navegação, contagem de métricas, cronômetro, cálculos de cada rubrica, validação de notas, logotipos e proteção XSS.</p>
+    </div>
+    <div class="modal-body" id="testModalBody"></div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE AUTENTICAÇÃO COM CONTA GOOGLE ================= -->
+<div class="modal-overlay" id="googleAuthModal">
+  <div class="modal-card" style="max-width:560px">
+    <div class="modal-header" style="background:linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%)">
+      <button type="button" class="modal-close-btn" id="btnCloseGoogleModal" aria-label="Fechar">✕</button>
+      <h2>👤 Acesso do Aluno & Login com Google</h2>
+      <p>Sincronize permanentemente seus temas, redações, notas de simulados e histórico na sua conta Google.</p>
+    </div>
+    <div class="modal-body" style="padding:24px">
+      <!-- AVISO DE PRIMEIRO LOGIN VS RETORNO -->
+      <div id="googleAuthStatusNotice" class="notice notice-blue" style="margin-bottom:18px">
+        <b>💡 Reconhecimento Automático:</b> Se for seu primeiro acesso, sua conta será cadastrada automaticamente. Se for aluno recorrente, todas as suas redações anteriores e assuntos salvos serão restaurados imediatamente!
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px;align-items:center;margin:16px 0">
+        <!-- BOTÃO OFICIAL GOOGLE GIS -->
+        <div id="googleGsiBtnContainer" style="min-height:44px;display:flex;justify-content:center"></div>
+
+        <div style="display:flex;align-items:center;gap:10px;width:100%;color:var(--muted);font-size:12px">
+          <div style="flex:1;height:1px;background:var(--line)"></div>
+          <span>OU ENTRE COM SUA CONTA GOOGLE DIRETAMENTE</span>
+          <div style="flex:1;height:1px;background:var(--line)"></div>
+        </div>
+
+        <!-- FORMULÁRIO RÁPIDO DE CONTA GOOGLE -->
+        <div style="width:100%;background:#f8fafc;padding:16px;border-radius:14px;border:1px solid var(--line)">
+          <div style="margin-bottom:12px">
+            <label for="googleModalEmail" style="display:block;font-size:12px;font-weight:700;margin-bottom:4px">Seu E-mail Google (@gmail.com)</label>
+            <input type="email" id="googleModalEmail" placeholder="exemplo: seu.nome@gmail.com" class="field" style="width:100%;margin:0;padding:9px 12px;font-size:14px">
+          </div>
+          <div style="margin-bottom:14px">
+            <label for="googleModalNome" style="display:block;font-size:12px;font-weight:700;margin-bottom:4px">Seu Nome Completo</label>
+            <input type="text" id="googleModalNome" placeholder="exemplo: Maria Eduarda Silva" class="field" style="width:100%;margin:0;padding:9px 12px;font-size:14px">
+          </div>
+          <button type="button" class="btn btn-primary" id="btnConfirmGoogleLogin" style="width:100%;justify-content:center">
+            <svg style="width:16px;height:16px;margin-right:6px" viewBox="0 0 24 24"><path fill="#fff" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#fff" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#fff" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#fff" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+            Entrar com a Conta Google e Salvar Assuntos
+          </button>
+        </div>
+
+        <!-- ACESSO DEMO RÁPIDO EM 1 CLIQUE -->
+        <div style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <button type="button" class="btn btn-light btn-sm" id="btnQuickDemoGoogle" style="font-size:12px">
+            ⚡ Aluno Concurseiro (Demo Rápido)
+          </button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnSkipGoogleLogin" style="font-size:12px;color:var(--muted)">
+            Continuar como Visitante (Offline)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE CONFIGURAÇÃO DE CHAVES DE IA ================= -->
+<div class="modal-overlay" id="aiConfigModal">
+  <div class="modal-card" style="max-width:580px">
+    <div class="modal-header" style="background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%)">
+      <button type="button" class="modal-close-btn" id="btnCloseAiModal" aria-label="Fechar">✕</button>
+      <h2>⚙️ Configuração de Chaves de IA</h2>
+      <p>Configure sua chave da Google Gemini ou OpenAI para ativar a cascata de IA com fallback automático.</p>
+    </div>
+    <div class="modal-body" style="padding:22px">
+      <div class="notice notice-blue" style="margin-bottom:16px;font-size:13px">
+        <b>🤖 Onde a chave é salva?</b> Ao clicar em Salvar, a chave é gravada automaticamente no arquivo <b><code>.env</code></b> na raiz do seu projeto e no seu navegador. Nenhuma chave é compartilhada externamente.
+      </div>
+
+      <div style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <label for="aiKeyGemini" style="font-size:13px;font-weight:700">Chave Google Gemini API (Recomendado)</label>
+          <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="font-size:11.5px;color:var(--th-primary);font-weight:700">Obter chave grátis ↗</a>
+        </div>
+        <input type="password" id="aiKeyGemini" placeholder="Cole aqui sua chave (ex: AIzaSy...)" class="field" style="width:100%;margin:0;padding:10px 12px;font-size:13.5px;font-family:monospace">
+        <small style="color:var(--muted);font-size:11.5px">Aciona sequencialmente: Gemini 2.5 Pro ➔ 2.5 Flash ➔ 2.0 Flash ➔ 1.5 Pro</small>
+      </div>
+
+      <div style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <label for="aiKeyOpenai" style="font-size:13px;font-weight:700">Chave OpenAI API (Opcional - Fallback)</label>
+          <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style="font-size:11.5px;color:var(--th-primary);font-weight:700">Obter chave OpenAI ↗</a>
+        </div>
+        <input type="password" id="aiKeyOpenai" placeholder="Cole aqui sua chave OpenAI (ex: sk-...)" class="field" style="width:100%;margin:0;padding:10px 12px;font-size:13.5px;font-family:monospace">
+        <small style="color:var(--muted);font-size:11.5px">Modelos de contingência: GPT-4o e GPT-4o-mini</small>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button type="button" class="btn btn-light btn-sm" id="btnCancelAiModal">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btnSaveAiKeys">💾 Salvar e Ativar Cascata de IA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer><div class="wrap">
+  <b>Redação Aprovada 2.0 | Concursos Públicos & ENEM</b> · Plataforma profissional de correção contextual e estudo orientado por rubricas.<br>
+  Critérios documentados para Instituto AOCP (PMPE/CBMPE), Cebraspe (PCPE), Vunesp (PMSP) e INEP (ENEM).
+</div></footer>
+
+<div id="toast"></div>
+
+<script src="dados-pedagogicos.js"></script>
+<script src="motor-correcao.js"></script>
+<script src="tests.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
