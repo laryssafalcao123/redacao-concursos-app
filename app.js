@@ -2270,9 +2270,11 @@ function inicializarApp(){
     if(typeof google !== 'undefined' && google.accounts && google.accounts.id){
       try {
         const c = $('#googleGsiBtnContainer');
-        if(c){
+        const customClientId = store.get('google_client_id') || (typeof window !== 'undefined' && window.GOOGLE_CLIENT_ID);
+        // Só inicializa o popup do Google se houver um Client ID real do Google configurado (evita erro 401: invalid_client)
+        if(c && customClientId && !customClientId.includes('mockredacao')){
           google.accounts.id.initialize({
-            client_id: '1088484920482-mockredacao.apps.googleusercontent.com',
+            client_id: customClientId,
             callback: global.handleGoogleCredentialResponse,
             auto_select: false
           });
@@ -2284,6 +2286,10 @@ function inicializarApp(){
             logo_alignment: 'left',
             width: 280
           });
+        } else if(c){
+          c.style.display = 'none';
+          const sep = $('#googleGsiSeparator');
+          if(sep) sep.style.display = 'none';
         }
       } catch(err){
         console.warn('[GSI] Erro ao renderizar botão oficial Google:', err.message);
