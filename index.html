@@ -266,6 +266,113 @@ nav button.active {
 }
 .btn-logout-google:hover { color: #ef4444; background: rgba(255,255,255,0.1); }
 
+/* CONTROLE DE COTA / CRÉDITOS SAAS B2B CURSINHO */
+.creditos-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff; padding: 5px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 700; transition: all 0.2s ease;
+  cursor: pointer; user-select: none;
+}
+.creditos-pill:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: #fde047;
+  transform: translateY(-1px);
+}
+.creditos-pill .creditos-icon { font-size: 13px; color: #fde047; }
+.creditos-pill.esgotado {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #f87171;
+  color: #fef2f2;
+}
+.creditos-pill.esgotado .creditos-icon { color: #f87171; }
+.creditos-pill.baixo {
+  background: rgba(245, 158, 11, 0.3);
+  border-color: #fde68a;
+  color: #fef3c7;
+}
+
+/* FEEDBACK VISUAL DE CARREGAMENTO PROFISSIONAL (B2B SAAS) */
+.avaliacao-loading-card {
+  border-left: 5px solid var(--th-primary);
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+  margin-top: 20px;
+  border: 1px solid var(--line);
+  animation: rise 0.3s ease;
+}
+.loading-pulsing-orb {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: var(--th-card-highlight, #f0fdf4);
+  border: 1px solid var(--th-primary, #15803d);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0;
+  animation: pulseOrb 2s infinite ease-in-out;
+}
+@keyframes pulseOrb {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(21, 128, 61, 0.2); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(21, 128, 61, 0); }
+}
+.loading-progress-track {
+  width: 100%; height: 8px; background: #e2e8f0;
+  border-radius: 999px; overflow: hidden; margin: 16px 0 18px;
+}
+.loading-progress-bar {
+  height: 100%; width: 33%;
+  background: linear-gradient(90deg, var(--th-primary, #15803d), #3b82f6);
+  border-radius: 999px;
+  transition: width 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  background-size: 30px 30px;
+  background-image: linear-gradient(45deg, rgba(255,255,255,.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.2) 50%, rgba(255,255,255,.2) 75%, transparent 75%, transparent);
+  animation: progressStripes 1s linear infinite;
+}
+@keyframes progressStripes {
+  from { background-position: 30px 0; }
+  to { background-position: 0 0; }
+}
+.loading-steps-grid {
+  display: grid; gap: 10px; margin-bottom: 16px;
+}
+.loading-step-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; border-radius: 10px;
+  border: 1px solid var(--line, #e2e8f0);
+  background: #ffffff; transition: all 0.3s ease;
+  font-size: 13.5px;
+}
+.loading-step-item.active {
+  border-color: var(--th-primary, #15803d);
+  background: var(--th-card-highlight, #f0fdf4);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.loading-step-item.done {
+  border-color: #22c55e;
+  background: #f0fdf4;
+}
+.loading-step-item .step-icon { font-size: 18px; }
+.loading-step-item .step-text { flex: 1; display: flex; flex-direction: column; }
+.loading-step-item .step-text small { color: var(--muted, #64748b); font-size: 11.5px; }
+.loading-step-item .step-status {
+  font-size: 11.5px; font-weight: 700;
+  color: var(--muted, #64748b);
+}
+.loading-step-item.active .step-status { color: var(--th-primary, #15803d); }
+.loading-step-item.done .step-status { color: #16a34a; }
+.loading-footer-tip {
+  padding: 10px 14px; border-radius: 8px;
+  background: #eff6ff; border: 1px solid #bfdbfe;
+  color: #1e40af; font-size: 12.5px; line-height: 1.5;
+}
+.loading-spinner {
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%; border-top-color: #fff;
+  animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle;
+}
+
 /* STATUS E CASCATA DE IA */
 .ai-status-pill {
   display: inline-flex; align-items: center; gap: 7px;
@@ -712,10 +819,12 @@ footer b { color: #fff; }
 .glau-pill-legend:hover {
   transform: translateY(-1px);
 }
-.legend-erro { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.legend-erro, .legend-gramatica { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
 .legend-coesao { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-.legend-rep { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
-.legend-ok { background: #dcfce7; color: #166534; border-color: #86efac; }
+.legend-repeticao { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; }
+.legend-rep, .legend-argumentacao { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
+.legend-ok, .legend-acerto { background: #dcfce7; color: #166534; border-color: #86efac; }
+.legend-all { background: #f1f5f9; color: #334155; border-color: #cbd5e1; }
 
 .glau-split-view {
   display: grid;
@@ -731,12 +840,42 @@ footer b { color: #fff; }
   max-height: 720px;
   overflow-y: auto;
   box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+  position: relative;
 }
 .glau-reader {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   font-size: 15.5px;
   line-height: 2.15;
   color: #1e293b;
+}
+.glau-paragraph-wrapper {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 22px;
+  align-items: flex-start;
+}
+.glau-line-gutter {
+  display: flex;
+  flex-direction: column;
+  user-select: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  padding-top: 4px;
+  line-height: 2.15;
+  text-align: right;
+  min-width: 28px;
+  border-right: 2px solid #e2e8f0;
+  padding-right: 10px;
+}
+.glau-par-text {
+  flex: 1;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15.5px;
+  line-height: 2.15;
+  color: #1e293b;
+  position: relative;
 }
 .glau-paragraph {
   margin-bottom: 20px;
@@ -779,25 +918,69 @@ footer b { color: #fff; }
   z-index: 2;
   position: relative;
 }
-.glau-mark-erro {
-  background: #fee2e2;
+.glau-mark-erro, .glau-mark-gramatica {
+  background: rgba(239, 68, 68, 0.14);
   color: #991b1b;
   border-bottom: 2.5px solid #ef4444;
 }
 .glau-mark-coesao {
-  background: #fef3c7;
+  background: rgba(245, 158, 11, 0.16);
   color: #92400e;
   border-bottom: 2.5px solid #f59e0b;
 }
-.glau-mark-rep {
-  background: #e0f2fe;
-  color: #0369a1;
-  border-bottom: 2.5px solid #0284c7;
+.glau-mark-repeticao {
+  background: rgba(168, 85, 247, 0.16);
+  color: #6b21a8;
+  border-bottom: 2.5px solid #a855f7;
 }
-.glau-mark-ok {
-  background: #dcfce7;
+.glau-mark-rep, .glau-mark-argumentacao {
+  background: rgba(59, 130, 246, 0.16);
+  color: #1e40af;
+  border-bottom: 2.5px solid #3b82f6;
+}
+.glau-mark-ok, .glau-mark-acerto {
+  background: rgba(34, 197, 94, 0.16);
   color: #166534;
-  border-bottom: 2.5px solid #10b981;
+  border-bottom: 2.5px solid #22c55e;
+}
+.glau-mark-resolvido {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+  border-bottom: 2.5px solid #16a34a !important;
+}
+
+.btn-aplicar-correcao {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12.5px;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-aplicar-correcao:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+}
+
+.glau-floating-popover {
+  position: absolute;
+  z-index: 1000;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 16px;
+  width: 330px;
+  box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.22), 0 4px 10px -2px rgba(15, 23, 42, 0.1);
+  display: none;
+}
+.glau-floating-popover.active {
+  display: block;
 }
 
 /* PAINEL DE INSPEÇÃO INTERATIVO (COLUNA DIREITA) */
@@ -847,6 +1030,23 @@ footer b { color: #fff; }
   margin-top: 18px;
   padding-top: 14px;
   border-top: 1px solid var(--line);
+}
+
+/* ================= OCR FORENSE DE FOLHA MANUSCRITA ================= */
+.ocr-dropzone:hover, .ocr-dropzone.dragover {
+  border-color: var(--th-primary) !important;
+  background: #f0fdf4 !important;
+}
+.ocr-split-view {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 768px) {
+  .ocr-split-view {
+    grid-template-columns: 1fr !important;
+  }
 }
 
 /* ================= RESPONSIVIDADE TOTAL (MOBILE, TABLET E DESKTOP) ================= */
@@ -1229,11 +1429,184 @@ html, body {
   background: #f1f5f9;
 }
 
+/* =====================================================================
+   PAINEL DO GESTOR / PROFESSOR (B2B CURSINHOS)
+   ===================================================================== */
+.prof-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+  border-radius: 18px;
+  padding: 24px 28px;
+  color: #ffffff;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.4);
+}
+.prof-hero-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.prof-badge-b2b {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(253, 224, 71, 0.2);
+  border: 1px solid #fde047;
+  color: #fde047;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.prof-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+.prof-select-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.prof-select {
+  border: 1.5px solid var(--line);
+  background: #f8fafc;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 13.5px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.prof-select:focus {
+  border-color: var(--th-primary);
+  background: #ffffff;
+}
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+@media (max-width: 900px) {
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 550px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+}
+.kpi-card {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+.kpi-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--kpi-bar, var(--th-primary));
+}
+.kpi-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.kpi-value {
+  font-size: 27px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.kpi-sub {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.prof-ranking-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.prof-ranking-table th {
+  background: #0f172a;
+  color: #ffffff;
+  padding: 12px 14px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  text-align: left;
+}
+.prof-ranking-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.prof-ranking-table tr:hover td {
+  background: #f8fafc;
+}
+.prof-crit-bar-track {
+  width: 100%;
+  height: 9px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+.prof-crit-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.prof-recom-box {
+  background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+  border: 1.5px solid #facc15;
+  border-radius: 12px;
+  padding: 16px 18px;
+  color: #713f12;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
 @media print {
   body.print-result > *:not(main), body.print-result .topbar, body.print-result footer,
   body.print-result .no-print, body.print-result .view:not(#v-escrever),
   body.print-result .sheet { display: none !important; }
   body.print-result #resultado { display: block !important; margin-top: 0 !important; }
+  body.print-prof > *:not(main), body.print-prof .topbar, body.print-prof footer,
+  body.print-prof .no-print, body.print-prof .view:not(#v-professor),
+  body.print-prof .prof-controls-bar, body.print-prof #btnVoltarVisaoAluno { display: none !important; }
+  body.print-prof #v-professor { display: block !important; }
 }
 </style>
 </head>
@@ -1258,8 +1631,21 @@ html, body {
         <span id="topbarPillName">Instituto AOCP</span>
         <span style="opacity:0.75;font-size:11px">🔄 Trocar</span>
       </button>
+
+      <!-- BADGE DE CRÉDITOS DA SEMANA (B2B SAAS CURSINHO) -->
+      <div id="creditosContainer" class="creditos-pill" role="button" tabindex="0" title="Cota semanal do cursinho: clique para ver seus créditos">
+        <span class="creditos-icon">⚡</span>
+        <span id="creditosTexto">Créditos: <b>5/5</b> disponíveis</span>
+      </div>
+
+      <!-- BOTÃO DE DESTAQUE B2B: VISÃO DO PROFESSOR -->
+      <button type="button" class="btn btn-warning btn-sm" id="btnNavProfessor" style="font-size:12px;font-weight:800;background:#fde047;color:#0f172a;border:none;padding:5px 12px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px" title="Alternar para o Painel do Gestor / Professor (B2B)">
+        <span>👨‍🏫</span> <span>Visão do Professor</span>
+      </button>
+
       <div id="googleAuthBox" style="display:inline-flex;align-items:center;gap:6px"></div>
       <select id="profileSelect" class="profile-select" aria-label="Selecionar perfil de aluno" style="display:none"></select>
+      <span id="adminBadge" class="badge" style="display:none;background:#7c3aed;color:#fff;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px">🛠️ Admin Cursinho</span>
       <button type="button" class="btn btn-light btn-sm" id="btnOpenAiConfig" title="Configurar Chaves de API das IAs (Google Gemini / OpenAI)" style="display:none !important">⚙️ Chaves de IA</button>
       <button type="button" class="btn btn-light btn-sm" id="btnOpenTests" title="Suíte de Testes Obrigatórios e Auditoria de Qualidade" style="display:none !important">🧪 Testes</button>
     </div>
@@ -1272,6 +1658,7 @@ html, body {
       <button type="button" data-go="repertorio">Repertório</button>
       <button type="button" data-go="portugues">Português</button>
       <button type="button" data-go="evolucao">Evolução</button>
+      <button type="button" data-go="professor" class="nav-btn-professor" style="background:rgba(253,224,71,0.18);border:1px solid #fde047;color:#fde047;font-weight:700">👨‍🏫 Visão do Professor</button>
     </nav>
   </div>
 </header>
@@ -1394,6 +1781,7 @@ html, body {
       <button type="button" class="btn btn-light btn-sm" id="btnRandom">🎲 Sortear tema da banca</button>
       <button type="button" class="btn btn-light btn-sm" data-go="temas">📚 Banco de temas</button>
       <button type="button" class="btn btn-light btn-sm" data-go="repertorio">🏛️ Consultar Repertório</button>
+      <button type="button" class="btn btn-warning btn-sm" id="btnOcrUpload" style="background:#fef08a;color:#713f12;font-weight:700;border:1px solid #facc15" title="Enviar foto da folha manuscrita para transcrição automática por IA">📸 Enviar Foto do Manuscrito (OCR)</button>
       <select id="timerPreset" aria-label="Duração do simulado" class="field" style="width:auto;margin:0;padding:6px 12px;font-size:13px">
         <option value="0">Cronômetro livre</option>
         <option value="30">Simulado 30 min</option>
@@ -1531,6 +1919,124 @@ html, body {
   </div>
   <div style="margin-top:16px" class="no-print">
     <button type="button" class="btn btn-light btn-sm" id="btnHistClear">🗑️ Limpar Histórico do Perfil Ativo</button>
+  </div>
+</div></section>
+
+<!-- ================= PAINEL DO GESTOR / PROFESSOR (B2B CURSINHOS) ================= -->
+<section class="view" id="v-professor"><div class="wrap">
+  <div class="prof-hero">
+    <div class="prof-hero-header">
+      <div>
+        <span class="prof-badge-b2b">🎓 Módulo B2B · Gestão Pedagógica de Turmas</span>
+        <h1 style="font-size:26px;font-weight:800;margin:6px 0 2px;color:#fff">Painel do Gestor & Professor</h1>
+        <p style="font-size:13.5px;color:#cbd5e1;margin:0">Acompanhamento analítico de turmas, diagnóstico de fragilidades por banca examinadora e ranking de redações.</p>
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary" id="btnVoltarVisaoAluno" style="background:#fde047;color:#0f172a;font-weight:800;border:none">
+          ✍️ Voltar para Visão do Aluno
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BARRA DE CONTROLES E FILTROS -->
+  <div class="prof-controls-bar">
+    <div class="prof-select-group">
+      <label for="profTurmaSelect" style="font-size:12px;font-weight:700;color:var(--muted)">TURMA / EDITAL:</label>
+      <select id="profTurmaSelect" class="prof-select">
+        <option value="pmpe">Turma PMPE (Instituto AOCP - 40 pts)</option>
+        <option value="pcpe">Turma PCPE (Cebraspe - 30 pts)</option>
+        <option value="pppe">Turma PPPE (Cebraspe - 10 pts)</option>
+        <option value="cbmpe">Turma CBMPE (Instituto AOCP - 40 pts)</option>
+        <option value="pmsp">Turma PMSP (Fundação VUNESP - 100 pts)</option>
+      </select>
+
+      <label for="profPeriodoSelect" style="font-size:12px;font-weight:700;color:var(--muted);margin-left:8px">PERÍODO:</label>
+      <select id="profPeriodoSelect" class="prof-select">
+        <option value="7d">Últimos 7 dias</option>
+        <option value="30d">Últimos 30 dias</option>
+        <option value="all">Geral (Todo o Período)</option>
+      </select>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button type="button" class="btn btn-light btn-sm" id="btnProfExportCsv" style="font-size:12px;font-weight:700">
+        📥 Exportar Planilha (CSV)
+      </button>
+      <button type="button" class="btn btn-light btn-sm" id="btnProfExportPdf" style="font-size:12px;font-weight:700">
+        🖨️ Imprimir / PDF
+      </button>
+    </div>
+  </div>
+
+  <!-- CARDS DE METRICAS (KPIS) -->
+  <div class="kpi-grid" id="profKpisGrid">
+    <!-- Renderizado dinamicamente via JS -->
+  </div>
+
+  <!-- DIAGNÓSTICO PEDAGÓGICO: 2 COLUNAS -->
+  <div class="grid g2" style="margin-bottom:24px">
+    <!-- ONDE A TURMA MAIS PERDE PONTOS (BARRAS POR CRITÉRIO) -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h3 style="margin:0;font-size:16px;display:flex;align-items:center;gap:6px">
+          <span>📉</span> <span>Onde a sua turma mais perde pontos</span>
+        </h3>
+        <span class="badge" id="profCritBancaBadge" style="font-size:11px">AOCP</span>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Aproveitamento médio dos critérios cobrados pela banca no edital selecionado:</p>
+      <div id="profCritBarsContainer">
+        <!-- Barras por critério -->
+      </div>
+    </div>
+
+    <!-- TOP 5 ERROS GRAMATICAIS E RECOMENDAÇÃO PEDAGÓGICA -->
+    <div class="card">
+      <h3 style="margin:0 0 8px;font-size:16px;display:flex;align-items:center;gap:6px">
+        <span>⚠️</span> <span>Top 5 Erros Mais Frequentes da Turma</span>
+      </h3>
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Fragilidades gramaticais e desvios microestruturais recorrentes detectados pela IA:</p>
+      <div id="profErrosListContainer">
+        <!-- Lista de 5 erros -->
+      </div>
+
+      <div class="prof-recom-box" id="profRecomBox">
+        <!-- Recomendação para próxima aula -->
+      </div>
+    </div>
+  </div>
+
+  <!-- TABELA DE GESTÃO E RANKING DE ALUNOS -->
+  <div class="card" style="padding:0;overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:#f8fafc">
+      <div>
+        <h3 style="margin:0;font-size:16.5px">🏆 Ranking e Gestão Individual dos Alunos</h3>
+        <small style="color:var(--muted)">Desempenho individual, evolução temporal e auditoria de redações</small>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <input type="text" id="profAlunoSearch" placeholder="🔍 Buscar aluno por nome..." class="field" style="margin:0;padding:7px 12px;font-size:13px;width:220px">
+      </div>
+    </div>
+
+    <div style="overflow-x:auto">
+      <table class="prof-ranking-table">
+        <thead>
+          <tr>
+            <th style="width:60px;text-align:center">Pos.</th>
+            <th>Nome do Aluno</th>
+            <th>Concurso Foco</th>
+            <th style="text-align:center">Redações</th>
+            <th style="text-align:center">Última Nota</th>
+            <th style="text-align:center">Evolução</th>
+            <th style="text-align:center">Status</th>
+            <th style="text-align:center">Ação</th>
+          </tr>
+        </thead>
+        <tbody id="profRankingTableBody">
+          <!-- Linhas renderizadas dinamicamente -->
+        </tbody>
+      </table>
+    </div>
   </div>
 </div></section>
 </main>
@@ -1684,6 +2190,51 @@ html, body {
   </div>
 </div>
 
+<!-- ================= MODAL DE CRÉDITOS & COTA SEMANAL B2B ================= -->
+<div class="modal-overlay" id="creditosModal">
+  <div class="modal-card" style="max-width:540px">
+    <div class="modal-header" style="background:linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #15803d 100%)">
+      <button type="button" class="modal-close-btn" id="btnCloseCreditosModal" aria-label="Fechar">✕</button>
+      <h2>⚡ Cota Semanal de Correções</h2>
+      <p>Plano Cursinho Parceiro · Avaliação com Inteligência Artificial Especializada</p>
+    </div>
+    <div class="modal-body" style="padding:22px">
+      <div id="creditosModalStatusCard" style="background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
+        <div style="font-size:32px;font-weight:800;color:var(--th-primary);margin-bottom:4px" id="modalCreditosDestaque">5 / 5</div>
+        <div style="font-size:13.5px;font-weight:700;color:#334155" id="modalCreditosSub">correções disponíveis nesta semana</div>
+        <div class="loading-progress-track" style="margin:12px auto 6px;max-width:320px;height:10px">
+          <div id="modalCreditosBarra" style="height:100%;width:100%;background:var(--th-primary);border-radius:999px;transition:0.4s"></div>
+        </div>
+      </div>
+
+      <div class="notice notice-blue" style="font-size:13px;margin-bottom:14px;line-height:1.5">
+        <b>🏢 Como funciona a cota do cursinho?</b><br>
+        Cada aluno matriculado recebe <b>5 correções semanais completas</b> com geração integral do Relatório A–I, espelho oficial da banca examinadora e análise de repertório.
+      </div>
+
+      <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
+        • <b>Renovação Periódica:</b> Seus créditos renovam automaticamente toda <b>segunda-feira às 00h00</b>.<br>
+        • <b>Proteção de Qualidade:</b> Garante que o motor de IA mantenha dedicação analítica profunda a cada redação enviada.<br>
+        • <b>Precisa de mais envios?</b> Caso esteja em reta final de preparação ou simulado intensivo, solicite créditos adicionais diretamente com a <b>Coordenação Pedagógica / Secretaria do seu cursinho parceiro</b>.
+      </div>
+
+      <!-- PAINEL SUPER ADMIN (VISÍVEL APENAS COM ?admin=true) -->
+      <div id="adminCreditosPanel" style="display:none;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;padding:12px;margin-bottom:14px">
+        <b style="color:#6d28d9;font-size:12.5px">🛠️ Controles de Super Admin (Cursinho):</b>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button type="button" class="btn btn-sm btn-light" id="btnAdminAddCredits" style="font-size:11.5px">+5 Créditos</button>
+          <button type="button" class="btn btn-sm btn-light" id="btnAdminUnlimitedCredits" style="font-size:11.5px">♾️ Modo Ilimitado (99)</button>
+          <button type="button" class="btn btn-sm btn-light" id="btnAdminResetCredits" style="font-size:11.5px">🔄 Resetar Padrão (5/5)</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end">
+        <button type="button" class="btn btn-primary btn-sm" id="btnEntendidoCreditos">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ================= MODAL DE CONFIGURAÇÃO DE CHAVES DE IA ================= -->
 <div class="modal-overlay" id="aiConfigModal">
   <div class="modal-card" style="max-width:580px">
@@ -1718,6 +2269,151 @@ html, body {
       <div style="display:flex;justify-content:flex-end;gap:10px">
         <button type="button" class="btn btn-light btn-sm" id="btnCancelAiModal">Cancelar</button>
         <button type="button" class="btn btn-primary" id="btnSaveAiKeys">💾 Salvar e Ativar Cascata de IA</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE AUDITORIA DO PROFESSOR (RELATÓRIO A-I DO ALUNO) ================= -->
+<div class="modal-overlay" id="professorAuditoriaModal">
+  <div class="modal-card" style="max-width:880px;max-height:92vh;overflow-y:auto">
+    <div class="modal-header" style="background:linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #312e81 100%)">
+      <button type="button" class="modal-close-btn" id="btnCloseAuditoriaModal" aria-label="Fechar">✕</button>
+      <h2 id="auditoriaModalTitle" style="color:#fff">📄 Auditoria Pedagógica de Redação</h2>
+      <p id="auditoriaModalSub" style="color:#cbd5e1">Espelho oficial de correção e feedback do aluno para a banca examinadora</p>
+    </div>
+    <div class="modal-body" id="auditoriaModalBody" style="padding:22px">
+      <!-- Conteúdo detalhado injetado via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL DE ENVIO POR FOTO (OCR DE FOLHA MANUSCRITA) ================= -->
+<div class="modal-overlay" id="ocrModal">
+  <div class="modal-card" style="max-width:940px;max-height:92vh;overflow-y:auto">
+    <div class="modal-header" style="background:linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #0284c7 100%)">
+      <button type="button" class="modal-close-btn" id="btnCloseOcrModal" aria-label="Fechar">✕</button>
+      <h2 style="color:#fff;display:flex;align-items:center;gap:8px">
+        <span>📸</span> <span>Envio de Redação por Foto (OCR Forense)</span>
+      </h2>
+      <p style="color:#cbd5e1">Transcreva sua redação escrita à mão no papel com IA multimodal e fidelidade absoluta aos seus erros</p>
+    </div>
+    <div class="modal-body" style="padding:22px">
+      <!-- ETAPA 1: CAPTURA E UPLOAD -->
+      <div id="ocrStepUpload">
+        <!-- GUIA RÁPIDO DE BOAS PRÁTICAS -->
+        <div class="notice notice-blue" style="margin-bottom:18px;font-size:13px;line-height:1.6">
+          <b style="color:#1e3a8a;font-size:13.5px">📋 Guia Rápido para uma Transcrição 100% Precisa:</b>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-top:8px">
+            <div>💡 <b>Ilumine bem a folha:</b> Evite sombras de mãos ou celular.</div>
+            <div>📐 <b>Enquadre as margens:</b> Capture da margem esquerda à direita.</div>
+            <div>☀️ <b>Folha reta e plana:</b> Mantenha todas as linhas pautadas visíveis.</div>
+            <div>🔍 <b>Nitidez:</b> Certifique-se de que o texto não esteja borrado.</div>
+          </div>
+        </div>
+
+        <input type="file" id="ocrFileInput" accept="image/jpeg,image/png,image/webp" capture="environment" style="display:none">
+
+        <!-- DROP ZONE -->
+        <div id="ocrDropZone" class="ocr-dropzone" style="border:2px dashed #94a3b8;border-radius:14px;padding:34px 20px;text-align:center;background:#f8fafc;cursor:pointer;transition:border-color 0.2s, background 0.2s">
+          <div style="font-size:42px;margin-bottom:10px">📷</div>
+          <b style="font-size:16px;color:#0f172a;display:block;margin-bottom:4px">Clique aqui ou arraste a foto da folha manuscrita</b>
+          <p style="font-size:13px;color:var(--muted);margin:0 0 14px">Suporta fotos da câmera do celular (JPEG, PNG, WebP até 15MB)</p>
+          <button type="button" class="btn btn-primary" id="btnSelectOcrFile">
+            📸 Tirar Foto com a Câmera ou Escolher Arquivo
+          </button>
+        </div>
+
+        <!-- PREVIEW DA IMAGEM CARREGADA -->
+        <div id="ocrPreviewContainer" style="display:none;margin-top:18px;background:#f1f5f9;border-radius:14px;padding:16px;border:1px solid #cbd5e1">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+            <span style="font-weight:700;font-size:13.5px;color:#0f172a">🖼️ Prévia da Foto Enquadrada:</span>
+            <div style="display:flex;gap:8px">
+              <button type="button" class="btn btn-light btn-sm" id="btnRotateOcr">🔄 Girar 90°</button>
+              <button type="button" class="btn btn-light btn-sm" id="btnChangeOcrImg">Trocar Imagem</button>
+            </div>
+          </div>
+
+          <div style="text-align:center;max-height:360px;overflow:hidden;border-radius:10px;background:#000;display:flex;align-items:center;justify-content:center">
+            <img id="ocrImgPreview" src="" alt="Foto da Redação" style="max-height:360px;max-width:100%;object-fit:contain;transition:transform 0.3s">
+          </div>
+
+          <div style="margin-top:16px;display:flex;justify-content:flex-end">
+            <button type="button" class="btn btn-primary" id="btnProcessOcr" style="font-size:14px;padding:10px 22px;background:linear-gradient(135deg, #0284c7 0%, #1e3a8a 100%)">
+              🚀 Transcrever Redação com IA Forense ➔
+            </button>
+          </div>
+        </div>
+
+        <!-- FEEDBACK DE CARREGAMENTO -->
+        <div id="ocrLoadingState" style="display:none;text-align:center;padding:36px 20px">
+          <div class="loading-orb" style="margin:0 auto 16px"></div>
+          <b style="font-size:16px;color:#0f172a;display:block;margin-bottom:6px" id="ocrLoadingTitle">Processando Imagem com Gemini Vision...</b>
+          <p style="font-size:13px;color:var(--muted);max-width:440px;margin:0 auto" id="ocrLoadingSub">
+            Identificando linhas pautadas, transcrevendo grafia exata sem corrigir erros e calculando legibilidade...
+          </p>
+        </div>
+      </div>
+
+      <!-- ETAPA 2: REVISÃO HUMANA LADO A LADO -->
+      <div id="ocrStepReview" style="display:none">
+        <div class="ocr-split-view">
+          <!-- COLUNA ESQUERDA: FOTO COM CONTROLES DE ZOOM -->
+          <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:14px;padding:14px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase">📸 Foto Original da Folha</span>
+              <div style="display:flex;gap:4px">
+                <button type="button" class="btn btn-light btn-sm" id="btnZoomInOcr" style="padding:2px 8px;font-size:12px" title="Aumentar zoom">🔍+</button>
+                <button type="button" class="btn btn-light btn-sm" id="btnZoomOutOcr" style="padding:2px 8px;font-size:12px" title="Diminuir zoom">🔍-</button>
+                <button type="button" class="btn btn-light btn-sm" id="btnZoomResetOcr" style="padding:2px 8px;font-size:12px" title="Resetar zoom">↺</button>
+              </div>
+            </div>
+            <div id="ocrReviewImgBox" style="max-height:480px;overflow:auto;border-radius:8px;background:#0f172a;text-align:center;padding:8px">
+              <img id="ocrReviewImg" src="" alt="Manuscrito" style="max-width:100%;transition:transform 0.2s;transform-origin:top center">
+            </div>
+          </div>
+
+          <!-- COLUNA DIREITA: TEXTO TRANSCRITO EDITÁVEL E DADOS EXTRAÍDOS -->
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:12.5px;font-weight:700;color:var(--muted);text-transform:uppercase">✍️ Texto Transcrito (Editável)</span>
+              <span class="badge" style="background:#dcfce7;color:#166534;font-size:11px">Fidelidade Forense 100%</span>
+            </div>
+
+            <!-- ALERTA DE PALAVRAS DUVIDOSAS -->
+            <div id="ocrDubiousBox" style="display:none;background:#fefce8;border:1px solid #facc15;border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:12.5px;color:#713f12">
+              <b>⚠️ Palavras de difícil leitura identificadas pela caligrafia:</b>
+              <div id="ocrDubiousChips" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px"></div>
+            </div>
+
+            <textarea id="ocrTextareaReview" class="field" style="width:100%;height:220px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.75;padding:12px;border-radius:10px;background:#ffffff;margin-bottom:12px;resize:vertical"></textarea>
+
+            <!-- CARDS DE DADOS EXTRAÍDOS DA FOLHA FÍSICA -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+              <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 12px">
+                <div style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase">📏 Linhas Reais na Folha</div>
+                <div style="font-size:20px;font-weight:800;color:#0f172a" id="ocrLinhasReaisVal">--</div>
+                <small id="ocrLinhasStatus" style="font-size:11px;color:#15803d;font-weight:600">Validado com o edital</small>
+              </div>
+
+              <div style="background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px 12px">
+                <div style="font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase">✍️ Caligrafia & Margens</div>
+                <div style="font-size:20px;font-weight:800;color:#0f172a" id="ocrCaligrafiaVal">--</div>
+                <small id="ocrRasurasStatus" style="font-size:11px;color:var(--muted)">0 rasuras detectadas</small>
+              </div>
+            </div>
+
+            <div id="ocrComentarioCaligrafiaBox" style="font-size:12px;color:var(--muted);background:#f1f5f9;padding:8px 12px;border-radius:8px;margin-bottom:16px;line-height:1.5">
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+              <button type="button" class="btn btn-light btn-sm" id="btnBackToUpload">← Enviar Outra Imagem</button>
+              <button type="button" class="btn btn-primary" id="btnConfirmOcr" style="font-weight:800;background:linear-gradient(135deg, #15803d 0%, #166534 100%)">
+                ✅ Confirmar Transcrição e Inserir na Folha ➔
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

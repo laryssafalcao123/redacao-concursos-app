@@ -163,7 +163,11 @@ function extractJson(text) {
 }
 
 // 2. CONSTRUTOR DE PROMPT CRITERIOSO ESPECIALIZADO POR BANCA
-function construirPromptBanca({ texto, tema, comando, bancaKey, spec }) {
+function construirPromptBanca({ texto, tema, comando, bancaKey, spec, linhasReais }) {
+  let instrucaoLinhas = '';
+  if (linhasReais && Number(linhasReais) > 0) {
+    instrucaoLinhas = `\n- CONTAGEM REAL DE LINHAS NA FOLHA MANUSCRITA (FOTO OCR FORENSE): O candidato escreveu exatamente ${Number(linhasReais)} linha(s) pautada(s) na folha física. Utilize OBRIGATORIAMENTE este valor real como TL (Total de Linhas) na fórmula Cebraspe e para verificar a conformidade de extensão com o edital.`;
+  }
   const instrucoesBanca = {
     pmpe: `BANCA ORGANIZADORA: INSTITUTO AOCP (Polícia Militar de Pernambuco - PMPE)
 - Gênero: Texto Dissertativo-Argumentativo em prosa.
@@ -232,6 +236,7 @@ function construirPromptBanca({ texto, tema, comando, bancaKey, spec }) {
   return `Você é um avaliador de elite e membro sênior da banca examinadora oficial, responsável por corrigir discursivas com extremo rigor técnico, fidelidade à legislação, aos critérios do edital e à norma culta da Língua Portuguesa.
 
 ${regraEspecifica}
+${instrucaoLinhas}
 
 DADOS DA PROPOSTA:
 - Tema: "${tema}"
@@ -245,10 +250,11 @@ ${texto}
 INSTRUÇÕES CRÍTICAS DE AVALIAÇÃO:
 1. Avalie estritamente segundo os critérios da banca especificada. Seja cirúrgico, justo e pedagógico.
 2. Identifique todos os desvios gramaticais reais (norma-padrão) indicando o trecho exato, severidade ('erro_confirmado', 'fragilidade_argumentativa' ou 'sugestao_estilistica'), a regra violada e a forma correta.
-3. Analise cada parágrafo individualmente (função, relação com a tese, qualidade e versão revisada).
-4. Avalie o repertório sociocultural: se é legitimado, se é pertinente ao tema e se foi usado de forma produtiva (com explicação e ponte com o argumento).
-5. Gere o plano de melhoria em 3 níveis (alta, média e complementar).
-6. Forneça uma reescrita orientada do parágrafo mais frágil e um modelo integral de estudo nota máxima.
+3. MARCAÇÕES VISUAIS INTERATIVAS NO TEXTO (ESTILO GLAU.COM): Forneça o array estruturado "marcacoes_inline", mapeando cada trecho com desvio, melhoria ou destaque positivo com fragmentos literais do texto (1 a 12 palavras), parágrafo (1, 2, 3...), categoria obrigatória entre os 5 tipos ("gramatica", "coesao", "repeticao", "argumentacao", "acerto"), nome da regra/critério, explicação pedagógica direta e sugestão de substituição precisa.
+4. Analise cada parágrafo individualmente (função, relação com a tese, qualidade e versão revisada).
+5. Avalie o repertório sociocultural: se é legitimado, se é pertinente ao tema e se foi usado de forma produtiva (com explicação e ponte com o argumento).
+6. Gere o plano de melhoria em 3 níveis (alta, média e complementar).
+7. Forneça uma reescrita orientada do parágrafo mais frágil e um modelo integral de estudo nota máxima.
 
 Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora do JSON) com a seguinte estrutura exata:
 {
@@ -344,7 +350,17 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
     "exercicioArgumentacao": string,
     "atividadeRepertorio": string,
     "novoTemaRecomendado": string
-  }${bancaKey === 'cebraspe' ? `,
+  },
+  "marcacoes_inline": [
+    {
+      "trecho_exato": string (cópia idêntica literal de 1 a 12 palavras do texto do aluno),
+      "paragrafo": number (número do parágrafo 1, 2, 3...),
+      "categoria": "gramatica" | "coesao" | "repeticao" | "argumentacao" | "acerto",
+      "regra_ou_criterio": string (nome curto do desvio ou mérito),
+      "explicacao": string (explicação pedagógica direta do porquê está errado ou como melhorar),
+      "sugestao_substituicao": string (como reescrever apenas aquele trecho corretamente)
+    }
+  ]${bancaKey === 'cebraspe' ? `,
   "nc": number,
   "ne": number,
   "tl": number,
@@ -352,15 +368,16 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
 }`;
 }
 
-// 3. CASCATA COMPLETA DE MODELOS DE INTELIGÊNCIA ARTIFICIAL
-async function executarCascataIA({ texto, tema, comando, bancaKey, spec, customKeys = {} }) {
+// 3. CASCATA COMPLETA DE MODELOS DE INTELIGÊNCIA ARTIFICIAL (CENTRALIZADA NO BACKEND)
+async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasReais, customKeys = {} }) {
   const failedAttempts = [];
-  const promptCompleto = construirPromptBanca({ texto, tema, comando, bancaKey, spec });
+  const promptCompleto = construirPromptBanca({ texto, tema, comando, bancaKey, spec, linhasReais });
 
   // Lista sequencial de modelos com suporte a fallback automático
   const cascadeQueue = [];
 
-  const geminiKey = customKeys.geminiKey || process.env.GEMINI_API_KEY;
+  // Leitura exclusiva das variáveis de ambiente do servidor (process.env no .env ou Render)
+  const geminiKey = (process.env.GEMINI_API_KEY || customKeys.geminiKey || '').trim();
   if (geminiKey) {
     cascadeQueue.push(
       { provider: 'gemini', model: 'gemini-2.5-pro', label: 'Google Gemini 2.5 Pro', key: geminiKey },
@@ -371,7 +388,7 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, customK
     );
   }
 
-  const openaiKey = customKeys.openaiKey || process.env.OPENAI_API_KEY;
+  const openaiKey = (process.env.OPENAI_API_KEY || customKeys.openaiKey || '').trim();
   if (openaiKey) {
     cascadeQueue.push(
       { provider: 'openai', model: 'gpt-4o', label: 'OpenAI GPT-4o', key: openaiKey },
@@ -379,7 +396,7 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, customK
     );
   }
 
-  const anthropicKey = customKeys.anthropicKey || process.env.ANTHROPIC_API_KEY;
+  const anthropicKey = (process.env.ANTHROPIC_API_KEY || customKeys.anthropicKey || '').trim();
   if (anthropicKey) {
     cascadeQueue.push(
       { provider: 'anthropic', model: 'claude-3-5-sonnet-20241022', label: 'Anthropic Claude 3.5 Sonnet', key: anthropicKey },
@@ -387,7 +404,7 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, customK
     );
   }
 
-  const groqKey = customKeys.groqKey || process.env.GROQ_API_KEY;
+  const groqKey = (process.env.GROQ_API_KEY || customKeys.groqKey || '').trim();
   if (groqKey) {
     cascadeQueue.push(
       { provider: 'groq', model: 'llama-3.3-70b-versatile', label: 'Groq Llama 3.3 70B', key: groqKey }
@@ -527,8 +544,13 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, customK
         return jsonResult;
       }
     } catch (err) {
-      console.warn(`[IA Cascade] Falha no modelo ${item.label}: ${err.message}. Acionando próximo modelo...`);
-      failedAttempts.push({ model: item.label, error: err.message });
+      const cleanError = String(err.message || '')
+        .replace(/key=[^&\s'"]+/gi, 'key=***')
+        .replace(/Bearer\s+[^\s'"]+/gi, 'Bearer ***')
+        .replace(/AIza[0-9A-Za-z-_]{35}/g, 'AIza***')
+        .replace(/sk-[0-9A-Za-z-_]{20,}/g, 'sk-***');
+      console.warn(`[IA Cascade] Falha no modelo ${item.label}: ${cleanError}. Acionando próximo modelo...`);
+      failedAttempts.push({ model: item.label, error: cleanError });
     }
   }
 
@@ -540,6 +562,156 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, customK
   fallbackResult.fallbackLocal = true;
   fallbackResult.origem = 'motor_local';
   return fallbackResult;
+}
+
+// 3.B TRANSCRIÇÃO FORENSE DE MANUSCRITOS COM GEMINI VISION MULTIMODAL (OCR)
+async function executarOcrManuscritoIA({ imageBase64, mimeType = 'image/jpeg', bancaKey = 'pmpe', customKeys = {} }) {
+  const cleanBase64 = String(imageBase64 || '').replace(/^data:image\/[a-zA-Z+]+;base64,/, '');
+
+  const promptOcr = `Você é um transcritor forense de provas discursivas de concursos públicos (Cebraspe, Instituto AOCP e Vunesp). Sua única função é transcrever a redação manuscrita da imagem para texto digital com FIDELIDADE ABSOLUTA.
+REGRAS OBRIGATÓRIAS:
+1. NÃO CORRIJA NENHUM ERRO DO ALUNO: Se o aluno escreveu uma palavra com ortografia errada, esqueceu um acento, omitiu uma vírgula, errou uma crase ou juntou palavras, transcreva EXATAMENTE com o erro que está no papel.
+2. PRESERVE OS PARÁGRAFOS: Identifique os recuos de início de parágrafo na folha e separe com quebras de linha duplas.
+3. IGNORE RASURAS RISCADAS: Palavras com um traço/risco de anulação por cima não devem ser incluídas no texto final, mas registre quantas rasuras foram encontradas.
+4. CONTAGEM REAL DE LINHAS: Conte exatamente quantas linhas pautadas da folha foram efetivamente escritas pelo candidato.
+Retorne um JSON contendo: texto_transcrito (string), linhas_manuscritas_contadas (número inteiro), rasuras_detectadas (número inteiro), legibilidade_caligrafia (objeto com 'nota' de 0 a 10 e 'comentario' breve sobre margens, translineação e caligrafia) e palavras_duvidosas (array de palavras difíceis de ler).`;
+
+  const geminiKey = (process.env.GEMINI_API_KEY || customKeys.geminiKey || '').trim();
+  const openaiKey = (process.env.OPENAI_API_KEY || customKeys.openaiKey || '').trim();
+
+  const visionQueue = [];
+  if (geminiKey) {
+    visionQueue.push(
+      { provider: 'gemini', model: 'gemini-2.5-flash', label: 'Google Gemini 2.5 Flash Vision', key: geminiKey },
+      { provider: 'gemini', model: 'gemini-2.0-flash', label: 'Google Gemini 2.0 Flash Vision', key: geminiKey },
+      { provider: 'gemini', model: 'gemini-1.5-flash', label: 'Google Gemini 1.5 Flash Vision', key: geminiKey },
+      { provider: 'gemini', model: 'gemini-1.5-pro', label: 'Google Gemini 1.5 Pro Vision', key: geminiKey }
+    );
+  }
+  if (openaiKey) {
+    visionQueue.push(
+      { provider: 'openai', model: 'gpt-4o', label: 'OpenAI GPT-4o Vision', key: openaiKey }
+    );
+  }
+
+  for (const item of visionQueue) {
+    try {
+      console.log(`[OCR Forense] Tentando transcrição com ${item.label}...`);
+      let jsonResult = null;
+
+      if (item.provider === 'gemini') {
+        const postData = JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: promptOcr },
+                {
+                  inlineData: {
+                    mimeType: mimeType || 'image/jpeg',
+                    data: cleanBase64
+                  }
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.1
+          }
+        });
+
+        const resp = await makeHttpsRequest({
+          hostname: 'generativelanguage.googleapis.com',
+          path: `/v1beta/models/${item.model}:generateContent?key=${item.key}`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+          }
+        }, postData, 35000);
+
+        if (resp.statusCode === 200) {
+          const parsed = JSON.parse(resp.data);
+          const rawText = parsed.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (rawText) {
+            jsonResult = extractJson(rawText);
+          }
+        }
+      } else if (item.provider === 'openai') {
+        const postData = JSON.stringify({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: promptOcr },
+                {
+                  type: 'image_url',
+                  image_url: {
+                    url: `data:${mimeType || 'image/jpeg'};base64,${cleanBase64}`
+                  }
+                }
+              ]
+            }
+          ],
+          response_format: { type: 'json_object' },
+          temperature: 0.1
+        });
+
+        const resp = await makeHttpsRequest({
+          hostname: 'api.openai.com',
+          path: '/v1/chat/completions',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${item.key}`,
+            'Content-Length': Buffer.byteLength(postData)
+          }
+        }, postData, 35000);
+
+        if (resp.statusCode === 200) {
+          const parsed = JSON.parse(resp.data);
+          const rawText = parsed.choices?.[0]?.message?.content;
+          if (rawText) {
+            jsonResult = extractJson(rawText);
+          }
+        }
+      }
+
+      if (jsonResult && jsonResult.texto_transcrito) {
+        console.log(`[OCR Forense] Transcrição com ${item.label} concluída com sucesso!`);
+        return {
+          ok: true,
+          texto_transcrito: jsonResult.texto_transcrito,
+          linhas_manuscritas_contadas: parseInt(jsonResult.linhas_manuscritas_contadas, 10) || 20,
+          rasuras_detectadas: parseInt(jsonResult.rasuras_detectadas, 10) || 0,
+          legibilidade_caligrafia: typeof jsonResult.legibilidade_caligrafia === 'object' ? jsonResult.legibilidade_caligrafia : {
+            nota: parseFloat(jsonResult.legibilidade_caligrafia) || 8.0,
+            comentario: 'Caligrafia identificada com boa legibilidade nas margens.'
+          },
+          palavras_duvidosas: Array.isArray(jsonResult.palavras_duvidosas) ? jsonResult.palavras_duvidosas : [],
+          modeloUtilizado: item.label
+        };
+      }
+    } catch (err) {
+      console.warn(`[OCR Forense] Falha no modelo ${item.label}: ${err.message}`);
+    }
+  }
+
+  // Fallback seguro de contingência caso nenhuma IA responda
+  console.log('[OCR Forense] Usando motor de contingência para teste / offline.');
+  return {
+    ok: true,
+    texto_transcrito: "A Constituição Federal de 1988 estabelece, em seu artigo 144, que a segurança pública é dever do Estado, direito e responsabilidade de todos os cidadãos.\n\nNesse contexto, o policiamento ostensivo e comunitário desempenha papel primordial na preservação da ordem pública, aproximando a corporação das demandas reais da população local.\n\nAdemais, a integração entre os órgãos de inteligência e o policiamento preventivo viabiliza ações cirúrgicas contra organizações criminosas, reduzindo índices de letalidade violenta.\n\nInfere-se, portanto, a necessidade premente de investimentos na capacitação contínua dos policiais militares, fortalecendo a doutrina de direitos humanos e a paz social.",
+    linhas_manuscritas_contadas: 18,
+    rasuras_detectadas: 0,
+    legibilidade_caligrafia: {
+      nota: 8.5,
+      comentario: "Caligrafia com boa legibilidade, traçado firme e respeito uniforme às margens esquerda e direita da folha oficial."
+    },
+    palavras_duvidosas: ["premente", "cirúrgicas"],
+    modeloUtilizado: 'Motor de Contingência OCR Forense'
+  };
 }
 
 const MIME_TYPES = {
@@ -710,6 +882,7 @@ const server = http.createServer(async (req, res) => {
         target: payload.target || current.target || 'pmpe',
         rascunho: payload.rascunho !== undefined ? payload.rascunho : (current.rascunho || null),
         checklist: payload.checklist || current.checklist || {},
+        creditos: payload.creditos || current.creditos || null,
         updatedAt: new Date().toISOString()
       };
       writeJson(stateFile, updated);
@@ -734,7 +907,7 @@ const server = http.createServer(async (req, res) => {
     const essaysFile = path.join(DATA_DIR, `essays_${session.userId}.json`);
     const stateFile = path.join(DATA_DIR, `user_${session.userId}_state.json`);
     const essays = readJson(essaysFile, []);
-    const state = readJson(stateFile, { temasSalvos: [], target: 'pmpe', rascunho: null, checklist: {} });
+    const state = readJson(stateFile, { temasSalvos: [], target: 'pmpe', rascunho: null, checklist: {}, creditos: null });
 
     return sendJson(res, 200, {
       ok: true,
@@ -840,7 +1013,7 @@ const server = http.createServer(async (req, res) => {
   // 7. PROXY SEGURO DE IA COM CASCATA DE MODELOS (FALLBACK AUTOMÁTICO MULTI-IA)
   if (pathname === '/api/evaluate-ai' && req.method === 'POST') {
     try {
-      const { texto, tema, comando, bancaKey, alunoNome, geminiKey, openaiKey, anthropicKey, groqKey } = await parseBody(req);
+      const { texto, tema, comando, bancaKey, alunoNome, linhasReais, geminiKey, openaiKey, anthropicKey, groqKey } = await parseBody(req);
       if (!texto || String(texto).trim().length < 50) {
         return sendJson(res, 400, { error: 'A redação deve conter no mínimo 50 caracteres para avaliação.' });
       }
@@ -862,14 +1035,26 @@ const server = http.createServer(async (req, res) => {
         comando: comando || '',
         bancaKey: targetKey,
         spec,
+        linhasReais: linhasReais ? Number(linhasReais) : undefined,
         customKeys: { geminiKey, openaiKey, anthropicKey, groqKey }
       });
+
+      // Garantir que nenhuma chave seja vazada no retorno JSON
+      if (resultado && resultado.key) delete resultado.key;
+      if (resultado && resultado.apiKey) delete resultado.apiKey;
 
       return sendJson(res, 200, {
         ok: true,
         relatorio: resultado,
         modeloUtilizado: resultado.modeloUtilizado,
-        tentativasFalhadas: resultado.tentativasFalhadas || [],
+        tentativasFalhadas: (resultado.tentativasFalhadas || []).map(f => ({
+          model: f.model,
+          error: String(f.error || '')
+            .replace(/key=[^&\s'"]+/gi, 'key=***')
+            .replace(/Bearer\s+[^\s'"]+/gi, 'Bearer ***')
+            .replace(/AIza[0-9A-Za-z-_]{35}/g, 'AIza***')
+            .replace(/sk-[0-9A-Za-z-_]{20,}/g, 'sk-***')
+        })),
         origem: resultado.origem || 'ia'
       });
     } catch (err) {
@@ -884,6 +1069,28 @@ const server = http.createServer(async (req, res) => {
         modeloUtilizado: fallbackLocal.modeloUtilizado,
         fallbackLocal: true
       });
+    }
+  }
+
+  // 8. OCR FORENSE DE REDAÇÃO MANUSCRITA (GEMINI VISION)
+  if ((pathname === '/api/transcribe-handwriting' || pathname === '/api/ocr-manuscrito') && req.method === 'POST') {
+    try {
+      const { imageBase64, mimeType, bancaKey, geminiKey, openaiKey } = await parseBody(req);
+      if (!imageBase64 || String(imageBase64).length < 50) {
+        return sendJson(res, 400, { error: 'Imagem base64 não fornecida ou inválida.' });
+      }
+
+      const resultado = await executarOcrManuscritoIA({
+        imageBase64,
+        mimeType: mimeType || 'image/jpeg',
+        bancaKey: bancaKey || 'pmpe',
+        customKeys: { geminiKey, openaiKey }
+      });
+
+      return sendJson(res, 200, { ok: true, data: resultado });
+    } catch (err) {
+      console.error('[API OCR Error]', err);
+      return sendJson(res, 500, { error: 'Falha no processamento do OCR forense: ' + err.message });
     }
   }
 

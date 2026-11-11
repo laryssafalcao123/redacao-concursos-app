@@ -1459,45 +1459,49 @@ function validarNotasCorrecao(resultadoBruto, spec, ocorrencias){
 
 
 /* =====================================================================
-   NOVO: GERADOR DE TEXTO ANOTADO COM GRIFOS INTERATIVOS (PADRÃO GLAU.COM)
+   DETECTOR AUTOMÁTICO LOCAL DE REPETIÇÃO E TAMANHO DE PERÍODO (FALLBACK)
    ===================================================================== */
-function gerarTextoAnotadoGlau(texto, ocorrencias = [], repertorios = [], analiseParagrafos = []){
+function detectarFragilidadesLocais(texto){
+  const marcacoes = [];
   const paragrafos = String(texto || '').split(/\n+/).map(p => p.trim()).filter(Boolean);
-  const repLista = Array.isArray(repertorios) ? repertorios : (repertorios.lista || []);
+  const stopWords = new Set([
+    'mesmo', 'mesma', 'mesmos', 'mesmas', 'sobre', 'entao', 'assim', 'ainda',
+    'outro', 'outra', 'outros', 'outras', 'quando', 'quanto', 'quantos', 'quantas',
+    'como', 'entre', 'todos', 'todas', 'pelos', 'pelas', 'desta', 'deste',
+    'desses', 'dessas', 'nesses', 'nessas', 'nestes', 'nestas', 'disso', 'daquilo',
+    'porque', 'portanto', 'embora', 'enquanto', 'segundo', 'conforme', 'ademais',
+    'outrossim', 'dessarte', 'destarte', 'apenas', 'tambem', 'sempre', 'muito',
+    'muita', 'muitos', 'muitas', 'pouco', 'pouca', 'poucos', 'poucas', 'haver',
+    'fazer', 'sendo', 'estar', 'foram', 'seria', 'seriam', 'havia', 'tinham'
+  ]);
 
-  return paragrafos.map((par, pIdx) => {
+  paragrafos.forEach((par, pIdx) => {
     const numP = pIdx + 1;
-    const intervals = [];
-
-    // 1. Ocorrências gramaticais e de coesão
-    ocorrencias.forEach(o => {
-      if(o.paragrafo === numP && o.trechoOriginal){
-        const idx = par.indexOf(o.trechoOriginal);
-        if(idx !== -1){
-          const tipo = o.tipoGlau || (o.severidade === 'erro_confirmado' ? 'erro' : (o.severidade === 'fragilidade_argumentativa' ? 'coesao' : 'estilo'));
-          intervals.push({
-            start: idx,
-            end: idx + o.trechoOriginal.length,
-            tipo,
-            id: o.id || `occ_${numP}_${idx}`
-          });
-        }
+    const tokens = par.match(/[a-zA-ZÀ-ÿ]+/g) || [];
+    const freq = {};
+    tokens.forEach(tok => {
+      const lower = tok.toLowerCase();
+      if(lower.length > 4 && !stopWords.has(lower)){
+        freq[lower] = (freq[lower] || 0) + 1;
       }
     });
 
-    // 2. Citações de repertório sociocultural
-    repLista.forEach((r, rIdx) => {
-      if(r.paragrafo === numP){
-        const termos = [r.nome, r.fonte, 'Constituição', 'Artigo', 'Art.', 'Lei', 'Código', 'Hobbes', 'Platão', 'Freire', 'SUS', 'Beccaria', 'Durkheim', 'Bauman', 'Arendt', 'Weber', 'Krenak', 'Bourdieu', 'Harari', 'Piketty', 'Aristóteles', 'Locke', 'Rousseau', 'Sartre'];
-        for(const t of termos){
-          if(!t || t.length < 3) continue;
-          const idx = par.toLowerCase().indexOf(t.toLowerCase());
-          if(idx !== -1){
-            intervals.push({
-              start: idx,
-              end: idx + t.length,
-              tipo: 'rep',
-              id: `rep_${rIdx}`
+    Object.entries(freq).forEach(([palavra, count]) => {
+      if(count >= 3){
+        const regex = new RegExp('\\b(' + palavra + ')\\b', 'gi');
+        let m;
+        let c = 0;
+        while((m = regex.exec(par)) !== null){
+          c++;
+          if(c >= 2){
+            marcacoes.push({
+              id: `rep_local_${numP}_${m.index}`,
+              trecho_exato: m[1],
+              paragrafo: numP,
+              categoria: 'repeticao',
+              regra_ou_criterio: 'Eco Vocabular / Repetição Frequente',
+              explicacao: `A palavra "${m[1]}" repete-se ${count} vezes neste parágrafo. Isso empobrece o vocabulário e gera penalização na modalidade escrita da banca.`,
+              sugestao_substituicao: `Substituir por sinônimo (ex: pronome anafórico ou termo equivalente).`
             });
             break;
           }
@@ -1505,22 +1509,143 @@ function gerarTextoAnotadoGlau(texto, ocorrencias = [], repertorios = [], analis
       }
     });
 
-    // 3. Tese no primeiro parágrafo
-    if(numP === 1 && analiseParagrafos[0] && !analiseParagrafos[0].relacaoTese.includes('implícita')){
-      const sentences = par.match(/[^.!?]+[.!?]*/g) || [];
-      if(sentences.length >= 2){
-        const lastSent = sentences[sentences.length - 1].trim();
-        const sIdx = par.lastIndexOf(lastSent);
-        if(sIdx !== -1 && lastSent.length > 25){
+    const periodos = par.match(/[^.!?]+[.!?]*/g) || [];
+    periodos.forEach(periodo => {
+      const words = periodo.trim().split(/\s+/).filter(Boolean);
+      if(words.length > 45){
+        const trechoExato = words.slice(0, 8).join(' ');
+        marcacoes.push({
+          id: `long_sent_${numP}`,
+          trecho_exato: trechoExato,
+          paragrafo: numP,
+          categoria: 'coesao',
+          regra_ou_criterio: 'Período Excessivamente Longo (> 45 palavras)',
+          explicacao: `Este período contém ${words.length} palavras sem ponto final. Frases muito longas aumentam a probabilidade de truncamento sintático e perda de coesão.`,
+          sugestao_substituicao: `Dividir o período em duas orações utilizando ponto e vírgula ou conectivo.`
+        });
+      }
+    });
+  });
+
+  return marcacoes;
+}
+
+/* =====================================================================
+   NOVO: GERADOR DE TEXTO ANOTADO COM GRIFOS INTERATIVOS (PADRÃO GLAU.COM)
+   ===================================================================== */
+function gerarTextoAnotadoGlau(texto, ocorrencias = [], repertorios = [], analiseParagrafos = [], marcacoesInline = []){
+  const paragrafos = String(texto || '').split(/\n+/).map(p => p.trim()).filter(Boolean);
+  const repLista = Array.isArray(repertorios) ? repertorios : (repertorios.lista || []);
+
+  // Mesclar com detecções locais
+  const localDetections = detectarFragilidadesLocais(texto);
+  const todasMarcacoes = [...(marcacoesInline || [])];
+
+  // Se marcacoesInline veio da IA ou não, adicionar ocorrências de gramática
+  ocorrencias.forEach(o => {
+    if(o.trechoOriginal && !todasMarcacoes.some(m => m.trecho_exato === o.trechoOriginal)){
+      let cat = 'gramatica';
+      if(o.severidade === 'fragilidade_argumentativa') cat = 'coesao';
+      else if(o.severidade === 'sugestao_estilistica') cat = 'coesao';
+      todasMarcacoes.push({
+        id: o.id || `occ_${o.paragrafo}_${Math.random().toString(36).slice(2,7)}`,
+        trecho_exato: o.trechoOriginal,
+        paragrafo: o.paragrafo || 1,
+        categoria: cat,
+        regra_ou_criterio: o.categoria || o.explicacaoRegra || 'Desvio Gramatical',
+        explicacao: o.explicacaoRegra || o.diagnostico || 'Desvio identificado na norma culta.',
+        sugestao_substituicao: o.sugestaoCorrecao || ''
+      });
+    }
+  });
+
+  // Adicionar detecções locais de repetição e períodos longos
+  localDetections.forEach(ld => {
+    if(!todasMarcacoes.some(m => m.trecho_exato === ld.trecho_exato)){
+      todasMarcacoes.push(ld);
+    }
+  });
+
+  // Adicionar repertórios como 'argumentacao'
+  repLista.forEach((r, rIdx) => {
+    if(r.nome && !todasMarcacoes.some(m => m.trecho_exato === r.nome)){
+      todasMarcacoes.push({
+        id: `rep_${rIdx}`,
+        trecho_exato: r.nome,
+        paragrafo: r.paragrafo || 1,
+        categoria: 'argumentacao',
+        regra_ou_criterio: 'Repertório Sociocultural Legitimado',
+        explicacao: `Citação de ${r.nome} (${r.tipo || 'Referência Externa'}). ${r.produtivo ? 'Repertório pertinente e produtivo.' : 'Necessita maior vínculo com a tese.'}`,
+        sugestao_substituicao: r.produtivo ? 'Excelente utilização argumentativa.' : 'Articular diretamente a citação com os argumentos do parágrafo.'
+      });
+    }
+  });
+
+  // Adicionar tese como 'acerto'
+  if(analiseParagrafos[0] && !analiseParagrafos[0].relacaoTese?.includes('implícita') && paragrafos[0]){
+    const sentences = paragrafos[0].match(/[^.!?]+[.!?]*/g) || [];
+    if(sentences.length >= 2){
+      const lastSent = sentences[sentences.length - 1].trim();
+      if(lastSent.length > 25 && !todasMarcacoes.some(m => m.trecho_exato === lastSent)){
+        todasMarcacoes.push({
+          id: 'tese_p1',
+          trecho_exato: lastSent,
+          paragrafo: 1,
+          categoria: 'acerto',
+          regra_ou_criterio: 'Tese Central & Tópico Frasal',
+          explicacao: 'Tese dissertativa clara e explicitada na introdução do texto.',
+          sugestao_substituicao: 'Manter a tese dividida em núcleos argumentativos bem definidos.'
+        });
+      }
+    }
+  }
+
+  let lineCounter = 1;
+
+  return paragrafos.map((par, pIdx) => {
+    const numP = pIdx + 1;
+    const wordsInPar = par.split(/\s+/).filter(Boolean).length;
+    const linesInPar = Math.max(1, Math.round(wordsInPar / 11));
+    const startLine = lineCounter;
+    const endLine = lineCounter + linesInPar - 1;
+    lineCounter = endLine + 1;
+
+    let gutterHtml = '';
+    for(let ln = startLine; ln <= endLine; ln++){
+      gutterHtml += `<span>${String(ln).padStart(2, '0')}</span>`;
+    }
+
+    const intervals = [];
+    const parMarks = todasMarcacoes.filter(m => m.paragrafo === numP);
+
+    parMarks.forEach((m, mIdx) => {
+      if(!m.trecho_exato) return;
+      const idx = par.indexOf(m.trecho_exato);
+      if(idx !== -1){
+        intervals.push({
+          start: idx,
+          end: idx + m.trecho_exato.length,
+          categoria: m.categoria || 'gramatica',
+          id: m.id || `mark_${numP}_${mIdx}`,
+          regra: m.regra_ou_criterio || '',
+          explicacao: m.explicacao || '',
+          sugestao: m.sugestao_substituicao || ''
+        });
+      } else {
+        const lowerIdx = par.toLowerCase().indexOf(m.trecho_exato.toLowerCase());
+        if(lowerIdx !== -1){
           intervals.push({
-            start: sIdx,
-            end: sIdx + lastSent.length,
-            tipo: 'ok',
-            id: 'tese_p1'
+            start: lowerIdx,
+            end: lowerIdx + m.trecho_exato.length,
+            categoria: m.categoria || 'gramatica',
+            id: m.id || `mark_${numP}_${mIdx}`,
+            regra: m.regra_ou_criterio || '',
+            explicacao: m.explicacao || '',
+            sugestao: m.sugestao_substituicao || ''
           });
         }
       }
-    }
+    });
 
     // Ordenar decrescente para filtrar colisões
     intervals.sort((a, b) => b.start - a.start);
@@ -1542,21 +1667,31 @@ function gerarTextoAnotadoGlau(texto, ocorrencias = [], repertorios = [], analis
         pResult += esc(par.slice(cursor, inv.start));
       }
       const trecho = par.slice(inv.start, inv.end);
-      pResult += `<mark class="glau-mark glau-mark-${inv.tipo}" data-target-id="${inv.id}" tabindex="0" role="button" aria-label="Ver detalhes">${esc(trecho)}</mark>`;
+      pResult += `<mark class="glau-mark glau-mark-${inv.categoria}" data-target-id="${inv.id}" data-categoria="${inv.categoria}" data-regra="${esc(inv.regra)}" data-explicacao="${esc(inv.explicacao)}" data-sugestao="${esc(inv.sugestao)}" tabindex="0" role="button" aria-label="${esc(inv.regra || 'Marcação')}">${esc(trecho)}</mark>`;
       cursor = inv.end;
     }
     if(cursor < par.length){
       pResult += esc(par.slice(cursor));
     }
 
-    return `<p class="glau-paragraph" data-par-num="${numP}"><span class="glau-par-badge">P${numP}</span>${pResult}</p>`;
+    return `
+      <div class="glau-paragraph-wrapper" data-par-num="${numP}">
+        <div class="glau-line-gutter" title="Linhas estimadas da folha oficial">
+          ${gutterHtml}
+        </div>
+        <div class="glau-par-text">
+          <span class="glau-par-badge">§ ${numP} · Linhas ${String(startLine).padStart(2, '0')}–${String(endLine).padStart(2, '0')}</span>
+          ${pResult}
+        </div>
+      </div>
+    `;
   }).join('\n');
 }
 
 /* =====================================================================
    7. FUNÇÃO PRINCIPAL DE AVALIAÇÃO COMPLETA (13 PASSOS - SEÇÕES 4 E 5)
    ===================================================================== */
-function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
+function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = '', opcoes = {}){
   const bancaKey = global.RedacaoDados.BANCA_SPECS[bancaKeyRaw] ? bancaKeyRaw : 'pmpe';
   const spec = global.RedacaoDados.BANCA_SPECS[bancaKey];
   const texto = String(textoRaw || '').trim();
@@ -1566,16 +1701,18 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
   // Métricas físicas reais do texto
   const palavras = texto ? texto.split(/\s+/).filter(Boolean).length : 0;
   const paragrafos = texto ? texto.split(/\n+/).map(p => p.trim()).filter(Boolean) : [];
-  // Estimativa realista combinando palavras por linha (~11) e caracteres por linha (~68)
-  const linhasEstimadas = paragrafos.length
-    ? paragrafos.reduce((acc, p) => {
-        const w = p.split(/\s+/).filter(Boolean).length;
-        const c = p.length;
-        const lPorPalavras = Math.ceil(w / 11);
-        const lPorChars = Math.ceil(c / 68);
-        return acc + Math.max(1, Math.round((lPorPalavras + lPorChars) / 2));
-      }, 0)
-    : 0;
+  // Estimativa realista combinando palavras por linha (~11) e caracteres por linha (~68), ou linhas reais contadas na folha física via OCR
+  const linhasEstimadas = (opcoes && opcoes.linhasReais && Number(opcoes.linhasReais) > 0)
+    ? Math.round(Number(opcoes.linhasReais))
+    : (paragrafos.length
+        ? paragrafos.reduce((acc, p) => {
+            const w = p.split(/\s+/).filter(Boolean).length;
+            const c = p.length;
+            const lPorPalavras = Math.ceil(w / 11);
+            const lPorChars = Math.ceil(c / 68);
+            return acc + Math.max(1, Math.round((lPorPalavras + lPorChars) / 2));
+          }, 0)
+        : 0);
 
   // Etapa 4: Verificar aderência semântica ao tema
   const nucleosTema = extrairNucleosTematicos(tema, comando);
@@ -1758,6 +1895,28 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
     planoMelhoria,
     reescritaOrientada,
     proximaAtividade,
+    marcacoes_inline: (function(){
+      const local = detectarFragilidadesLocais(texto);
+      const list = [];
+      ocorrencias.forEach(o => {
+        let cat = 'gramatica';
+        if(o.severidade === 'fragilidade_argumentativa') cat = 'coesao';
+        else if(o.severidade === 'sugestao_estilistica') cat = 'coesao';
+        list.push({
+          id: o.id || `occ_${o.paragrafo}_${Math.random().toString(36).slice(2,7)}`,
+          trecho_exato: o.trechoOriginal,
+          paragrafo: o.paragrafo || 1,
+          categoria: cat,
+          regra_ou_criterio: o.categoria || o.explicacaoRegra || 'Desvio Gramatical',
+          explicacao: o.explicacaoRegra || o.diagnostico || 'Desvio identificado na norma culta.',
+          sugestao_substituicao: o.sugestaoCorrecao || ''
+        });
+      });
+      local.forEach(ld => {
+        if(!list.some(m => m.trecho_exato === ld.trecho_exato)) list.push(ld);
+      });
+      return list;
+    })(),
     textoAnotadoGlau: gerarTextoAnotadoGlau(texto, ocorrencias, repertorio, analiseParagrafos),
 
     // Compatibilidade com renderizadores e testes
@@ -1801,6 +1960,7 @@ function gerarModeloIntegralEstudo(tema, bancaKey){
 global.MotorCorrecao = {
   avaliarRedacao,
   gerarTextoAnotadoGlau,
+  detectarFragilidadesLocais,
   analisarAderenciaAoTema,
   analisarRepertorioContextual,
   analisarOcorrenciasPorSentenca,

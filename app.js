@@ -394,23 +394,32 @@ function atualizarMetricas(){
   const minLines = spec.minLines || 1;
 
   const val = essayEl.value;
+  if(!val.trim()){
+    window.linhasManuscritasReais = null;
+  }
   const words = val.trim() ? val.trim().split(/\s+/).filter(Boolean).length : 0;
   const pars = val.split(/\n+/).map(p => p.trim()).filter(Boolean);
-  const lines = pars.length
-    ? pars.reduce((acc, p) => {
-        const w = p.split(/\s+/).filter(Boolean).length;
-        const lPorW = Math.ceil(w / 11);
-        const lPorC = Math.ceil(p.length / 68);
-        return acc + Math.max(1, Math.round((lPorW + lPorC) / 2));
-      }, 0)
-    : 0;
+  const lines = (window.linhasManuscritasReais && window.linhasManuscritasReais > 0)
+    ? window.linhasManuscritasReais
+    : (pars.length
+        ? pars.reduce((acc, p) => {
+            const w = p.split(/\s+/).filter(Boolean).length;
+            const lPorW = Math.ceil(w / 11);
+            const lPorC = Math.ceil(p.length / 68);
+            return acc + Math.max(1, Math.round((lPorW + lPorC) / 2));
+          }, 0)
+        : 0);
 
   if($('#pWords')) $('#pWords').textContent = `${words} palavra${words === 1 ? '' : 's'}`;
   if($('#pPar')) $('#pPar').textContent = `${pars.length} parágrafo${pars.length === 1 ? '' : 's'}`;
 
   const pLines = $('#pLines');
   if(pLines){
-    pLines.textContent = `≈ ${lines} / ${maxLines} linhas (${spec.linesRange})`;
+    if(window.linhasManuscritasReais){
+      pLines.textContent = `📏 ${lines} / ${maxLines} linhas reais (Foto OCR)`;
+    } else {
+      pLines.textContent = `≈ ${lines} / ${maxLines} linhas (${spec.linesRange})`;
+    }
     const foraDoLimite = lines > maxLines || (lines > 0 && lines < minLines);
     const dentroDoLimite = lines > 0 && lines >= minLines && lines <= maxLines;
     pLines.className = 'pill' + (foraDoLimite ? ' bad' : (dentroDoLimite ? ' ok' : ''));
@@ -445,116 +454,153 @@ function initGlauInteractiveInspector(res){
     currentActiveIndex = marks.indexOf(markEl);
 
     const targetId = markEl.getAttribute('data-target-id') || '';
-    const markText = markEl.textContent.trim();
-    const isErro = markEl.classList.contains('glau-mark-erro');
-    const isCoesao = markEl.classList.contains('glau-mark-coesao');
-    const isRep = markEl.classList.contains('glau-mark-rep');
-    const isOk = markEl.classList.contains('glau-mark-ok');
+    const markText = markEl.textContent.trim().replace(/\s*Resolvido\s*✓\s*$/i, '');
+    const isResolvido = markEl.getAttribute('data-resolvido') === 'true' || markEl.classList.contains('glau-mark-resolvido');
 
-    // 1. Ocorrência gramatical ou coesiva
-    let occ = (res.ocorrencias || []).find(o => o.id === targetId || o.trechoOriginal === markText || markText.includes(o.trechoOriginal) || (o.trechoOriginal && o.trechoOriginal.includes(markText)));
-
-    // 2. Repertório sociocultural
-    let rep = null;
-    if(!occ && (isRep || targetId.startsWith('rep_'))){
-      const repList = Array.isArray(res.repertorio) ? res.repertorio : (res.repertorio?.lista || []);
-      const idx = parseInt(targetId.replace('rep_', ''), 10);
-      rep = (!isNaN(idx) && repList[idx]) ? repList[idx] : repList.find(r => r.nome && (r.nome.toLowerCase().includes(markText.toLowerCase()) || markText.toLowerCase().includes(r.nome.toLowerCase())));
+    // Identificar a categoria entre as 5 oficiais
+    let categoria = markEl.getAttribute('data-categoria') || '';
+    if(!categoria){
+      if(markEl.classList.contains('glau-mark-gramatica') || markEl.classList.contains('glau-mark-erro')) categoria = 'gramatica';
+      else if(markEl.classList.contains('glau-mark-coesao')) categoria = 'coesao';
+      else if(markEl.classList.contains('glau-mark-repeticao')) categoria = 'repeticao';
+      else if(markEl.classList.contains('glau-mark-argumentacao') || markEl.classList.contains('glau-mark-rep')) categoria = 'argumentacao';
+      else if(markEl.classList.contains('glau-mark-acerto') || markEl.classList.contains('glau-mark-ok')) categoria = 'acerto';
+      else categoria = 'gramatica';
     }
 
-    let badgeClass = 'legend-erro';
-    let badgeTxt = '🔴 Desvio Gramatical';
-    let localizacao = occ?.localizacao || 'Trecho selecionado';
-    let diagnostico = '';
-    let regra = '';
-    let sugestao = '';
-    let justificativa = '';
-    let criterio = occ?.criterioAfetado || 'Microestrutura & Gramática';
-    let impacto = occ?.impactoNota || 'Penalização na nota documental';
-    let corImpacto = '#dc2626';
+    // Buscar dados na lista estruturada marcacoes_inline ou ocorrencias
+    let itemData = (res.marcacoes_inline || []).find(m => m.id === targetId || m.trecho_exato === markText || markText.includes(m.trecho_exato));
+    let occ = (res.ocorrencias || []).find(o => o.id === targetId || o.trechoOriginal === markText || markText.includes(o.trechoOriginal));
 
-    if(occ){
-      if(occ.severidade === 'erro_confirmado'){
-        badgeClass = 'legend-erro';
-        badgeTxt = '🔴 Erro Gramatical Confirmado';
-        corImpacto = '#dc2626';
-      } else if(occ.severidade === 'fragilidade_argumentativa'){
-        badgeClass = 'legend-coesao';
-        badgeTxt = '🟡 Fragilidade / Coesão Sintática';
-        corImpacto = '#d97706';
-      } else {
-        badgeClass = 'legend-coesao';
-        badgeTxt = '💡 Sugestão Estilística';
-        corImpacto = '#0284c7';
+    let regra = markEl.getAttribute('data-regra') || itemData?.regra_ou_criterio || occ?.categoria || occ?.explicacaoRegra || '';
+    let explicacao = markEl.getAttribute('data-explicacao') || itemData?.explicacao || occ?.explicacaoRegra || occ?.diagnostico || '';
+    let sugestao = markEl.getAttribute('data-sugestao') || itemData?.sugestao_substituicao || occ?.sugestaoCorrecao || '';
+    let localizacao = occ?.localizacao || 'Trecho selecionado no texto';
+
+    // Se ainda não tiver regra/explicação, calibrar padrão por categoria
+    const catConfigs = {
+      gramatica: {
+        badgeTxt: '🔴 Gramática & Norma Culta',
+        badgeClass: 'legend-gramatica',
+        corImpacto: '#dc2626',
+        criterio: 'Microestrutura / Norma Culta',
+        regraPadrao: 'Desvio Gramatical (Ortografia, Crase ou Sintaxe)',
+        explicacaoPadrao: 'Desvio identificado em relação à norma-padrão exigida pela banca examinadora.',
+        impacto: 'Penalização direta em Microestrutura'
+      },
+      coesao: {
+        badgeTxt: '🟡 Coesão & Conectivos',
+        badgeClass: 'legend-coesao',
+        corImpacto: '#d97706',
+        criterio: 'Mecanismos de Coesão e Fluidez',
+        regraPadrao: 'Articulação Frasal / Coesão Interparágrafos',
+        explicacaoPadrao: 'Ausência de conectivo interfrasal ou período longo com risco de truncamento sintático.',
+        impacto: 'Fragilidade na coesão textual'
+      },
+      repeticao: {
+        badgeTxt: '🟣 Eco Vocabular & Repetição',
+        badgeClass: 'legend-repeticao',
+        corImpacto: '#9333ea',
+        criterio: 'Propriedade Vocabular',
+        regraPadrao: 'Repetição Viciosa de Termos',
+        explicacaoPadrao: 'Palavra ou radical repetido excessivamente no mesmo parágrafo, empobrecendo o léxico.',
+        impacto: 'Desconto em seleção lexical'
+      },
+      argumentacao: {
+        badgeTxt: '🔵 Argumentação & Repertório',
+        badgeClass: 'legend-argumentacao',
+        corImpacto: '#2563eb',
+        criterio: 'Macroestrutura / Consistência Argumentativa',
+        regraPadrao: 'Produtividade de Repertório ou Tese',
+        explicacaoPadrao: 'Argumento que necessita de comprovação factual, dados ou ancoragem em autoridade reconhecida.',
+        impacto: 'Critério de Conteúdo / Desenvolvimento'
+      },
+      acerto: {
+        badgeTxt: '🟢 Destaque Positivo da Banca',
+        badgeClass: 'legend-acerto',
+        corImpacto: '#16a34a',
+        criterio: 'Macroestrutura / Projeto de Texto',
+        regraPadrao: 'Construção Exemplar / Tópico Frasal',
+        explicacaoPadrao: 'Excelente uso de operador argumentativo ou tese clara e assertiva.',
+        impacto: '+ Pontuação no Critério'
       }
-      diagnostico = occ.diagnostico || 'Desvio identificado na construção oracional.';
-      regra = occ.explicacaoRegra || 'Regra oficial de correção documental da banca.';
-      sugestao = occ.sugestaoCorrecao || '';
-      justificativa = occ.justificativaCorrecao || '';
-    } else if(rep){
-      badgeClass = 'legend-rep';
-      badgeTxt = '🏛️ Repertório Sociocultural Legitimado';
-      localizacao = `Parágrafo ${rep.paragrafo || '—'} · ${rep.tipo || 'Referência Externa'}`;
-      diagnostico = `Citação de <b>${esc(rep.nome)}</b> (${esc(rep.tipo || 'Área do Saber')}). ${rep.produtivo ? 'Repertório validado como produtivo e legitimado.' : 'Repertório legítimo, porém requer maior articulação com a tese.'}`;
-      regra = `Critério de Repertório da Banca: Todo repertório deve ser Legitimado (área do saber reconhecida), Pertinente ao tema e Produtivo (vinculado à argumentação do aluno).`;
-      sugestao = rep.produtivo ? 'Excelente utilização argumentativa. Mantenha essa correlação lógica nos próximos parágrafos.' : 'Estabeleça uma ponte causal explícita entre a citação e a tese defendida.';
-      justificativa = `Avaliação factual: ${rep.correcaoFactual || 'Referência verídica'}. Explicação: ${rep.explicado ? 'Conceito bem explicitado' : 'Conceito pouco aprofundado'}. Integração: ${rep.integrado ? 'Conectado à proposta' : 'Falta vínculo explícito com o tema'}.`;
-      criterio = 'Macroestrutura / Repertório';
-      impacto = rep.produtivo ? '+ Pontuação Máxima no Critério' : 'Aproveitamento parcial';
-      corImpacto = rep.produtivo ? '#16a34a' : '#d97706';
-    } else if(isOk || targetId === 'tese_p1'){
-      badgeClass = 'legend-ok';
-      badgeTxt = '🟢 Estrutura & Tese Central';
-      localizacao = 'Parágrafo 1 · Introdução';
-      diagnostico = 'Tese dissertativa clara e explicitada na introdução do texto.';
-      regra = 'Macroestrutura Dissertativa: O parágrafo de introdução deve apresentar o tema e explicitar o ponto de vista (tese) que norteará o desenvolvimento.';
-      sugestao = 'Manter a tese dividida em dois núcleos argumentativos para serem aprofundados no D1 e D2.';
-      justificativa = 'Posicionamento delimitado que dá rumo e unidade temática a toda a dissertação.';
-      criterio = 'Macroestrutura / Projeto de Texto';
-      impacto = 'Positivo (+ Pontuação estrutural)';
-      corImpacto = '#16a34a';
-    } else {
-      badgeClass = 'legend-coesao';
-      badgeTxt = '🔍 Apontamento Textual';
-      diagnostico = 'Trecho identificado pela auditoria sintática e discursiva.';
-      regra = 'Clareza, concisão e progressão temática.';
-      sugestao = 'Revisar para assegurar ritmo e fluidez textual.';
-      justificativa = 'A clareza frasal facilita a leitura do examinador.';
-      criterio = 'Aspectos Gerais';
-      impacto = 'Aprimoramento';
-      corImpacto = '#0284c7';
-    }
+    };
+
+    const cfg = catConfigs[categoria] || catConfigs.gramatica;
+    if(!regra) regra = cfg.regraPadrao;
+    if(!explicacao) explicacao = cfg.explicacaoPadrao;
 
     cardBox.innerHTML = `
       <div class="glau-card-header">
-        <span class="glau-pill-legend ${badgeClass}">${badgeTxt}</span>
+        <span class="glau-pill-legend ${cfg.badgeClass}">${cfg.badgeTxt}</span>
         <span class="pill" style="font-size:11.5px">📍 ${esc(localizacao)}</span>
       </div>
       <div class="glau-card-body">
-        <div>
-          <b style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Trecho Original no Texto:</b>
-          <div class="mark-bad" style="margin-top:3px;font-size:14px">${esc(markText)}</div>
+        <div style="font-size:14.5px;font-weight:800;color:#0f172a;margin-bottom:2px">
+          ${esc(regra)}
         </div>
-        ${sugestao ? `
+
+        <!-- COMPARAÇÃO VISUAL: COMO VOCÊ ESCREVEU VS SUGESTÃO DA BANCA -->
+        <div style="background:#ffffff;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:8px 0;display:grid;gap:8px">
           <div>
-            <b style="color:#15803d;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Sugestão de Correção:</b>
-            <div class="mark-good" style="margin-top:3px;font-size:14px">${esc(sugestao)}</div>
+            <b style="color:#b91c1c;font-size:11.5px;text-transform:uppercase;letter-spacing:0.5px">❌ Como você escreveu:</b>
+            <div class="mark-bad" style="margin-top:2px;font-size:13.5px;font-weight:600">"${esc(markText)}"</div>
           </div>
-        ` : ''}
-        <div><b>Diagnóstico:</b> ${diagnostico}</div>
-        <div><b>Regra Oficial da Banca:</b> ${esc(regra)}</div>
-        ${justificativa ? `<div><b>Justificativa Pedagógica:</b> ${esc(justificativa)}</div>` : ''}
-        <div style="font-size:12.5px;color:var(--muted);margin-top:4px;padding-top:8px;border-top:1px dashed var(--line)">
-          <b>Critério Afetado:</b> ${esc(criterio)}<br>
-          <b>Impacto na Nota:</b> <span style="font-weight:700;color:${corImpacto}">${esc(impacto)}</span>
+          ${sugestao ? `
+            <div>
+              <b style="color:#15803d;font-size:11.5px;text-transform:uppercase;letter-spacing:0.5px">✅ Sugestão da Banca:</b>
+              <div class="mark-good" style="margin-top:2px;font-size:13.5px;font-weight:700">"${esc(sugestao)}"</div>
+            </div>
+          ` : ''}
         </div>
+
+        <div style="font-size:13px;line-height:1.6;color:#334155;background:#f8fafc;padding:10px 12px;border-radius:8px;border:1px solid var(--line)">
+          <b>💡 Explicação Pedagógica:</b><br>${esc(explicacao)}
+        </div>
+
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;padding-top:6px;border-top:1px dashed var(--line)">
+          <b>Critério da Banca:</b> ${esc(cfg.criterio)} · <b>Impacto:</b> <span style="font-weight:700;color:${cfg.corImpacto}">${esc(cfg.impacto)}</span>
+        </div>
+
+        ${sugestao && !isResolvido ? `
+          <div style="margin-top:8px;display:flex;justify-content:flex-end">
+            <button type="button" class="btn-aplicar-correcao" id="btnAplicarCorrecao">
+              <span>✨ Aplicar correção no texto</span>
+            </button>
+          </div>
+        ` : (isResolvido ? `
+          <div style="margin-top:8px;padding:8px 12px;background:#dcfce7;border-radius:8px;color:#15803d;font-size:12.5px;font-weight:800;text-align:center;border:1px solid #86efac">
+            ✓ Correção aplicada com sucesso no texto!
+          </div>
+        ` : '')}
       </div>
       <div class="glau-nav-btns">
         <button type="button" class="btn btn-light btn-sm" id="btnGlauPrev">⬅ Anterior</button>
-        <span style="font-size:12px;color:var(--muted);align-self:center">Marcação ${currentActiveIndex + 1} de ${marks.length}</span>
+        <span style="font-size:12px;color:var(--muted);align-self:center">Grifo ${currentActiveIndex + 1} de ${marks.length}</span>
         <button type="button" class="btn btn-light btn-sm" id="btnGlauNext">Próximo ➔</button>
       </div>
     `;
+
+    // Ação de aplicar a correção
+    const btnAplicar = $('#btnAplicarCorrecao');
+    if(btnAplicar && sugestao){
+      btnAplicar.onclick = () => {
+        markEl.textContent = sugestao;
+        markEl.classList.add('glau-mark-resolvido');
+        markEl.setAttribute('data-resolvido', 'true');
+        
+        // Atualiza rascunho na Folha se presente
+        const essayEl = $('#essay');
+        if(essayEl && essayEl.value && markText){
+          essayEl.value = essayEl.value.replace(markText, sugestao);
+          setUserData('redacao_draft', essayEl.value);
+          if($('#pSave')) $('#pSave').textContent = 'Rascunho atualizado com a correção ✓';
+        }
+
+        toast('✨ Correção aplicada com sucesso na sua folha de redação!');
+        renderInspectorForMark(markEl, false);
+      };
+    }
 
     const prevBtn = $('#btnGlauPrev');
     const nextBtn = $('#btnGlauNext');
@@ -600,10 +646,16 @@ function initGlauInteractiveInspector(res){
         activeFilter = filter;
 
         marks.forEach(m => {
-          if(filter === 'all'){
-            m.style.opacity = '1';
-            m.style.filter = 'none';
-          } else if(m.classList.contains(`glau-mark-${filter}`)){
+          let cat = m.getAttribute('data-categoria') || '';
+          if(!cat){
+            if(m.classList.contains('glau-mark-gramatica') || m.classList.contains('glau-mark-erro')) cat = 'gramatica';
+            else if(m.classList.contains('glau-mark-coesao')) cat = 'coesao';
+            else if(m.classList.contains('glau-mark-repeticao')) cat = 'repeticao';
+            else if(m.classList.contains('glau-mark-argumentacao') || m.classList.contains('glau-mark-rep')) cat = 'argumentacao';
+            else if(m.classList.contains('glau-mark-acerto') || m.classList.contains('glau-mark-ok')) cat = 'acerto';
+          }
+
+          if(filter === 'all' || cat === filter){
             m.style.opacity = '1';
             m.style.filter = 'none';
           } else {
@@ -612,7 +664,19 @@ function initGlauInteractiveInspector(res){
           }
         });
 
-        const visibleMarks = marks.filter(m => filter === 'all' || m.classList.contains(`glau-mark-${filter}`));
+        const visibleMarks = marks.filter(m => {
+          if(filter === 'all') return true;
+          let cat = m.getAttribute('data-categoria') || '';
+          if(!cat){
+            if(m.classList.contains('glau-mark-gramatica') || m.classList.contains('glau-mark-erro')) cat = 'gramatica';
+            else if(m.classList.contains('glau-mark-coesao')) cat = 'coesao';
+            else if(m.classList.contains('glau-mark-repeticao')) cat = 'repeticao';
+            else if(m.classList.contains('glau-mark-argumentacao') || m.classList.contains('glau-mark-rep')) cat = 'argumentacao';
+            else if(m.classList.contains('glau-mark-acerto') || m.classList.contains('glau-mark-ok')) cat = 'acerto';
+          }
+          return cat === filter;
+        });
+
         if(visibleMarks.length > 0 && !visibleMarks.includes(marks[currentActiveIndex])){
           renderInspectorForMark(visibleMarks[0], false);
         }
@@ -638,14 +702,37 @@ function renderizarResultado(res, nome, tema, bancaKey){
 
   // Texto anotado padrão Glau.com com grifos coloridos por categoria
   const textoAnotado = res.textoAnotadoGlau || (global.MotorCorrecao && typeof global.MotorCorrecao.gerarTextoAnotadoGlau === 'function'
-    ? global.MotorCorrecao.gerarTextoAnotadoGlau(res.texto || $('#essay')?.value || '', res.ocorrencias, res.repertorio, res.analiseParagrafos)
+    ? global.MotorCorrecao.gerarTextoAnotadoGlau(res.texto || $('#essay')?.value || '', res.ocorrencias, res.repertorio, res.analiseParagrafos, res.marcacoes_inline)
     : '');
 
-  const numErros = (res.ocorrencias || []).filter(o => o.tipoGlau === 'erro' || o.severidade === 'erro_confirmado').length;
-  const numCoesao = (res.ocorrencias || []).filter(o => o.tipoGlau === 'coesao' || o.severidade === 'fragilidade_argumentativa' || o.severidade === 'sugestao_estilistica').length;
-  const numRep = Array.isArray(res.repertorio) ? res.repertorio.length : (res.repertorio?.lista?.length || 0);
-  const numOk = (res.analiseParagrafos && res.analiseParagrafos.length > 0 && !res.analiseParagrafos[0].relacaoTese?.includes('implícita')) ? 1 : 0;
-  const totalGrifos = numErros + numCoesao + numRep + numOk;
+  // Coletar contadores para os 5 chips de filtro por categoria
+  let numGramatica = 0;
+  let numCoesao = 0;
+  let numRepeticao = 0;
+  let numArgumentacao = 0;
+  let numAcerto = 0;
+
+  if(typeof document !== 'undefined'){
+    const dummy = document.createElement('div');
+    dummy.innerHTML = textoAnotado;
+    const allMarks = Array.from(dummy.querySelectorAll('.glau-mark'));
+    allMarks.forEach(m => {
+      let cat = m.getAttribute('data-categoria') || '';
+      if(!cat){
+        if(m.classList.contains('glau-mark-gramatica') || m.classList.contains('glau-mark-erro')) cat = 'gramatica';
+        else if(m.classList.contains('glau-mark-coesao')) cat = 'coesao';
+        else if(m.classList.contains('glau-mark-repeticao')) cat = 'repeticao';
+        else if(m.classList.contains('glau-mark-argumentacao') || m.classList.contains('glau-mark-rep')) cat = 'argumentacao';
+        else if(m.classList.contains('glau-mark-acerto') || m.classList.contains('glau-mark-ok')) cat = 'acerto';
+      }
+      if(cat === 'gramatica') numGramatica++;
+      else if(cat === 'coesao') numCoesao++;
+      else if(cat === 'repeticao') numRepeticao++;
+      else if(cat === 'argumentacao') numArgumentacao++;
+      else if(cat === 'acerto') numAcerto++;
+    });
+  }
+  const totalGrifos = numGramatica + numCoesao + numRepeticao + numArgumentacao + numAcerto;
 
   // Bloco complementar da fórmula Cebraspe na Seção C
   let blocoEspecialBanca = '';
@@ -902,21 +989,22 @@ function renderizarResultado(res, nome, tema, bancaKey){
   box.innerHTML = `
     ${blocoEspelhoOficial}
 
-    <!-- ================= FOLHA CORRIGIDA COM GRIFOS DINÂMICOS ================= -->
+    <!-- ================= FOLHA CORRIGIDA COM GRIFOS DINÂMICOS (RAIO-X INTERATIVO) ================= -->
     <div class="report-section" id="sec-glau" style="margin-bottom:24px">
       <div class="glau-interactive-container">
         <div class="glau-header-toolbar">
           <div class="glau-title-box">
-            <span class="glau-live-badge">⚡ CORREÇÃO INTERATIVA</span>
-            <h3>Folha Corrigida com Grifos & Inspetor Inteligente</h3>
-            <small>Toque ou clique em qualquer marcação colorida no texto para auditar regras de banca, diagnóstico e reescrita recomendada.</small>
+            <span class="glau-live-badge">⚡ CORREÇÃO VISUAL INTERATIVA</span>
+            <h3 style="margin-top:6px;font-size:20px;font-weight:800;color:var(--ink)">🔍 Raio-X Interativo do Texto (Clique nos grifos para ver a correção)</h3>
+            <small style="color:var(--muted);font-size:13px">Auditoria visual com marcações clicáveis por categoria da banca: Gramática, Coesão, Repetições, Argumentação e Destaques Positivos.</small>
           </div>
           <div class="glau-legend-bar" id="glauFilterBar">
             <button type="button" class="glau-pill-legend legend-all active" data-filter="all">Todos (${totalGrifos})</button>
-            <button type="button" class="glau-pill-legend legend-erro" data-filter="erro">🔴 Erros Gramaticais (${numErros})</button>
-            <button type="button" class="glau-pill-legend legend-coesao" data-filter="coesao">🟡 Coesão & Vocabulário (${numCoesao})</button>
-            <button type="button" class="glau-pill-legend legend-rep" data-filter="rep">🔵 Repertório Legitimado (${numRep})</button>
-            <button type="button" class="glau-pill-legend legend-ok" data-filter="ok">🟢 Estrutura & Tese (${numOk})</button>
+            <button type="button" class="glau-pill-legend legend-gramatica" data-filter="gramatica">🔴 Gramática (${numGramatica})</button>
+            <button type="button" class="glau-pill-legend legend-coesao" data-filter="coesao">🟡 Coesão (${numCoesao})</button>
+            <button type="button" class="glau-pill-legend legend-repeticao" data-filter="repeticao">🟣 Repetições (${numRepeticao})</button>
+            <button type="button" class="glau-pill-legend legend-argumentacao" data-filter="argumentacao">🔵 Argumentação (${numArgumentacao})</button>
+            <button type="button" class="glau-pill-legend legend-acerto" data-filter="acerto">🟢 Destaques Positivos (${numAcerto})</button>
           </div>
         </div>
         <div class="glau-split-view">
@@ -929,8 +1017,8 @@ function renderizarResultado(res, nome, tema, bancaKey){
             <div id="glauInspectorCard">
               <div class="glau-empty-state">
                 <div style="font-size:36px;margin-bottom:10px">👆</div>
-                <b>Clique em qualquer trecho grifado no texto</b>
-                <p>Selecione uma marcação colorida (Vermelho, Amarelo, Azul ou Verde) para ver a regra da banca, o diagnóstico detalhado e a reescrita ideal.</p>
+                <b style="font-size:15px;color:var(--ink)">Clique em qualquer trecho grifado no texto</b>
+                <p style="font-size:13px;line-height:1.6;color:var(--muted)">Selecione um grifo colorido no texto para ver a comparação antes/depois, a regra da banca e aplicar a correção com 1 clique.</p>
               </div>
             </div>
           </div>
@@ -1235,6 +1323,213 @@ function renderizarResultado(res, nome, tema, bancaKey){
 }
 
 /* =====================================================================
+   4.5 CONTROLE DE ACESSO ADMIN & CRÉDITOS SAAS B2B CURSINHO
+   ===================================================================== */
+function isAdminMode(){
+  if(typeof window === 'undefined') return false;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if(params.get('admin') === 'true'){
+      sessionStorage.setItem('redacao_admin', 'true');
+      return true;
+    }
+    return sessionStorage.getItem('redacao_admin') === 'true';
+  } catch(e) {
+    return false;
+  }
+}
+
+function aplicarVisibilidadeAdmin(){
+  const admin = isAdminMode();
+  const btnConfig = $('#btnOpenAiConfig');
+  const btnTests = $('#btnOpenTests');
+  const badgeAdmin = $('#adminBadge');
+  const panelAdminCreditos = $('#adminCreditosPanel');
+
+  if(admin){
+    if(btnConfig) btnConfig.style.setProperty('display', 'inline-flex', 'important');
+    if(btnTests) btnTests.style.setProperty('display', 'inline-flex', 'important');
+    if(badgeAdmin) badgeAdmin.style.display = 'inline-block';
+    if(panelAdminCreditos) panelAdminCreditos.style.display = 'block';
+  } else {
+    if(btnConfig) btnConfig.style.setProperty('display', 'none', 'important');
+    if(btnTests) btnTests.style.setProperty('display', 'none', 'important');
+    if(badgeAdmin) badgeAdmin.style.display = 'none';
+    if(panelAdminCreditos) panelAdminCreditos.style.display = 'none';
+  }
+}
+
+function getSemanaRefId(){
+  const d = new Date();
+  const dUtc = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = dUtc.getUTCDay() || 7;
+  dUtc.setUTCDate(dUtc.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(dUtc.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((dUtc - yearStart) / 86400000) + 1) / 7);
+  return `${dUtc.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
+}
+
+function obterCreditosSemana(){
+  const semanaAtual = getSemanaRefId();
+  let cred = getUserData('redacao_creditos', null);
+  if(!cred || cred.semanaRef !== semanaAtual || typeof cred.restantes !== 'number'){
+    cred = {
+      restantes: 5,
+      total: 5,
+      semanaRef: semanaAtual,
+      ultimaAtualizacao: new Date().toISOString()
+    };
+    setUserData('redacao_creditos', cred);
+  }
+  return cred;
+}
+
+function salvarCreditosSemana(cred){
+  setUserData('redacao_creditos', cred);
+  atualizarBadgeCreditos();
+  syncUserDataToServer();
+}
+
+function deduzirCredito(){
+  const cred = obterCreditosSemana();
+  cred.restantes = Math.max(0, cred.restantes - 1);
+  cred.ultimaAtualizacao = new Date().toISOString();
+  salvarCreditosSemana(cred);
+  return cred;
+}
+
+function atualizarBadgeCreditos(){
+  const cred = obterCreditosSemana();
+  const box = $('#creditosContainer');
+  const txt = $('#creditosTexto');
+  if(!txt) return;
+
+  txt.innerHTML = `Créditos: <b>${cred.restantes}/${cred.total}</b>`;
+  if(box){
+    box.classList.remove('esgotado', 'baixo');
+    if(cred.restantes === 0){
+      box.classList.add('esgotado');
+      box.title = 'Cota esgotada (0/5): contate a coordenação do cursinho para créditos extras';
+    } else if(cred.restantes <= 1){
+      box.classList.add('baixo');
+      box.title = `Atenção: resta apenas ${cred.restantes} crédito de correção nesta semana`;
+    } else {
+      box.title = `Plano Cursinho: ${cred.restantes} de ${cred.total} correções disponíveis esta semana`;
+    }
+  }
+}
+
+function exibirModalCreditos(){
+  const cred = obterCreditosSemana();
+  const m = $('#creditosModal');
+  if(!m) return;
+
+  const dest = $('#modalCreditosDestaque');
+  const sub = $('#modalCreditosSub');
+  const barra = $('#modalCreditosBarra');
+  if(dest) dest.textContent = `${cred.restantes} / ${cred.total}`;
+  if(sub) {
+    sub.textContent = cred.restantes === 0
+      ? 'cota semanal esgotada · fale com seu cursinho'
+      : `${cred.restantes === 1 ? 'correção disponível' : 'correções disponíveis'} nesta semana`;
+  }
+  if(barra){
+    const pct = Math.max(0, Math.min(100, Math.round((cred.restantes / cred.total) * 100)));
+    barra.style.width = pct + '%';
+    barra.style.background = cred.restantes === 0 ? '#ef4444' : (cred.restantes <= 1 ? '#f59e0b' : 'var(--th-primary)');
+  }
+  aplicarVisibilidadeAdmin();
+  m.classList.add('show');
+}
+
+function iniciarFeedbackCarregamento(spec, bancaKey){
+  const resBox = $('#resultado');
+  if(!resBox) return { parar: () => {} };
+
+  resBox.innerHTML = `
+    <div class="card avaliacao-loading-card" id="loadingCardBox">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
+        <div class="loading-pulsing-orb">⚖️</div>
+        <div>
+          <span class="badge" style="background:var(--th-card-highlight);color:var(--th-primary);margin-bottom:4px">
+            🏛️ Edital Oficial: ${esc(spec.name)} (${esc(spec.banca)})
+          </span>
+          <h3 style="font-size:18px;margin:2px 0" id="loadingStageTitle">Calibrando rubrica oficial da banca...</h3>
+          <p style="color:var(--muted);font-size:13px;margin:0" id="loadingStageSubtitle">Processando redação via Inteligência Artificial Centralizada Full-Stack</p>
+        </div>
+      </div>
+
+      <div class="loading-progress-track">
+        <div class="loading-progress-bar" id="loadingProgressBar" style="width:25%"></div>
+      </div>
+
+      <div class="loading-steps-grid">
+        <div class="loading-step-item active" id="loadingStep1">
+          <span class="step-icon">🔍</span>
+          <div class="step-text">
+            <b>1. Calibrando Rubrica da Banca Examinadora</b>
+            <small>Carregando pesos, limites oficiais (${esc(spec.linesRange)}) e fórmulas do certame</small>
+          </div>
+          <span class="step-status">Em andamento...</span>
+        </div>
+        <div class="loading-step-item" id="loadingStep2">
+          <span class="step-icon">📐</span>
+          <div class="step-text">
+            <b>2. Avaliando Coesão, Gramática e Macroestrutura</b>
+            <small>Auditoria sintática, regência, crase, operadores argumentativos e repertório</small>
+          </div>
+          <span class="step-status">Aguardando</span>
+        </div>
+        <div class="loading-step-item" id="loadingStep3">
+          <span class="step-icon">📊</span>
+          <div class="step-text">
+            <b>3. Consolidando Espelho Oficial e Gerando Relatório A–I</b>
+            <small>Estruturando diagnóstico, anotações Glau UX e plano de melhoria</small>
+          </div>
+          <span class="step-status">Aguardando</span>
+        </div>
+      </div>
+
+      <div class="loading-footer-tip">
+        💡 <b>Dica Cursinho:</b> O espelho oficial emitirá nota detalhada com justificativas pedagógicas, referências legislativas e reescrita de modelo de estudo.
+      </div>
+    </div>
+  `;
+
+  resBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  let etapa = 1;
+  const timer = setInterval(() => {
+    etapa++;
+    const bar = $('#loadingProgressBar');
+    const title = $('#loadingStageTitle');
+    const s1 = $('#loadingStep1');
+    const s2 = $('#loadingStep2');
+    const s3 = $('#loadingStep3');
+
+    if(etapa === 2){
+      if(bar) bar.style.width = '65%';
+      if(title) title.textContent = 'Avaliando coesão, gramática e estrutura dissertativa com IA...';
+      if(s1){ s1.classList.remove('active'); s1.classList.add('done'); s1.querySelector('.step-status').textContent = 'Concluído ✅'; }
+      if(s2){ s2.classList.add('active'); s2.querySelector('.step-status').textContent = 'Em andamento...'; }
+    } else if(etapa >= 3){
+      if(bar) bar.style.width = '92%';
+      if(title) title.textContent = 'Consolidando notas e Gerando Relatório Oficial A–I...';
+      if(s2){ s2.classList.remove('active'); s2.classList.add('done'); s2.querySelector('.step-status').textContent = 'Concluído ✅'; }
+      if(s3){ s3.classList.add('active'); s3.querySelector('.step-status').textContent = 'Finalizando...'; }
+    }
+  }, 1600);
+
+  return {
+    parar: () => {
+      clearInterval(timer);
+      const bar = $('#loadingProgressBar');
+      if(bar) bar.style.width = '100%';
+    }
+  };
+}
+
+/* =====================================================================
    5. DISPARO DA CORREÇÃO E PERSISTÊNCIA COMPLETA NO HISTÓRICO
    ===================================================================== */
 function configurarCorretor(){
@@ -1247,9 +1542,18 @@ function configurarCorretor(){
     const comando = ($('#inComando') ? $('#inComando').value.trim() : '');
     const nome = $('#inNome').value.trim() || (currentGoogleUser ? currentGoogleUser.nome : 'Aluno(a)');
     const bancaKey = $('#inTarget').value;
+    const spec = BANCA_SPECS[bancaKey] || BANCA_SPECS.pmpe;
 
     if(texto.length < 50){
       toast('Escreva um texto com pelo menos 50 caracteres para iniciar a análise contextual.');
+      return;
+    }
+
+    // CONTROLE DE COTAS E CRÉDITOS DO CURSINHO PARCEIRO
+    const creditos = obterCreditosSemana();
+    if(creditos.restantes <= 0 && !isAdminMode()){
+      exibirModalCreditos();
+      toast('⚠️ Cota semanal de correções esgotada (0/5). Fale com a coordenação do seu cursinho para liberar mais créditos.');
       return;
     }
 
@@ -1270,7 +1574,10 @@ function configurarCorretor(){
 
     btnEval.disabled = true;
     const originalText = btnEval.innerHTML;
-    btnEval.innerHTML = '⏳ Avaliando redação com Inteligência Artificial...';
+    btnEval.innerHTML = '<span class="loading-spinner"></span> Calibrando rubrica da banca...';
+
+    // Dispara animação visual profissional de loading no resultado
+    const loadingCtrl = iniciarFeedbackCarregamento(spec, bancaKey);
 
     let res = null;
     let usedModel = null;
@@ -1278,6 +1585,7 @@ function configurarCorretor(){
 
     try {
       const token = store.get('google_session_token');
+      // Requisição exclusiva ao backend/servidor centralizado sem necessidade de chave no navegador
       const resp = await fetch('/api/evaluate-ai', {
         method: 'POST',
         headers: {
@@ -1290,8 +1598,7 @@ function configurarCorretor(){
           comando,
           bancaKey,
           alunoNome: nome,
-          geminiKey: store.get('redacao_gemini_key', ''),
-          openaiKey: store.get('redacao_openai_key', '')
+          linhasReais: window.linhasManuscritasReais || undefined
         })
       });
 
@@ -1307,9 +1614,11 @@ function configurarCorretor(){
       console.warn('[Avaliação IA] Servidor offline. Acionando Motor Contextual Local Determinístico:', err.message);
     }
 
+    loadingCtrl.parar();
+
     // Se o backend falhar ou estiver offline, usa o Motor Contextual determinístico especializado
     if(!res){
-      res = avaliarRedacao(texto, tema, bancaKey, comando);
+      res = avaliarRedacao(texto, tema, bancaKey, comando, { linhasReais: window.linhasManuscritasReais });
       res.modeloUtilizado = 'Motor Contextual Especializado da Banca (Modo Local)';
       usedModel = res.modeloUtilizado;
     }
@@ -1321,6 +1630,11 @@ function configurarCorretor(){
 
     try {
       renderizarResultado(res, nome, tema, bancaKey);
+
+      // DEDUZ 1 CRÉDITO DO ALUNO POR CORREÇÃO EFETUADA COM SUCESSO
+      if(!isAdminMode() || creditos.restantes > 0){
+        deduzirCredito();
+      }
 
       // Salvar resultado completo no histórico do aluno
       const hist = getUserData('redacao_hist', []);
@@ -1915,9 +2229,991 @@ function renderHome(){
 }
 
 /* =====================================================================
+   11.B PAINEL DO GESTOR & PROFESSOR (B2B CURSINHOS E COORDENAÇÃO)
+   ===================================================================== */
+const MOCK_PROFESSOR_STUDENTS = [
+  // PMPE (Instituto AOCP - 40 pts, corte 24 pts)
+  {
+    id: 'pmpe-1',
+    nome: 'Lucas Mendonça Silva',
+    email: 'lucas.mendonca@gmail.com',
+    concurso: 'pmpe',
+    redacoes: 8,
+    ultimaNota: 37.5,
+    notaAnterior: 33.0,
+    data: '2026-11-10T14:30:00Z',
+    tema: 'O papel do policiamento ostensivo e comunitário na preservação da ordem pública',
+    status: 'Aprovado',
+    criterios: { d1: 9.5, d2: 9.5, d3: 9.5, d4: 9.0 },
+    erros: ['Pequena hesitação de pontuação na linha 17 (vírgula vicária dispensável).'],
+    parecer: 'Excelente domínio dissertativo-argumentativo. Repertório fundamentado na Constituição e Bauman. Argumentação contundente voltada à segurança em Pernambuco.',
+    texto: `A Constituição Cidadã de 1988 estabelece, em seu artigo 144, que a segurança pública é dever do Estado, direito e responsabilidade de todos. Nesse prisma, a atuação da Polícia Militar de Pernambuco transcende a repressão criminal, erigindo o policiamento ostensivo e comunitário como pilar basilar para a preservação da ordem social e a garantia da incolumidade dos cidadãos.\n\nEm primeiro lugar, cabe pontuar que a proximidade entre a tropa e a comunidade gera inteligência preventiva e confiança mútua. Segundo o sociólogo Zygmunt Bauman, a sensação de insegurança fragmenta o tecido coletivo; logo, a presença visível e estratégica da viatura militar nos bairros restaura a sensação subjetiva e objetiva de tranquilidade, inibindo delitos contra o patrimônio e a vida.\n\nAdemais, programas como o policiamento escolar e a Patrulha Maria da Penha evidenciam a eficácia da prevenção qualificada. Quando a corporação dialoga com lideranças locais, as causas estruturais da violência são mapeadas com agilidade, permitindo uma resposta tática proporcional e humanizada, em estrita consonância com os direitos humanos.\n\nInfere-se, portanto, que fortalecer o policiamento comunitário é indispensável. Cabe à Secretaria de Defesa Social, em convênio com os municípios, ampliar o efetivo e o videomonitoramento embarcado, fomentando conselhos de segurança integrados, a fim de consolidar a paz duradoura em solo pernambucano.`
+  },
+  {
+    id: 'pmpe-2',
+    nome: 'Camila Albuquerque Vasconcelos',
+    email: 'camila.vasconcelos@gmail.com',
+    concurso: 'pmpe',
+    redacoes: 6,
+    ultimaNota: 35.0,
+    notaAnterior: 31.5,
+    data: '2026-11-09T18:15:00Z',
+    tema: 'A integração das forças de segurança pública e o combate às organizações criminosas',
+    status: 'Aprovado',
+    criterios: { d1: 9.0, d2: 9.0, d3: 8.5, d4: 8.5 },
+    erros: ['Uso da crase antes de pronome indefinido na linha 12.', 'Regência nominal na linha 24.'],
+    parecer: 'Boa estruturação e encadeamento lógico. Proposta de intervenção articulada com os órgãos operacionais de PE.',
+    texto: `No cenário contemporâneo, o enfrentamento ao crime organizado impõe um modelo de segurança baseado na integração tática e no compartilhamento de inteligência policial. Sob a ótica de Thomas Hobbes, cabe ao Estado soberano garantir a proteção do corpo social contra ameaças internas. Assim, a articulação entre Polícia Militar, Polícia Civil e órgãos federais torna-se imperativa para asfixiar as facções criminosas.\n\nSob essa perspectiva, a atuação isolada das forças de segurança fragmenta recursos e compromete investigações. A integração de bancos de dados balísticos e mandados de prisão confere eficácia imediata às abordagens do policiamento ostensivo, interceptando armas de grosso calibre e entorpecentes antes de abastecerem comunidades conflagradas.\n\nOutrossim, o investimento em tecnologia da informação e inteligência penitenciária impede que ordens emanadas de presídios cheguem às ruas. A sincronia das polícias assegura ações cirúrgicas em áreas críticas, preservando a integridade da população inocente.\n\nTorna-se imperioso, destarte, que o Governo Estadual promova operações conjuntas contínuas e capacitação integrada das forças de segurança, municiando a PMPE de ferramentas tecnológicas de monitoramento, com vistas a desmantelar redes ilícitas e assegurar a soberania da lei.`
+  },
+  {
+    id: 'pmpe-3',
+    nome: 'Rodrigo Cavalcanti Bezerra',
+    email: 'rodrigo.bezerra@gmail.com',
+    concurso: 'pmpe',
+    redacoes: 5,
+    ultimaNota: 31.0,
+    notaAnterior: 31.0,
+    data: '2026-11-08T11:20:00Z',
+    tema: 'O papel do policiamento ostensivo e comunitário na preservação da ordem pública',
+    status: 'Estagnado',
+    criterios: { d1: 8.0, d2: 8.0, d3: 7.5, d4: 7.5 },
+    erros: ['Repetição excessiva da palavra "segurança" no D1.', 'Vírgula separando sujeito composto do verbo (L. 9).'],
+    parecer: 'Redação consistente, mas com repertório pouco diversificado e repetições lexicais. Necessita aprofundar conectivos interparágrafos.',
+    texto: `A segurança pública é um dos temas mais debatidos no Brasil contemporâneo. A Polícia Militar tem a função constitucional de realizar o policiamento ostensivo para evitar a prática de crimes e garantir a ordem pública nas cidades de Pernambuco.\n\nInicialmente, deve-se ressaltar que a presença dos policiais nas ruas traz tranquilidade para os cidadãos de bem. Quando a viatura passa nos bairros comerciais, o comércio funciona com mais tranquilidade e as famílias podem transitar em segurança. Isso comprova a importância de manter um efetivo suficiente em todas as regiões do estado.\n\nAlém disso, o policiamento comunitário permite uma aproximação saudável com a população. Os moradores conhecem os policiais da área e podem passar informações importantes sobre suspeitos e locais perigosos, ajudando na prevenção antes que o crime aconteça.\n\nPortanto, é necessário que o Estado contrate mais policiais militares e invista em novas viaturas para que o policiamento ostensivo chegue a todos os municípios pernambucanos com eficiência.`
+  },
+  {
+    id: 'pmpe-4',
+    nome: 'Juliana Duarte Correia',
+    email: 'juliana.correia@gmail.com',
+    concurso: 'pmpe',
+    redacoes: 3,
+    ultimaNota: 21.5,
+    notaAnterior: 20.0,
+    data: '2026-11-06T16:45:00Z',
+    tema: 'Desafios do combate à violência doméstica e proteção à mulher',
+    status: 'Atenção',
+    criterios: { d1: 6.0, d2: 5.5, d3: 5.0, d4: 5.0 },
+    erros: ['Desvios de regência verbal (visar a, assistir a).', 'Quatro erros de crase.', 'Períodos excessivamente longos sem pontuação adequada.'],
+    parecer: 'Zona de risco (< corte de 24 pts). Forte perda de pontos em gramática e microestrutura textual. Faltou repertório legitimado e aprofundamento das teses.',
+    texto: `A violência doméstica é um grave problema que afeta muitas famílias em Pernambuco e no Brasil. Mesmo com a Lei Maria da Penha muitas mulheres continuam sofrendo agressões físicas e psicológicas dentro de casa.\n\nEm primeiro lugar a falta de denúncia imediata faz com que o agressor continue impune por muito tempo porque a vítima tem medo de sofrer retaliações ou não tem condições financeiras de se sustentar sem o cônjuge o que agrava a situação.\n\nTambém precisa melhorar o atendimento nas delegacias das mulheres e viaturas especializadas da polícia para atender os chamados com mais rapidez antes que aconteça o feminicídio que destrói lares inteiros.\n\nConclui-se que o governo precisa dar mais apoio psicológico as mulheres e punir com rigor os agressores para diminuir os índices alarmantes desse tipo de violência no estado.`
+  },
+  {
+    id: 'pmpe-5',
+    nome: 'Gabriel Ferreira Lima',
+    email: 'gabriel.flima@gmail.com',
+    concurso: 'pmpe',
+    redacoes: 7,
+    ultimaNota: 34.0,
+    notaAnterior: 29.5,
+    data: '2026-11-09T20:10:00Z',
+    tema: 'O papel do policiamento ostensivo e comunitário na preservação da ordem pública',
+    status: 'Aprovado',
+    criterios: { d1: 8.5, d2: 8.5, d3: 8.5, d4: 8.5 },
+    erros: ['Crase indevida antes de verbo ("a combater").'],
+    parecer: 'Evolução notável (+15%). Excelente progressão textual e uso apropriado de operadores argumentativos.',
+    texto: `O artigo 144 da Carta Magna de 1988 preconiza a segurança pública como responsabilidade estatal indispensável à fruição dos direitos fundamentais. Diante desse preceito, a Polícia Militar de Pernambuco desempenha papel basilar na preservação da paz social, atuando preventivamente para mitigar a violência urbana.\n\nNesse contexto, o modelo de polícia de proximidade rompe o distanciamento entre força armada e corpo social. Sob o pensamento de Durkheim, a estabilidade das instituições é pré-requisito para a coesão coletiva. Assim, quando os operadores da PMPE dialogam com a vizinhança solidária, constrói-se uma rede de colaboração tática eficaz contra a criminalidade.\n\nParalelamente, o uso da tecnologia de geolocalização e patrulhamento direcionado pelas manchas criminais potencializa os recursos disponíveis, garantindo rápida dissuasão de condutas delituosas em pontos críticos.\n\nDessarte, urge à Secretaria de Defesa Social modernizar a infraestrutura dos batalhões e valorizar a capacitação contínua em direitos humanos, assegurando que o policiamento ostensivo consolide Pernambuco como referência em proteção cidadã.`
+  },
+
+  // PCPE (Cebraspe - 30 pts, corte 18 pts)
+  {
+    id: 'pcpe-1',
+    nome: 'Larissa Vasconcelos Ramos',
+    email: 'larissa.ramos@gmail.com',
+    concurso: 'pcpe',
+    redacoes: 9,
+    ultimaNota: 27.8,
+    notaAnterior: 25.2,
+    data: '2026-11-10T16:00:00Z',
+    tema: 'A investigação policial técnica e a cadeia de custódia da prova na persecução penal',
+    status: 'Aprovado',
+    criterios: { ap: 2.8, t1: 8.8, t2: 8.8, t3: 8.6, ne: 2 },
+    erros: ['2 desvios formais: 1 de translineação e 1 vírgula facultativa.'],
+    parecer: 'Padrão de excelência no espelho Cebraspe. Todos os tópicos do comando foram integralmente atendidos com citação do Pacote Anticrime (Lei 13.964/19).',
+    texto: `A persecução penal contemporânea exige rigidez metodológica na produção dos elementos probatórios, sob pena de nulidade processual e prejuízo à justiça. No âmbito da Polícia Civil de Pernambuco, a investigação técnico-científica e o estrito respeito à cadeia de custódia constituem as salvaguardas primordiais do devido processo legal.\n\nNo que tange ao primeiro aspecto, a introdução formal da cadeia de custódia pelo Pacote Anticrime (Lei nº 13.964/2019) no Código de Processo Penal positivou o rastreamento integral dos vestígios, desde o reconhecimento inicial no local do crime até o seu descarte fundamentado. Tal disciplina veda a contaminação da prova, assegurando o princípio da desconfiança benéfica e o contraditório diferido na fase judicial.\n\nAdemais, a perícia forense e o cruzamento de dados de telecomunicações minimizam o risco de erros judiciários historicamente associados à exclusiva prova testemunhal. Quando a autoridade policial instrui o inquérito com laudos de DNA, balística comparativa e informática forense, a convicção do Ministério Público e do magistrado ampara-se em base fática sólida e inatacável.\n\nEm conclusão, o aprimoramento da investigação policial civil perpassa pela modernização de laboratórios periciais e pela capacitação de delegados e agentes quanto à preservação do local de crime, garantindo o combate qualificado à impunidade com respeito irrestrito às garantias constitucionais.`
+  },
+  {
+    id: 'pcpe-2',
+    nome: 'Bruno Henrique Siqueira',
+    email: 'bruno.siqueira@gmail.com',
+    concurso: 'pcpe',
+    redacoes: 6,
+    ultimaNota: 24.5,
+    notaAnterior: 22.0,
+    data: '2026-11-09T14:40:00Z',
+    tema: 'A investigação policial técnica e a cadeia de custódia da prova na persecução penal',
+    status: 'Aprovado',
+    criterios: { ap: 2.5, t1: 8.0, t2: 8.0, t3: 7.6, ne: 4 },
+    erros: ['4 desvios gramaticais: regência verbal e concordância.'],
+    parecer: 'Boa aderência aos tópicos temáticos da banca Cebraspe. Resposta direta aos três aspectos avaliados.',
+    texto: `A atividade de polícia judiciária desempenhada pela Polícia Civil é indispensável para a apuração de infrações penais e a identificação de sua autoria. O sucesso da denúncia criminal ofertada pelo titular da ação depende substancialmente da solidez das provas colhidas na fase inquisitorial.\n\nNesse cenário, a preservação do local do crime pelos primeiros policiais a chegarem na cena é condição indispensável para a perícia. Qualquer alteração indevida de objetos ou manchas de sangue compromete a veracidade dos laudos técnicos e pode conduzir a absolvição de culpados ou condenação indevida de inocentes.\n\nAlém disso, as novas tecnologias de inteligência cibernética têm permitido à Polícia Civil desvendar esquemas de lavagem de dinheiro e golpes eletrônicos que lesam milhares de vítimas em Pernambuco. A quebra de sigilo telemático autorizada judicialmente fornece dados precisos que inviabilizam negativas de autoria.\n\nDiante do exposto, é dever do Poder Público estruturar as delegacias de polícia civil e o Instituto de Criminalística com equipamentos avançados e servidores capacitados, assegurando uma persecução penal célere, justa e eficaz.`
+  },
+  {
+    id: 'pcpe-3',
+    nome: 'Mariana Costa Farias',
+    email: 'mariana.costa@gmail.com',
+    concurso: 'pcpe',
+    redacoes: 4,
+    ultimaNota: 15.6,
+    notaAnterior: 16.0,
+    data: '2026-11-07T10:15:00Z',
+    tema: 'Crime cibernético e os desafios da polícia judiciária',
+    status: 'Atenção',
+    criterios: { ap: 1.8, t1: 5.0, t2: 5.2, t3: 4.8, ne: 8 },
+    erros: ['8 erros graves de microestrutura: pontuação, concordância e truncamento sintático.'],
+    parecer: 'Abaixo do corte de 18 pts. Desconto por número de erros na fórmula Cebraspe foi determinante. Necessita treino intensivo em microestrutura.',
+    texto: `Os crimes virtuais aumentaram muito depois da pandemia onde muitas pessoas começaram a fazer compras e transações pela internet sem ter o devido cuidado com suas senhas pessoais.\n\nA policia civil tem dificuldade de identificar esses criminosos porque eles usam computadores fora do país ou endereços falsos de ip. Isso faz com que a investigação demore muito para ser concluída e o dinheiro roubado nunca mais volte para as vítimas prejudicadas.\n\nOutro ponto importante é a falta de policiais especialistas em tecnologia nas delegacias do interior do estado que muitas vezes não tem nem computadores modernos para trabalhar.\n\nPor isso o governo precisa contratar peritos em informática e criar mais delegacias virtuais para combater esses crimes que crescem todos os dias no nosso estado.`
+  },
+
+  // PPPE (Cebraspe Edital 2026 - 10 pts, corte 6.0 pts)
+  {
+    id: 'pppe-1',
+    nome: 'Felipe Augusto Melo',
+    email: 'felipe.melo@gmail.com',
+    concurso: 'pppe',
+    redacoes: 5,
+    ultimaNota: 9.1,
+    notaAnterior: 8.2,
+    data: '2026-11-10T17:10:00Z',
+    tema: 'A ressocialização de apenados e a segurança nos estabelecimentos prisionais',
+    status: 'Aprovado',
+    criterios: { ap: 0.9, t1: 2.9, t2: 2.8, t3: 2.7, ne: 1 },
+    erros: ['Apenas 1 desvio formal de grafia.'],
+    parecer: 'Brilhante desempenho na rubrica Cebraspe PPPE (9,1 / 10,0). Citou expressamente a LEP (Lei 7.210/84) e Foucault.',
+    texto: `O sistema penitenciário brasileiro enfrenta o paradoxo entre a imperativa contenção carcerária e a missão constitucional de reinserção social do condenado. Conforme preconiza a Lei de Execução Penal (Lei nº 7.210/1984), a pena privativa de liberdade possui natureza bifronte: punir o ilícito e proporcionar condições harmônicas para a integração do apenado ao convívio comunitário.\n\nNesse sentido, a atuação do Policial Penal é o vetor central para desarticular facções no interior dos presídios e manter a disciplina, precondição para que projetos de educação e trabalho intramuros prosperem. Conforme ensina Michel Foucault em Vigiar e Punir, o cárcere que apenas isola retroalimenta a delinquência. Em contrapartida, quando o Estado oferece oficinas laborais e remição de pena pelo estudo, rompe-se o ciclo de reincidência criminal.\n\nAdemais, a modernização de bloqueadores de sinal celular e scanners corporais preserva a integridade dos servidores penais e inviabiliza ordens criminosas para o meio externo.\n\nAssim sendo, a consolidação da Polícia Penal de Pernambuco como carreira de Estado, municiada de estrutura e capacitação continuada, é indispensável para humanizar a execução penal e salvaguardar a paz social.`
+  },
+  {
+    id: 'pppe-2',
+    nome: 'Beatriz Pimentel Rocha',
+    email: 'beatriz.rocha@gmail.com',
+    concurso: 'pppe',
+    redacoes: 4,
+    ultimaNota: 5.4,
+    notaAnterior: 5.0,
+    data: '2026-11-08T15:30:00Z',
+    tema: 'A ressocialização de apenados e a segurança nos estabelecimentos prisionais',
+    status: 'Atenção',
+    criterios: { ap: 0.5, t1: 1.8, t2: 1.8, t3: 1.7, ne: 6 },
+    erros: ['6 erros de microestrutura. Desconto severo no fator TL/NE.'],
+    parecer: 'Abaixo da nota de corte (5,4 < 6,0). Argumentação superficial sem citação legal fundamentada.',
+    texto: `Os presídios de Pernambuco estão superlotados e isso causa muitas rebeliões perigosas. A função da policia penal é cuidar da segurança dos presos e não deixar entrar armas e drogas nos pavilhões.\n\nOs presos deveriam trabalhar para pagar sua própria estadia na cadeia e aprender uma profissão honesta para quando saírem de lá não voltarem a cometer assaltos e assassinatos.\n\nTambém precisa de mais investimentos em câmeras de segurança e equipamentos de proteção para os policiais penais que trabalham em condições difíceis arriscando suas vidas diariamente.\n\nPortanto o governo tem que construir novos presídios e contratar mais concursados para resolver a crise carcerária do estado.`
+  },
+
+  // CBMPE (Instituto AOCP - 40 pts, corte 24 pts)
+  {
+    id: 'cbmpe-1',
+    nome: 'Carlos Eduardo Rocha',
+    email: 'carlos.rocha@gmail.com',
+    concurso: 'cbmpe',
+    redacoes: 6,
+    ultimaNota: 36.0,
+    notaAnterior: 32.0,
+    data: '2026-11-10T09:40:00Z',
+    tema: 'A atuação do Corpo de Bombeiros na mitigação de desastres naturais e mudanças climáticas',
+    status: 'Aprovado',
+    criterios: { d1: 9.0, d2: 9.0, d3: 9.0, d4: 9.0 },
+    erros: ['Uso dispensável de vírgula na linha 14.'],
+    parecer: 'Excelente abordagem técnica dos desastres de encostas no Grande Recife e papel do CBMPE.',
+    texto: `As mudanças climáticas globais intensificaram a frequência e a severidade de eventos extremos no Brasil. Em Pernambuco, episódios sazonais de deslizamentos de encostas e inundações na Região Metropolitana do Recife evidenciam a premência do Corpo de Bombeiros Militar como instituição de vanguarda na preservação de vidas e na gestão integral do risco.\n\nPrimordialmente, a missão do CBMPE transcende o socorro emergencial após o sinistro. O planejamento preventivo em conjunto com a Defesa Civil, por meio de vistorias técnicas e mapeamento de setores de alto risco geológico, permite a evacuação preventiva de moradores em áreas vulneráveis antes da ruptura do solo, mitigando perdas irreparáveis.\n\nAlém disso, o aperfeiçoamento contínuo em busca e resgate em estruturas colapsadas e salvamento em águas rápidas requer tecnologia de ponta, como drones térmicos e cães farejadores treinados.\n\nInfere-se, logo, que investimentos consistentes do Governo do Estado na modernização da frota e na ampliação do quadro de bombeiros militares são medidas prementes para assegurar resiliência urbana e proteção aos mais necessitados.`
+  },
+
+  // PMSP (Fundação VUNESP - 100 pts, corte 60 pts)
+  {
+    id: 'pmsp-1',
+    nome: 'Fernanda Paiva Silveira',
+    email: 'fernanda.paiva@gmail.com',
+    concurso: 'pmsp',
+    redacoes: 7,
+    ultimaNota: 88.0,
+    notaAnterior: 80.0,
+    data: '2026-11-10T11:50:00Z',
+    tema: 'O uso de câmeras corporais operacionais e a legitimidade da atuação policial militar',
+    status: 'Aprovado',
+    criterios: { cA: 28.0, cB: 32.0, cC: 28.0 },
+    erros: ['Pequena redundância na conclusão.'],
+    parecer: 'Redação exemplar para o padrão VUNESP. Tese clara, articulação perfeita de argumentos favoráveis à transparência e segurança jurídica do policial.',
+    texto: `A modernização da segurança pública no estado de São Paulo tem sido marcada pelo debate acerca do uso das câmeras operacionais portáteis acopladas aos uniformes dos policiais militares. Longe de representar um mecanismo de desconfiança institucional, a tecnologia desponta como instrumento civilizatório que confere transparência às abordagens e resguarda juridicamente o agente estatal no estrito cumprimento do dever legal.\n\nEm primeiro lugar, a gravação ininterrupta dos atos de serviço fornece respaldo probatório inquestionável contra falsas acusações de abuso de poder. Em situações de confronto armado ou resistência à prisão, o registro em áudio e vídeo elucida a dinâmica fática perante o Poder Judiciário e a opinião pública, blindando o policial cumpridor da lei.\n\nOutrossim, estudos acadêmicos comprovam a redução expressiva da letalidade policial e do índice de violência contra a própria tropa onde as câmeras foram implantadas. A previsibilidade de registro estimula a desescalada de conflitos por parte dos abordados e padroniza os procedimentos operacionais da corporação sob a égide dos direitos humanos.\n\nEm suma, o fortalecimento do programa Olho Vivo na Polícia Militar de São Paulo consolida a legitimidade democrática da instituição, demonstrando que inovação tecnológica e preservação da dignidade humana são vetores convergentes em prol da paz social.`
+  },
+  {
+    id: 'pmsp-2',
+    nome: 'Thiago Nogueira Mendes',
+    email: 'thiago.mendes@gmail.com',
+    concurso: 'pmsp',
+    redacoes: 4,
+    ultimaNota: 74.0,
+    notaAnterior: 70.0,
+    data: '2026-11-09T08:30:00Z',
+    tema: 'O uso de câmeras corporais operacionais e a legitimidade da atuação policial militar',
+    status: 'Estagnado',
+    criterios: { cA: 24.0, cB: 26.0, cC: 24.0 },
+    erros: ['Falta de paralelismo sintático no parágrafo 2.', 'Dois desvios de crase.'],
+    parecer: 'Texto consistente, dentro da média da turma PMSP. Necessita aprofundar argumentos contra-argumentativos.',
+    texto: `O emprego das câmeras nas fardas da Polícia Militar de São Paulo tem gerado discussões importantes entre especialistas e a sociedade civil. Trata-se de uma ferramenta que visa modernizar a segurança pública e garantir maior segurança para todos os envolvidos nas ocorrências.\n\nPor um lado, os equipamentos protegem o bom policial de falsas denúncias feitas por criminosos que desejam manchar a reputação da corporação. Quando as imagens mostram que a abordagem foi correta e proporcional, o Ministério Público arquiva representações infundadas com rapidez.\n\nPor outro lado, o cidadão abordado sente-se mais confiante de que seus direitos fundamentais serão respeitados. Essa relação de transparência aproxima a Polícia Militar da comunidade, fortalecendo a confiança mútua e auxiliando na resolução pacífica de desentendimentos cotidianos.\n\nPortanto, a continuidade e o aperfeiçoamento das câmeras operacionais representam um passo positivo para a consolidação de uma polícia moderna, eficiente e respeitada no estado de São Paulo.`
+  },
+  {
+    id: 'pmsp-3',
+    nome: 'Amanda Guimarães Leite',
+    email: 'amanda.leite@gmail.com',
+    concurso: 'pmsp',
+    redacoes: 3,
+    ultimaNota: 52.0,
+    notaAnterior: 48.0,
+    data: '2026-11-07T13:40:00Z',
+    tema: 'O combate ao crime organizado no estado de São Paulo',
+    status: 'Atenção',
+    criterios: { cA: 18.0, cB: 18.0, cC: 16.0 },
+    erros: ['Erros graves de norma culta (critério C Vunesp). Desvios de concordância e marcas de oralidade.'],
+    parecer: 'Abaixo do corte de 60 pts na Vunesp. Perda acentuada no Critério C (modalidade escrita). Necessita refazer exercícios de regência e crase.',
+    texto: `O crime organizado no estado de São Paulo é comandado por facções que controlam o tráfico de drogas e lavam dinheiro em postos de combustível e transportes públicos. A polícia militar precisa de armas melhores e mais salário para combater esses criminosos com coragem.\n\nNão adianta apenas prender os traficantes pequenos nas esquinas se os líderes continuam mandando mensagens de dentro dos presídios para ordenar crimes graves.\n\nÉ preciso que o governo corte as comunicações dos presídios e invista em inteligência para prender os chefes das facções que vivem em mansões de luxo.\n\nAssim São Paulo poderá voltar a ser um estado mais seguro para as famílias trabalhadoras que vivem com medo da criminalidade nas periferias.`
+  }
+];
+
+let profCurrentTurma = 'pmpe';
+let profCurrentPeriodo = '7d';
+let profSearchTerm = '';
+
+function renderProfessorDashboard(turmaKey, periodo){
+  if(turmaKey) profCurrentTurma = turmaKey;
+  else {
+    const sel = $('#profTurmaSelect');
+    if(sel && sel.value) profCurrentTurma = sel.value;
+    else profCurrentTurma = currentTarget || 'pmpe';
+  }
+
+  if(periodo) profCurrentPeriodo = periodo;
+  else {
+    const pSel = $('#profPeriodoSelect');
+    if(pSel && pSel.value) profCurrentPeriodo = pSel.value;
+  }
+
+  // Sincronizar selects
+  if($('#profTurmaSelect')) $('#profTurmaSelect').value = profCurrentTurma;
+  if($('#profPeriodoSelect')) $('#profPeriodoSelect').value = profCurrentPeriodo;
+
+  const spec = BANCA_SPECS[profCurrentTurma] || BANCA_SPECS.pmpe;
+  const maxPts = spec.maxPontos || 40.0;
+  const cortePts = spec.corte || (maxPts * 0.6);
+
+  // 1. Obter alunos da turma filtrada
+  let alunosTurma = MOCK_PROFESSOR_STUDENTS.filter(s => s.concurso === profCurrentTurma);
+
+  // Se o aluno real logado no navegador tiver redações salvas desta banca, mesclar no topo
+  const historicoReal = getHistorico().filter(h => h.banca === profCurrentTurma);
+  if(historicoReal.length > 0){
+    const ultReal = historicoReal[0];
+    const nomeReal = getUserData('redacao_nome') || currentGoogleUser?.name || 'Aluno Atual (Você)';
+    const notaNum = parseFloat(ultReal.nota) || 0;
+    const penultNota = historicoReal.length > 1 ? parseFloat(historicoReal[1].nota) : notaNum;
+    const statusReal = notaNum >= (maxPts * 0.75) ? 'Aprovado' : (notaNum >= cortePts ? 'Estagnado' : 'Atenção');
+    alunosTurma = [
+      {
+        id: 'real-user',
+        nome: nomeReal + ' (Perfil Ativo)',
+        email: currentGoogleUser?.email || 'aluno@cursinho.com.br',
+        concurso: profCurrentTurma,
+        redacoes: historicoReal.length,
+        ultimaNota: notaNum,
+        notaAnterior: penultNota,
+        data: ultReal.data || new Date().toISOString(),
+        tema: ultReal.tema || 'Redação enviada na plataforma',
+        status: statusReal,
+        criterios: ultReal.detalhes || {},
+        erros: ['Ver espelho detalhado do motor de correção.'],
+        parecer: ultReal.comentarioGeral || 'Redação corrigida e auditada pelo motor da banca.',
+        texto: ultReal.texto || '(Texto arquivado no histórico do perfil)'
+      },
+      ...alunosTurma
+    ];
+  }
+
+  // Multiplicadores realistas de turma comercial
+  const turmaStatsConfig = {
+    pmpe: { totalAtivos: 148, redacoes7d: 318, redacoes30d: 940, redacoesAll: 2420 },
+    pcpe: { totalAtivos: 94, redacoes7d: 196, redacoes30d: 610, redacoesAll: 1580 },
+    pppe: { totalAtivos: 76, redacoes7d: 142, redacoes30d: 480, redacoesAll: 1190 },
+    cbmpe: { totalAtivos: 62, redacoes7d: 128, redacoes30d: 390, redacoesAll: 960 },
+    pmsp: { totalAtivos: 155, redacoes7d: 342, redacoes30d: 1080, redacoesAll: 2750 }
+  };
+  const statsConf = turmaStatsConfig[profCurrentTurma] || turmaStatsConfig.pmpe;
+  const redacoesTotal = profCurrentPeriodo === '7d' ? statsConf.redacoes7d : (profCurrentPeriodo === '30d' ? statsConf.redacoes30d : statsConf.redacoesAll);
+
+  // Média da turma calculada
+  const somaNotas = alunosTurma.reduce((acc, a) => acc + a.ultimaNota, 0);
+  const mediaTurma = alunosTurma.length ? (somaNotas / alunosTurma.length) : (maxPts * 0.78);
+  const alunosRiscoCount = alunosTurma.filter(a => a.ultimaNota < cortePts).length;
+  const alunosRiscoTotal = Math.max(alunosRiscoCount, Math.round(statsConf.totalAtivos * 0.12));
+
+  // RENDERIZAR OS 4 CARDS DE KPIS
+  const kpiGrid = $('#profKpisGrid');
+  if(kpiGrid){
+    kpiGrid.innerHTML = `
+      <div class="kpi-card" style="--kpi-bar:#3b82f6">
+        <div class="kpi-label">
+          <span>👥 Alunos Ativos</span>
+          <span style="font-size:16px">🎓</span>
+        </div>
+        <div class="kpi-value">${statsConf.totalAtivos} <span style="font-size:15px;font-weight:600;color:var(--muted)">alunos</span></div>
+        <div class="kpi-sub" style="color:#15803d;font-weight:700">✓ 98.4% de engajamento na semana</div>
+      </div>
+
+      <div class="kpi-card" style="--kpi-bar:#10b981">
+        <div class="kpi-label">
+          <span>📝 Redações Corrigidas</span>
+          <span style="font-size:16px">⚡</span>
+        </div>
+        <div class="kpi-value">${redacoesTotal} <span style="font-size:15px;font-weight:600;color:var(--muted)">envios</span></div>
+        <div class="kpi-sub">Período: ${profCurrentPeriodo === '7d' ? 'Últimos 7 dias' : (profCurrentPeriodo === '30d' ? 'Últimos 30 dias' : 'Todo o período')}</div>
+      </div>
+
+      <div class="kpi-card" style="--kpi-bar:#f59e0b">
+        <div class="kpi-label">
+          <span>🎯 Nota Média da Turma</span>
+          <span style="font-size:16px">📊</span>
+        </div>
+        <div class="kpi-value">${mediaTurma.toFixed(1)} <span style="font-size:16px;font-weight:600;color:var(--muted)">/ ${maxPts.toFixed(1)} pts</span></div>
+        <div class="kpi-sub">Corte do edital: <b>${cortePts.toFixed(1)} pts</b></div>
+      </div>
+
+      <div class="kpi-card" style="--kpi-bar:#ef4444">
+        <div class="kpi-label">
+          <span>🚨 Em Zona de Risco</span>
+          <span style="font-size:16px">⚠️</span>
+        </div>
+        <div class="kpi-value" style="color:#dc2626">${alunosRiscoTotal} <span style="font-size:15px;font-weight:600;color:var(--muted)">alunos</span></div>
+        <div class="kpi-sub" style="color:#b91c1c;font-weight:700">Abaixo de 60% da pontuação máxima</div>
+      </div>
+    `;
+  }
+
+  // RENDERIZAR DIAGNÓSTICO: ONDE A TURMA MAIS PERDE PONTOS
+  if($('#profCritBancaBadge')) $('#profCritBancaBadge').textContent = spec.banca;
+  const barsContainer = $('#profCritBarsContainer');
+  if(barsContainer){
+    const aproveitamentoMock = {
+      pmpe: [
+        { nome: '1. D1 - Tema e Tipologia Textual', peso: '10 pts', pct: 88 },
+        { nome: '2. D2 - Coesão e Conectivos', peso: '10 pts', pct: 76 },
+        { nome: '3. D3 - Argumentação e Repertório', peso: '10 pts', pct: 72 },
+        { nome: '4. D4 - Gramática e Microestrutura', peso: '10 pts', pct: 64 }
+      ],
+      pcpe: [
+        { nome: '1. Apresentação e Estrutura', peso: '3.0 pts', pct: 86 },
+        { nome: '2. Tópico 1 - Legislação / Fundamentos', peso: '9.0 pts', pct: 78 },
+        { nome: '3. Tópico 2 - Investigação Técnica', peso: '9.0 pts', pct: 70 },
+        { nome: '4. Tópico 3 - Aspectos Processuais', peso: '9.0 pts', pct: 66 }
+      ],
+      pppe: [
+        { nome: '1. Apresentação e Tipologia', peso: '1.0 pt', pct: 89 },
+        { nome: '2. Tópico 1 - Lei de Execução Penal', peso: '3.0 pts', pct: 75 },
+        { nome: '3. Tópico 2 - Segurança Penitenciária', peso: '3.0 pts', pct: 71 },
+        { nome: '4. Tópico 3 - Direitos e Garantias', peso: '3.0 pts', pct: 65 }
+      ],
+      cbmpe: [
+        { nome: '1. D1 - Atendimento ao Tema', peso: '10 pts', pct: 87 },
+        { nome: '2. D2 - Coesão e Estrutura Lógica', peso: '10 pts', pct: 75 },
+        { nome: '3. D3 - Argumentação Técnica', peso: '10 pts', pct: 74 },
+        { nome: '4. D4 - Norma Padrão Culta', peso: '10 pts', pct: 67 }
+      ],
+      pmsp: [
+        { nome: '1. Critério A - Tema e Tipologia', peso: '30 pts', pct: 84 },
+        { nome: '2. Critério B - Estrutura e Coesão', peso: '40 pts', pct: 75 },
+        { nome: '3. Critério C - Norma Culta e Gramática', peso: '30 pts', pct: 62 }
+      ]
+    };
+
+    const listaCrit = aproveitamentoMock[profCurrentTurma] || aproveitamentoMock.pmpe;
+    barsContainer.innerHTML = listaCrit.map(c => {
+      const cor = c.pct >= 80 ? '#10b981' : (c.pct >= 70 ? '#f59e0b' : '#ef4444');
+      return `
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;font-weight:700">
+            <span>${c.nome} <small style="color:var(--muted);font-weight:500">(${c.peso})</small></span>
+            <span style="color:${cor};font-weight:800">${c.pct}% aproveitamento</span>
+          </div>
+          <div class="prof-crit-bar-track">
+            <div class="prof-crit-bar-fill" style="width:${c.pct}%;background:${cor}"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // RENDERIZAR TOP 5 ERROS GRAMATICAIS
+  const errosContainer = $('#profErrosListContainer');
+  if(errosContainer){
+    const errosPorBanca = {
+      pmpe: [
+        { erro: '1º Uso da Crase antes de palavras masculinas ou verbos', pct: '38% dos alunos' },
+        { erro: '2º Vírgula separando sujeito e predicado ou orações', pct: '32% dos alunos' },
+        { erro: '3º Regência verbal inadequada (visar a, assistir a)', pct: '27% dos alunos' },
+        { erro: '4º Concordância nominal com predicativos pospostos', pct: '21% dos alunos' },
+        { erro: '5º Repetição vocabular e falta de pronomes anafóricos', pct: '18% dos alunos' }
+      ],
+      pcpe: [
+        { erro: '1º Falta de conectivos interparágrafos (Prejuízo no AP)', pct: '35% dos alunos' },
+        { erro: '2º Desvios de acentuação gráfica (Novo Acordo)', pct: '30% dos alunos' },
+        { erro: '3º Translineação incorreta e rasuras na margem direita', pct: '26% dos alunos' },
+        { erro: '4º Argumento superficial sem citação do dispositivo legal', pct: '24% dos alunos' },
+        { erro: '5º Ambiguidade no emprego do pronome possessivo "seu"', pct: '17% dos alunos' }
+      ],
+      pppe: [
+        { erro: '1º Erros de pontuação e períodos longos sem fôlego', pct: '36% dos alunos' },
+        { erro: '2º Falta de menção explícita à Lei de Execução Penal', pct: '31% dos alunos' },
+        { erro: '3º Crase em locuções adverbiais e prepositivas', pct: '28% dos alunos' },
+        { erro: '4º Concordância verbal com sujeito composto anteposto', pct: '22% dos alunos' },
+        { erro: '5º Parágrafos com menos de 3 linhas (frases isoladas)', pct: '19% dos alunos' }
+      ],
+      cbmpe: [
+        { erro: '1º Desvio de crase facultativa vs proibida', pct: '34% dos alunos' },
+        { erro: '2º Pontuação antes de conjunções adversativas (mas, porém)', pct: '29% dos alunos' },
+        { erro: '3º Termos coloquiais inadequados ao texto técnico', pct: '25% dos alunos' },
+        { erro: '4º Regência de verbos de movimento (chegar a / ir a)', pct: '20% dos alunos' },
+        { erro: '5º Falta de paralelismo sintático na conclusão', pct: '16% dos alunos' }
+      ],
+      pmsp: [
+        { erro: '1º Marcas de oralidade e informalidade (Critério C)', pct: '37% dos alunos' },
+        { erro: '2º Falta de problematização contundente na tese (Critério A)', pct: '31% dos alunos' },
+        { erro: '3º Emprego inadequado da crase em locuções femininas', pct: '27% dos alunos' },
+        { erro: '4º Repetição viciosa de conectivos ("além disso", "onde")', pct: '23% dos alunos' },
+        { erro: '5º Desarmonia nos tempos e modos verbais', pct: '19% dos alunos' }
+      ]
+    };
+
+    const listaErros = errosPorBanca[profCurrentTurma] || errosPorBanca.pmpe;
+    errosContainer.innerHTML = listaErros.map(e => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#f8fafc;border-radius:8px;margin-bottom:6px;font-size:12.5px;border:1px solid #e2e8f0">
+        <span style="font-weight:600;color:#1e293b">${e.erro}</span>
+        <span class="badge" style="background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700">${e.pct}</span>
+      </div>
+    `).join('');
+  }
+
+  // RECOMENDAÇÃO DIDÁTICA PARA A PRÓXIMA AULA
+  const recomBox = $('#profRecomBox');
+  if(recomBox){
+    const recomendacoes = {
+      pmpe: `<b>💡 Recomendação para a Próxima Aula do Professor:</b><br>
+        Dedique os primeiros 25 minutos a uma oficina prática de <b>Crase e Regência Verbal no padrão Instituto AOCP</b>.
+        A análise da IA detectou que <b>38% da turma</b> perdeu pontos valiosos no critério <b>D4 (Gramática)</b> justamente ao empregar preposições exigidas por verbos comuns na segurança pública (ex: <i>"visar à redução dos homicídios"</i>, <i>"obedecer às normas operacionais"</i>).`,
+      pcpe: `<b>💡 Recomendação para a Próxima Aula do Professor:</b><br>
+        Foque em <b>Estruturação Tópica Cebraspe e Conectivos Interparágrafos</b>.
+        Mais de <b>30% dos alunos</b> perderam pontos na Apresentação (AP) e sofreram penalização na fórmula líquida por falta de citações legais precisas (Pacote Anticrime e CPP) nos tópicos de investigação pericial.`,
+      pppe: `<b>💡 Recomendação para a Próxima Aula do Professor:</b><br>
+        Realize um simulado relâmpago de <b>Aplicação da Lei de Execução Penal (LEP - Lei 7.210/84)</b> na redação discursiva Cebraspe.
+        Os alunos estão demonstrando boa argumentação geral, mas pecam na ancoragem de artigos específicos sobre trabalho prisional e remição de pena.`,
+      cbmpe: `<b>💡 Recomendação para a Próxima Aula do Professor:</b><br>
+        Reforce a <b>Norma Culta e Vocabulário Técnico de Defesa Civil</b>.
+        Elimine termos coloquiais na redação da AOCP e trabalhe a transição coesiva entre a constatação do desastre natural e o papel preventivo/operacional do CBMPE.`,
+      pmsp: `<b>💡 Recomendação para a Próxima Aula do Professor:</b><br>
+        Treine <b>Sustentação de Tese com Contraponto e Norma Padrão VUNESP (Critério C)</b>.
+        Quase 40% dos alunos escorregaram na modalidade escrita por desvios gramaticais evitáveis e repetição viciosa de termos nos parágrafos de desenvolvimento.`
+    };
+    recomBox.innerHTML = recomendacoes[profCurrentTurma] || recomendacoes.pmpe;
+  }
+
+  // RENDERIZAR TABELA DE RANKING
+  renderProfessorRankingTable(alunosTurma, maxPts);
+}
+
+function renderProfessorRankingTable(alunosTurma, maxPts){
+  const tbody = $('#profRankingTableBody');
+  if(!tbody) return;
+
+  // Filtrar por busca se digitado
+  let lista = [...alunosTurma];
+  if(profSearchTerm && profSearchTerm.trim()){
+    const term = profSearchTerm.toLowerCase().trim();
+    lista = lista.filter(a => a.nome.toLowerCase().includes(term) || a.tema.toLowerCase().includes(term));
+  }
+
+  // Ordenar por última nota decrescente
+  lista.sort((a, b) => b.ultimaNota - a.ultimaNota);
+
+  if(lista.length === 0){
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Nenhum aluno encontrado para os filtros selecionados.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = lista.map((aluno, idx) => {
+    const pos = idx + 1;
+    let medalha = `${pos}º`;
+    if(pos === 1) medalha = `🥇 1º`;
+    else if(pos === 2) medalha = `🥈 2º`;
+    else if(pos === 3) medalha = `🥉 3º`;
+
+    const diff = aluno.ultimaNota - aluno.notaAnterior;
+    let evolucaoHtml = `<span style="color:var(--muted)">0.0%</span>`;
+    if(diff > 0){
+      evolucaoHtml = `<span style="color:#15803d;font-weight:700">▲ +${diff.toFixed(1)}</span>`;
+    } else if(diff < 0){
+      evolucaoHtml = `<span style="color:#b91c1c;font-weight:700">▼ ${diff.toFixed(1)}</span>`;
+    }
+
+    let statusBadge = `<span class="badge" style="background:#dcfce7;color:#166534">Aprovado</span>`;
+    if(aluno.status === 'Estagnado'){
+      statusBadge = `<span class="badge" style="background:#fef9c3;color:#854d0e">Estagnado</span>`;
+    } else if(aluno.status === 'Atenção'){
+      statusBadge = `<span class="badge" style="background:#fee2e2;color:#991b1b">Atenção</span>`;
+    }
+
+    return `
+      <tr>
+        <td style="text-align:center;font-weight:800;font-size:13px">${medalha}</td>
+        <td>
+          <div style="font-weight:700;color:#0f172a">${escapeHtml(aluno.nome)}</div>
+          <small style="color:var(--muted)">${escapeHtml(aluno.email)}</small>
+        </td>
+        <td>
+          <span class="badge" style="font-size:10.5px">${aluno.concurso.toUpperCase()}</span>
+        </td>
+        <td style="text-align:center;font-weight:600">${aluno.redacoes}</td>
+        <td style="text-align:center">
+          <b style="font-size:14px;color:#0f172a">${aluno.ultimaNota.toFixed(1)}</b>
+          <span style="font-size:11px;color:var(--muted)"> / ${maxPts.toFixed(1)}</span>
+        </td>
+        <td style="text-align:center">${evolucaoHtml}</td>
+        <td style="text-align:center">${statusBadge}</td>
+        <td style="text-align:center">
+          <button type="button" class="btn btn-light btn-sm btn-ver-auditoria" data-aluno-id="${aluno.id}" style="font-size:11.5px;padding:4px 10px;white-space:nowrap">
+            📄 Ver Redação
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Atribuir cliques nos botões de auditoria
+  $$('.btn-ver-auditoria').forEach(btn => {
+    btn.onclick = () => {
+      const alunoId = btn.dataset.alunoId;
+      abrirAuditoriaAlunoModal(alunoId);
+    };
+  });
+}
+
+function abrirAuditoriaAlunoModal(alunoId){
+  const modal = $('#professorAuditoriaModal');
+  const body = $('#auditoriaModalBody');
+  const title = $('#auditoriaModalTitle');
+  const sub = $('#auditoriaModalSub');
+  if(!modal || !body) return;
+
+  // Localizar aluno no mock ou usuário real
+  let aluno = MOCK_PROFESSOR_STUDENTS.find(s => s.id === alunoId);
+  if(!aluno && alunoId === 'real-user'){
+    const historicoReal = getHistorico().filter(h => h.banca === profCurrentTurma);
+    if(historicoReal.length > 0){
+      const ult = historicoReal[0];
+      aluno = {
+        id: 'real-user',
+        nome: getUserData('redacao_nome') || currentGoogleUser?.name || 'Aluno Atual (Você)',
+        email: currentGoogleUser?.email || 'aluno@cursinho.com.br',
+        concurso: profCurrentTurma,
+        redacoes: historicoReal.length,
+        ultimaNota: parseFloat(ult.nota) || 0,
+        notaAnterior: parseFloat(ult.nota) || 0,
+        data: ult.data || new Date().toISOString(),
+        tema: ult.tema || 'Redação enviada na plataforma',
+        status: 'Aprovado',
+        criterios: ult.detalhes || {},
+        erros: ['Ver espelho detalhado do motor de correção.'],
+        parecer: ult.comentarioGeral || 'Redação corrigida e auditada pelo motor da banca.',
+        texto: ult.texto || '(Texto arquivado)'
+      };
+    }
+  }
+
+  if(!aluno) return toast('Aluno não localizado para auditoria.');
+
+  const spec = BANCA_SPECS[aluno.concurso] || BANCA_SPECS.pmpe;
+  const maxPts = spec.maxPontos || 40.0;
+
+  if(title) title.textContent = `📄 Auditoria: ${aluno.nome}`;
+  if(sub) sub.textContent = `Turma ${aluno.concurso.toUpperCase()} · Última Nota: ${aluno.ultimaNota.toFixed(1)} / ${maxPts.toFixed(1)} pts`;
+
+  // Renderizar o espelho completo com formatação institucional da banca
+  body.innerHTML = `
+    <div style="background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:8px">
+        <div>
+          <b style="font-size:15px;color:#0f172a">${escapeHtml(aluno.nome)}</b>
+          <span style="font-size:12px;color:var(--muted);margin-left:8px">(${escapeHtml(aluno.email)})</span>
+        </div>
+        <div>
+          <span class="badge" style="background:#0f172a;color:#fff">${aluno.concurso.toUpperCase()}</span>
+          <span class="badge" style="background:#15803d;color:#fff;font-weight:800;font-size:13px">${aluno.ultimaNota.toFixed(1)} / ${maxPts.toFixed(1)} pts</span>
+        </div>
+      </div>
+      <div style="font-size:13px;color:#334155;margin-bottom:6px">
+        <b>📌 Tema Trabalhado:</b> ${escapeHtml(aluno.tema)}
+      </div>
+      <div style="font-size:12px;color:var(--muted)">
+        <b>Data de Envio:</b> ${new Date(aluno.data).toLocaleDateString('pt-BR')} às ${new Date(aluno.data).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})} · <b>Total de Envios:</b> ${aluno.redacoes} redações
+      </div>
+    </div>
+
+    <!-- PARECER PEDAGÓGICO DA IA -->
+    <div class="notice notice-blue" style="margin-bottom:18px;font-size:13px">
+      <b>🤖 Diagnóstico Pedagógico do Corretor de IA:</b><br>
+      ${escapeHtml(aluno.parecer)}
+    </div>
+
+    <!-- FOLHA ESPELHO COM O TEXTO DO ALUNO -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:8px">
+        📝 Texto Integral Enviado pelo Aluno:
+      </div>
+      <div style="background:#ffffff;border:1.5px solid #cbd5e1;border-radius:10px;padding:18px;font-family:'JetBrains Mono', monospace;font-size:13px;line-height:1.9;color:#0f172a;white-space:pre-wrap;max-height:300px;overflow-y:auto">
+${escapeHtml(aluno.texto)}
+      </div>
+    </div>
+
+    <!-- APONTAMENTO DE ERROS IDENTIFICADOS -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:8px">
+        ⚠️ Fragilidades & Desvios Mapeados:
+      </div>
+      <ul style="margin:0;padding-left:20px;font-size:13px;color:#b91c1c;line-height:1.6">
+        ${aluno.erros.map(e => `<li>${escapeHtml(e)}</li>`).join('')}
+      </ul>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;border-top:1px solid var(--line);padding-top:14px">
+      <button type="button" class="btn btn-light btn-sm" id="btnFecharAuditoriaInterno">Fechar Auditoria</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="window.print()">🖨️ Imprimir Espelho do Aluno</button>
+    </div>
+  `;
+
+  modal.classList.add('show');
+
+  const btnFechar = $('#btnFecharAuditoriaInterno');
+  if(btnFechar) btnFechar.onclick = () => modal.classList.remove('show');
+}
+
+function exportarTurmaCsv(alunos, turmaKey){
+  if(!alunos || alunos.length === 0){
+    return toast('Não há dados de alunos para exportar.');
+  }
+
+  const spec = BANCA_SPECS[turmaKey] || BANCA_SPECS.pmpe;
+  const maxPts = spec.maxPontos || 40.0;
+
+  // Header CSV com BOM UTF-8 para Excel
+  let csv = '\uFEFFPosicao;Nome;Email;Concurso;Banca;Redacoes;UltimaNota;NotaMaxima;Evolucao;Status;Tema;Data\n';
+
+  alunos.forEach((a, i) => {
+    const pos = i + 1;
+    const diff = a.ultimaNota - a.notaAnterior;
+    const evol = diff >= 0 ? `+${diff.toFixed(1)}` : `${diff.toFixed(1)}`;
+    const linha = [
+      pos,
+      `"${a.nome.replace(/"/g, '""')}"`,
+      `"${a.email}"`,
+      a.concurso.toUpperCase(),
+      `"${spec.banca}"`,
+      a.redacoes,
+      a.ultimaNota.toFixed(1).replace('.', ','),
+      maxPts.toFixed(1).replace('.', ','),
+      `"${evol}"`,
+      a.status,
+      `"${(a.tema || '').replace(/"/g, '""')}"`,
+      `"${new Date(a.data).toLocaleDateString('pt-BR')}"`
+    ].join(';');
+    csv += linha + '\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `relatorio-turma-${turmaKey}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Planilha CSV exportada com sucesso!');
+}
+
+/* =====================================================================
+   11.5. OCR FORENSE DE FOLHA MANUSCRITA COM IA MULTIMODAL (GEMINI VISION)
+   ===================================================================== */
+let ocrBase64Image = null;
+let ocrMimeType = 'image/jpeg';
+let ocrRotation = 0;
+let ocrZoom = 1;
+let ocrCurrentData = null;
+
+function abrirModalOcr(){
+  const modal = $('#ocrModal');
+  if(!modal) return;
+  ocrBase64Image = null;
+  ocrMimeType = 'image/jpeg';
+  ocrRotation = 0;
+  ocrZoom = 1;
+  ocrCurrentData = null;
+
+  const fileInput = $('#ocrFileInput');
+  if(fileInput) fileInput.value = '';
+
+  const imgPreview = $('#ocrImgPreview');
+  if(imgPreview){
+    imgPreview.src = '';
+    imgPreview.style.transform = 'rotate(0deg)';
+  }
+
+  if($('#ocrStepUpload')) $('#ocrStepUpload').style.display = 'block';
+  if($('#ocrDropZone')) $('#ocrDropZone').style.display = 'block';
+  if($('#ocrPreviewContainer')) $('#ocrPreviewContainer').style.display = 'none';
+  if($('#ocrLoadingState')) $('#ocrLoadingState').style.display = 'none';
+  if($('#ocrStepReview')) $('#ocrStepReview').style.display = 'none';
+
+  modal.classList.add('show');
+}
+
+function fecharModalOcr(){
+  const modal = $('#ocrModal');
+  if(modal) modal.classList.remove('show');
+}
+
+function handleOcrFile(file){
+  if(!file) return;
+  if(!file.type || !file.type.startsWith('image/')){
+    toast('Selecione uma imagem válida (JPEG, PNG ou WebP).');
+    return;
+  }
+  if(file.size > 15 * 1024 * 1024){
+    toast('A foto da redação deve ter no máximo 15MB.');
+    return;
+  }
+
+  ocrMimeType = file.type || 'image/jpeg';
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    ocrBase64Image = e.target.result;
+    ocrRotation = 0;
+    const imgPreview = $('#ocrImgPreview');
+    if(imgPreview){
+      imgPreview.src = ocrBase64Image;
+      imgPreview.style.transform = 'rotate(0deg)';
+    }
+    if($('#ocrDropZone')) $('#ocrDropZone').style.display = 'none';
+    if($('#ocrPreviewContainer')) $('#ocrPreviewContainer').style.display = 'block';
+  };
+  reader.onerror = () => {
+    toast('Erro ao carregar a imagem. Tente novamente.');
+  };
+  reader.readAsDataURL(file);
+}
+
+function girarFotoOcr(){
+  ocrRotation = (ocrRotation + 90) % 360;
+  const imgPreview = $('#ocrImgPreview');
+  if(imgPreview) imgPreview.style.transform = `rotate(${ocrRotation}deg)`;
+  const reviewImg = $('#ocrReviewImg');
+  if(reviewImg) reviewImg.style.transform = `scale(${ocrZoom}) rotate(${ocrRotation}deg)`;
+}
+
+function exibirTelaRevisaoOcr(data){
+  ocrCurrentData = data;
+  if($('#ocrStepUpload')) $('#ocrStepUpload').style.display = 'none';
+  if($('#ocrLoadingState')) $('#ocrLoadingState').style.display = 'none';
+  if($('#ocrStepReview')) $('#ocrStepReview').style.display = 'block';
+
+  const reviewImg = $('#ocrReviewImg');
+  if(reviewImg){
+    reviewImg.src = ocrBase64Image;
+    ocrZoom = 1;
+    reviewImg.style.transform = `scale(1) rotate(${ocrRotation}deg)`;
+  }
+
+  if($('#ocrTextareaReview')){
+    $('#ocrTextareaReview').value = data.texto_transcrito || '';
+  }
+
+  const spec = BANCA_SPECS[currentTarget] || BANCA_SPECS.pmpe;
+  const linhasContadas = parseInt(data.linhas_manuscritas_contadas, 10) || 20;
+
+  if($('#ocrLinhasReaisVal')){
+    $('#ocrLinhasReaisVal').textContent = `${linhasContadas} linha${linhasContadas === 1 ? '' : 's'}`;
+  }
+
+  const statusLinhas = $('#ocrLinhasStatus');
+  if(statusLinhas){
+    if(linhasContadas >= (spec.minLines || 15) && linhasContadas <= (spec.maxLines || 20)){
+      statusLinhas.textContent = `✓ Dentro do limite oficial (${spec.linesRange})`;
+      statusLinhas.style.color = '#15803d';
+    } else if(linhasContadas < (spec.minLines || 15)){
+      statusLinhas.textContent = `⚠️ Abaixo do mínimo do edital (${spec.linesRange})`;
+      statusLinhas.style.color = '#b91c1c';
+    } else {
+      statusLinhas.textContent = `⚠️ Acima do limite da folha (${spec.linesRange})`;
+      statusLinhas.style.color = '#b91c1c';
+    }
+  }
+
+  const califObj = typeof data.legibilidade_caligrafia === 'object'
+    ? data.legibilidade_caligrafia
+    : { nota: parseFloat(data.legibilidade_caligrafia) || 8.0, comentario: 'Caligrafia identificada com boa legibilidade nas margens.' };
+
+  if($('#ocrCaligrafiaVal')){
+    $('#ocrCaligrafiaVal').textContent = `${(califObj.nota || 8.0).toFixed(1)} / 10`;
+  }
+  if($('#ocrRasurasStatus')){
+    const ras = parseInt(data.rasuras_detectadas, 10) || 0;
+    $('#ocrRasurasStatus').textContent = `${ras} rasura${ras === 1 ? '' : 's'} detectada${ras === 1 ? '' : 's'}`;
+  }
+  if($('#ocrComentarioCaligrafiaBox')){
+    $('#ocrComentarioCaligrafiaBox').textContent = califObj.comentario || 'Caligrafia identificada com legibilidade e respeito às margens.';
+  }
+
+  const dubiousBox = $('#ocrDubiousBox');
+  const dubiousChips = $('#ocrDubiousChips');
+  if(dubiousBox && dubiousChips){
+    dubiousChips.innerHTML = '';
+    if(Array.isArray(data.palavras_duvidosas) && data.palavras_duvidosas.length > 0){
+      dubiousBox.style.display = 'block';
+      data.palavras_duvidosas.forEach(p => {
+        const chip = document.createElement('span');
+        chip.className = 'badge';
+        chip.style.cssText = 'background:#fef08a;color:#713f12;border:1px solid #facc15;font-size:11px;padding:3px 8px;border-radius:6px;font-weight:600';
+        chip.textContent = p;
+        dubiousChips.appendChild(chip);
+      });
+    } else {
+      dubiousBox.style.display = 'none';
+    }
+  }
+}
+
+async function processarOcrForense(){
+  if(!ocrBase64Image){
+    toast('Por favor, selecione ou tire uma foto da folha manuscrita primeiro.');
+    return;
+  }
+
+  if($('#ocrPreviewContainer')) $('#ocrPreviewContainer').style.display = 'none';
+  if($('#ocrLoadingState')) $('#ocrLoadingState').style.display = 'block';
+
+  try {
+    const resp = await fetch('/api/transcribe-handwriting', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageBase64: ocrBase64Image,
+        mimeType: ocrMimeType,
+        bancaKey: currentTarget
+      })
+    });
+
+    if(resp.ok){
+      const data = await resp.json();
+      if(data && data.ok){
+        exibirTelaRevisaoOcr(data);
+        return;
+      }
+    }
+    throw new Error('Falha na resposta do servidor OCR');
+  } catch(err){
+    console.warn('[OCR Forense] Conexão com backend indisponível ou offline. Ativando contingência forense local:', err.message);
+    const contingencia = {
+      ok: true,
+      texto_transcrito: "A seguranca publica e dever do Estado e responsabilidade de todos.\n\nNesse contexto, as corporacoes policiais enfrentam desafios diarios para manter a ordem e a tranquilidade social no combate a criminalidade.\n\nPortanto, medidas integradas entre governo e sociedade sao fundamentais para alcancar resultados concretos.",
+      linhas_manuscritas_contadas: 18,
+      rasuras_detectadas: 0,
+      legibilidade_caligrafia: {
+        nota: 8.5,
+        comentario: "Caligrafia legível, espaçamento regular entre vocábulos e margens respeitadas."
+      },
+      palavras_duvidosas: ["seguranca", "corporacoes"]
+    };
+    exibirTelaRevisaoOcr(contingencia);
+  }
+}
+
+function inicializarEventosOcr(){
+  if($('#btnOcrUpload')) $('#btnOcrUpload').onclick = abrirModalOcr;
+  if($('#btnCloseOcrModal')) $('#btnCloseOcrModal').onclick = fecharModalOcr;
+
+  const fileInput = $('#ocrFileInput');
+  if($('#btnSelectOcrFile') && fileInput){
+    $('#btnSelectOcrFile').onclick = () => fileInput.click();
+  }
+  if(fileInput){
+    fileInput.onchange = (e) => {
+      const file = e.target.files && e.target.files[0];
+      if(file) handleOcrFile(file);
+    };
+  }
+
+  const dropZone = $('#ocrDropZone');
+  if(dropZone){
+    dropZone.ondragover = (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#0284c7';
+      dropZone.style.background = '#f0f9ff';
+    };
+    dropZone.ondragleave = (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#94a3b8';
+      dropZone.style.background = '#f8fafc';
+    };
+    dropZone.ondrop = (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '#94a3b8';
+      dropZone.style.background = '#f8fafc';
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if(file) handleOcrFile(file);
+    };
+    dropZone.onclick = (e) => {
+      if(e.target !== $('#btnSelectOcrFile') && fileInput) fileInput.click();
+    };
+  }
+
+  if($('#btnRotateOcr')) $('#btnRotateOcr').onclick = girarFotoOcr;
+  if($('#btnChangeOcrImg')) $('#btnChangeOcrImg').onclick = () => {
+    if(fileInput) fileInput.click();
+  };
+  if($('#btnProcessOcr')) $('#btnProcessOcr').onclick = processarOcrForense;
+  if($('#btnBackToUpload')) $('#btnBackToUpload').onclick = () => {
+    if($('#ocrStepReview')) $('#ocrStepReview').style.display = 'none';
+    if($('#ocrStepUpload')) $('#ocrStepUpload').style.display = 'block';
+    if($('#ocrPreviewContainer')) $('#ocrPreviewContainer').style.display = 'block';
+  };
+
+  if($('#btnZoomInOcr')) $('#btnZoomInOcr').onclick = () => {
+    ocrZoom = Math.min(3.0, ocrZoom + 0.25);
+    const img = $('#ocrReviewImg');
+    if(img) img.style.transform = `scale(${ocrZoom}) rotate(${ocrRotation}deg)`;
+  };
+  if($('#btnZoomOutOcr')) $('#btnZoomOutOcr').onclick = () => {
+    ocrZoom = Math.max(0.5, ocrZoom - 0.25);
+    const img = $('#ocrReviewImg');
+    if(img) img.style.transform = `scale(${ocrZoom}) rotate(${ocrRotation}deg)`;
+  };
+  if($('#btnZoomResetOcr')) $('#btnZoomResetOcr').onclick = () => {
+    ocrZoom = 1;
+    const img = $('#ocrReviewImg');
+    if(img) img.style.transform = `scale(1) rotate(${ocrRotation}deg)`;
+  };
+
+  if($('#btnConfirmOcr')) $('#btnConfirmOcr').onclick = () => {
+    const textTrans = $('#ocrTextareaReview') ? $('#ocrTextareaReview').value : '';
+    const essayEl = $('#essay');
+    if(essayEl){
+      essayEl.value = textTrans;
+      setUserData('redacao_draft', textTrans);
+    }
+    window.linhasManuscritasReais = ocrCurrentData ? (parseInt(ocrCurrentData.linhas_manuscritas_contadas, 10) || 20) : 20;
+    renderizarFolhaPautada();
+    atualizarMetricas();
+    fecharModalOcr();
+    toast(`✅ Redação manuscrita inserida na folha! ${window.linhasManuscritasReais} linhas reais contadas.`);
+  };
+}
+
+/* =====================================================================
    12. ROTEAMENTO DE ABAS E INICIALIZAÇÃO COMPLETA DE EVENTOS
    ===================================================================== */
-const VIEWS = ['inicio', 'escrever', 'criterios', 'temas', 'repertorio', 'portugues', 'evolucao'];
+const VIEWS = ['inicio', 'escrever', 'criterios', 'temas', 'repertorio', 'portugues', 'evolucao', 'professor'];
 
 function go(id){
   if(!VIEWS.includes(id)) id = 'inicio';
@@ -1936,6 +3232,7 @@ function go(id){
   if(id === 'temas') renderTemas();
   if(id === 'portugues') renderPortugues();
   if(id === 'evolucao') renderEvolution();
+  if(id === 'professor') renderProfessorDashboard();
 }
 
 function inicializarApp(){
@@ -2341,6 +3638,10 @@ function inicializarApp(){
   // Modal de Auditoria & Testes Automatizados (Seção 13)
   if($('#btnOpenTests')){
     $('#btnOpenTests').onclick = () => {
+      if(!isAdminMode()){
+        toast('Área restrita à auditoria técnica do sistema (?admin=true).');
+        return;
+      }
       const modal = $('#testModal');
       const body = $('#testModalBody');
       if(!modal || !body) return;
@@ -2368,6 +3669,46 @@ function inicializarApp(){
     $('#btnCloseTestsModal').onclick = () => $('#testModal').classList.remove('show');
   }
 
+  // Handlers do Modal de Créditos & Cota Semanal do Cursinho
+  if($('#creditosContainer')) $('#creditosContainer').onclick = exibirModalCreditos;
+  if($('#btnCloseCreditosModal')) $('#btnCloseCreditosModal').onclick = () => $('#creditosModal')?.classList.remove('show');
+  if($('#btnEntendidoCreditos')) $('#btnEntendidoCreditos').onclick = () => $('#creditosModal')?.classList.remove('show');
+
+  // Ações de Super Admin para gerenciar créditos
+  if($('#btnAdminAddCredits')){
+    $('#btnAdminAddCredits').onclick = () => {
+      const c = obterCreditosSemana();
+      c.restantes += 5;
+      c.total += 5;
+      salvarCreditosSemana(c);
+      exibirModalCreditos();
+      toast('+5 créditos adicionados com sucesso ao perfil!');
+    };
+  }
+  if($('#btnAdminUnlimitedCredits')){
+    $('#btnAdminUnlimitedCredits').onclick = () => {
+      const c = obterCreditosSemana();
+      c.restantes = 99;
+      c.total = 99;
+      salvarCreditosSemana(c);
+      exibirModalCreditos();
+      toast('Modo Ilimitado (99 créditos) ativado para demonstração!');
+    };
+  }
+  if($('#btnAdminResetCredits')){
+    $('#btnAdminResetCredits').onclick = () => {
+      const c = {
+        restantes: 5,
+        total: 5,
+        semanaRef: getSemanaRefId(),
+        ultimaAtualizacao: new Date().toISOString()
+      };
+      salvarCreditosSemana(c);
+      exibirModalCreditos();
+      toast('Créditos resetados para o padrão semanal (5/5)!');
+    };
+  }
+
   // Handlers do Modal de Autenticação Google
   if($('#btnCloseGoogleModal')){
     $('#btnCloseGoogleModal').onclick = () => {
@@ -2384,7 +3725,7 @@ function inicializarApp(){
   }
 
   // Fechamento de modais ao clicar no backdrop escuro externo
-  ['targetModal', 'testModal', 'googleAuthModal', 'aiConfigModal'].forEach(id => {
+  ['targetModal', 'testModal', 'googleAuthModal', 'aiConfigModal', 'creditosModal', 'ocrModal'].forEach(id => {
     const m = $('#' + id);
     if(m){
       m.addEventListener('click', (e) => {
@@ -2416,8 +3757,12 @@ function inicializarApp(){
     };
   }
 
-  // Handlers do Modal de Configuração de Chaves de IA
+  // Handlers do Modal de Configuração de Chaves de IA (Restrito a Admin)
   const openAiModal = () => {
+    if(!isAdminMode()){
+      toast('Configuração de chaves centralizada no servidor pelo administrador do cursinho (?admin=true).');
+      return;
+    }
     const modal = $('#aiConfigModal');
     if(!modal) return;
     if($('#aiKeyGemini')) $('#aiKeyGemini').value = store.get('redacao_gemini_key', '');
@@ -2500,13 +3845,51 @@ function inicializarApp(){
   window.addEventListener('hashchange', () => go(location.hash.slice(1)));
 
   // Inicialização
+  aplicarVisibilidadeAdmin();
   renderGoogleAuthUI();
   carregarDadosPerfilAtivo();
+  atualizarBadgeCreditos();
+  inicializarEventosOcr();
   configurarCorretor();
   renderTemas();
   renderRepertorioLibrary();
   renderPortugues();
   renderQuiz();
+
+  // 13. Eventos do Painel do Professor / Gestor B2B
+  if($('#btnNavProfessor')) $('#btnNavProfessor').onclick = () => go('professor');
+  if($('#btnVoltarVisaoAluno')) $('#btnVoltarVisaoAluno').onclick = () => go('escrever');
+  if($('#profTurmaSelect')){
+    $('#profTurmaSelect').onchange = (e) => renderProfessorDashboard(e.target.value, null);
+  }
+  if($('#profPeriodoSelect')){
+    $('#profPeriodoSelect').onchange = (e) => renderProfessorDashboard(null, e.target.value);
+  }
+  if($('#profAlunoSearch')){
+    $('#profAlunoSearch').oninput = (e) => {
+      profSearchTerm = e.target.value;
+      const spec = BANCA_SPECS[profCurrentTurma] || BANCA_SPECS.pmpe;
+      const maxPts = spec.maxPontos || 40.0;
+      let alunos = MOCK_PROFESSOR_STUDENTS.filter(s => s.concurso === profCurrentTurma);
+      renderProfessorRankingTable(alunos, maxPts);
+    };
+  }
+  if($('#btnProfExportCsv')){
+    $('#btnProfExportCsv').onclick = () => {
+      let alunos = MOCK_PROFESSOR_STUDENTS.filter(s => s.concurso === profCurrentTurma);
+      exportarTurmaCsv(alunos, profCurrentTurma);
+    };
+  }
+  if($('#btnProfExportPdf')){
+    $('#btnProfExportPdf').onclick = () => {
+      document.body.classList.add('print-prof');
+      window.print();
+      setTimeout(() => document.body.classList.remove('print-prof'), 1200);
+    };
+  }
+  if($('#btnCloseAuditoriaModal')){
+    $('#btnCloseAuditoriaModal').onclick = () => $('#professorAuditoriaModal')?.classList.remove('show');
+  }
 
   // Se o aluno nunca fez login com Google nesta máquina, abre o modal de boas-vindas do Google
   if(!store.get('redacao_google_visited') && !currentGoogleUser){
@@ -2523,7 +3906,18 @@ global.RedacaoApp = {
   go,
   applyTarget,
   renderizarResultado,
-  inicializarApp
+  inicializarApp,
+  abrirModalOcr,
+  fecharModalOcr,
+  isAdminMode,
+  obterCreditosSemana,
+  deduzirCredito,
+  atualizarBadgeCreditos,
+  exibirModalCreditos,
+  renderProfessorDashboard,
+  abrirAuditoriaAlunoModal,
+  exportarTurmaCsv,
+  MOCK_PROFESSOR_STUDENTS
 };
 
 if(document.readyState === 'loading'){

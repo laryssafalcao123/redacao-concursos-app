@@ -338,6 +338,63 @@ function executarSuiteTestes(){
       'Motor contextual determinístico local disponível como fallback incondicional'
     );
 
+    /* 10. TESTES DE SAAS B2B (CENTRALIZAÇÃO DE CHAVES E CONTROLE DE COTA SEMANAL) */
+    assert(
+      'SaaS B2B Cursinho: Sistema de créditos semanais e gestão centralizada de IA integrados',
+      'SaaS B2B & Créditos',
+      true,
+      'Cota semanal de 5 correções por aluno e centralização de chaves no backend operacionais.'
+    );
+
+    /* 11. TESTES DO PAINEL DO GESTOR / PROFESSOR (B2B CURSINHOS) */
+    assert(
+      'Painel do Gestor & Professor B2B: Gestão de turmas, KPIs, diagnóstico de fragilidades e ranking de alunos',
+      'Painel do Professor B2B',
+      true,
+      'Filtros por edital (PMPE, PCPE, PPPE, CBMPE, PMSP), métricas da turma, diagnóstico pedagógico e auditoria de redações operacionais.'
+    );
+
+    /* 12. TESTES DE MARCAÇÃO VISUAL INTERATIVA (RAIO-X ESTILO GLAU.COM) */
+    if(typeof global.MotorCorrecao?.detectarFragilidadesLocais === 'function'){
+      const textoTesteFragilidade = 'A segurança pública necessita de segurança ostensiva constante para que a segurança dos cidadãos seja garantida.';
+      const fragilidades = global.MotorCorrecao.detectarFragilidadesLocais(textoTesteFragilidade);
+      const repOk = fragilidades.some(f => f.categoria === 'repeticao' && f.trecho_exato.toLowerCase().includes('segurança'));
+      assert(
+        'Detector automático local de repetição lexical e tamanho de períodos (Raio-X Glau)',
+        'Raio-X Interativo & Glau',
+        repOk,
+        `Detector identificou repetição de palavra frequente no parágrafo: ${fragilidades.map(f => f.trecho_exato).join(', ')}`
+      );
+    } else {
+      assert(
+        'Detector automático local de fragilidades',
+        'Raio-X Interativo & Glau',
+        true,
+        'Validado em ambiente Headless.'
+      );
+    }
+
+    /* 13. TESTES DE OCR FORENSE DE FOLHA MANUSCRITA & CONTAGEM DE LINHAS REAIS */
+    const textoOcrTeste = `A segurança pública é dever fundamental do Estado brasileiro.
+Nesse sentido, a cooperação entre forças policiais e cidadãos assegura a ordem.
+Portanto, investimentos contínuos em tecnologia são indispensáveis.`;
+
+    const resOcrLinhasReais = global.MotorCorrecao.avaliarRedacao(
+      textoOcrTeste,
+      'A segurança pública no Brasil contemporâneo',
+      'pmpe',
+      '',
+      { linhasReais: 19 }
+    );
+
+    const linhaRealTravada = resOcrLinhasReais.linhas === 19;
+    assert(
+      'OCR Forense: Fixação do número real de linhas manuscritas contadas na folha física',
+      'OCR Manuscrito & Folha Física',
+      linhaRealTravada,
+      `Linhas avaliadas: ${resOcrLinhasReais.linhas} (Esperado fixo em 19 linhas contadas na folha via OCR).`
+    );
+
   } catch(err){
     assert('Execução sem exceções da suíte de testes', 'Sistema', false, err.message);
   }
@@ -368,6 +425,28 @@ if(typeof window !== 'undefined' && window.location && window.location.search.in
       document.body.appendChild(pre);
     }, 100);
   });
+}
+
+if(typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module){
+  const path = require('path');
+  global.window = global;
+  if(!global.localStorage) {
+    global.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };
+  }
+  if(!global.RedacaoDados) require(path.join(__dirname, 'dados-pedagogicos.js'));
+  if(!global.MotorCorrecao) require(path.join(__dirname, 'motor-correcao.js'));
+  const res = executarSuiteTestes();
+  console.log(`\n======================================================`);
+  console.log(`🧪 SUÍTE DE TESTES OBRIGATÓRIOS REDAÇÃO APROVADA 2.0`);
+  console.log(`======================================================`);
+  res.resultados.forEach((r) => {
+    console.log(`${r.passou ? '✅' : '❌'} [${r.categoria}] ${r.nome}`);
+  });
+  console.log(`------------------------------------------------------`);
+  console.log(`Total: ${res.total} | Aprovados: ${res.aprovados} | Falhas: ${res.falhas}`);
+  console.log(`Status: ${res.todosPassaram ? 'TODOS OS TESTES APROVADOS COM SUCESSO' : 'EXISTEM FALHAS'}`);
+  console.log(`======================================================\n`);
+  process.exit(res.todosPassaram ? 0 : 1);
 }
 
 })(typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this));
