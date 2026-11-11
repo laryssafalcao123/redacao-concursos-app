@@ -163,7 +163,40 @@ const PADROES_REPERTORIO = [
   { nome: 'Amartya Sen (Desenvolvimento como Liberdade)', tipo: 'Economia & Desenvolvimento Humano', re: /\b(amartya sen|desenvolvimento como liberdade)\b/i, fonte: 'SEN, Amartya. Desenvolvimento como Liberdade (1999)' },
   { nome: 'Shoshana Zuboff (Capitalismo de Vigilância)', tipo: 'Sociologia Digital', re: /\b(shoshana zuboff|zuboff|capitalismo de vigilancia)\b/i, fonte: 'ZUBOFF, Shoshana. A Era do Capitalismo de Vigilância (2019)' },
   { nome: 'Dados / Órgãos Oficiais (IBGE, OMS, ONU, IPEA, FBSP)', tipo: 'Dados Estatísticos / Institucionais', re: /\b(ibge|oms|organizacao mundial da saude|onu|ipea|anuario brasileiro de seguranca|forum brasileiro de seguranca|cepal|unesco|ministerio da saude|ministerio da justica)\b/i, fonte: 'Relatórios e Pesquisas de Órgãos Oficiais' },
-  { nome: 'Alusão Histórica Documentada', tipo: 'História Geral / do Brasil', re: /\b(revolucao industrial|iluminismo|ditadura militar|periodo colonial|escravidao no brasil|segunda guerra mundial|declaracao universal dos direitos humanos|era vargas)\b/i, fonte: 'Historiografia Geral e do Brasil' }
+  { nome: 'Alusão Histórica Documentada', tipo: 'História Geral / do Brasil', re: /\b(revolucao industrial|iluminismo|ditadura militar|periodo colonial|escravidao no brasil|segunda guerra mundial|declaracao universal dos direitos humanos|era vargas)\b/i, fonte: 'Historiografia Geral e do Brasil' },
+  { nome: 'Max Weber (Monopólio Legítimo da Força)', tipo: 'Sociologia da Administração e do Estado', re: /\b(max weber|weber|monopolio da forca|acao social)\b/i, fonte: 'WEBER, Max. Ciência e Política: duas vocações (1919)' },
+  { nome: 'Teoria das Janelas Quebradas (Broken Windows)', tipo: 'Criminologia e Prevenção Primária', re: /\b(janelas quebradas|broken windows|wilson e kelling)\b/i, fonte: 'WILSON, James Q.; KELLING, George L. (1982)' },
+  { nome: 'Aristóteles (Justiça Distributiva e Zoon Politikon)', tipo: 'Filosofia Clássica', re: /\b(aristoteles|etica a nicomaco|zoon politikon|animal politico|justica distributiva)\b/i, fonte: 'ARISTÓTELES. A Política; Ética a Nicômaco' },
+  { nome: 'John Locke (Direitos Naturais Inalienáveis)', tipo: 'Filosofia Política / Liberalismo Clássico', re: /\b(john locke|locke|direitos naturais|segundo tratado)\b/i, fonte: 'LOCKE, John. Segundo Tratado sobre o Governo Civil (1689)' },
+  { nome: 'Jean-Jacques Rousseau (Vontade Geral e Soberania)', tipo: 'Filosofia Política Iluminista', re: /\b(rousseau|jean-jacques rousseau|vontade geral)\b/i, fonte: 'ROUSSEAU, Jean-Jacques. Do Contrato Social (1762)' },
+  { nome: 'Jürgen Habermas (Ação Comunicativa e Esfera Pública)', tipo: 'Filosofia Contemporânea', re: /\b(habermas|jurgen habermas|agir comunicativo|acao comunicativa|esfera publica)\b/i, fonte: 'HABERMAS, Jürgen. Teoria do Agir Comunicativo (1981)' },
+  { nome: 'Jean-Paul Sartre (Responsabilidade e Liberdade)', tipo: 'Existencialismo Ético', re: /\b(sartre|jean-paul sartre|existencialismo|existencia precede a essencia)\b/i, fonte: 'SARTRE, Jean-Paul. O Existencialismo é um Humanismo (1946)' },
+  { nome: 'Pierre Bourdieu (Violência Simbólica e Reprodução)', tipo: 'Sociologia da Cultura e Educação', re: /\b(pierre bourdieu|bourdieu|violencia simbolica|habitus|capital cultural)\b/i, fonte: 'BOURDIEU, Pierre. A Reprodução (1970)' },
+  { nome: 'Djamila Ribeiro (Lugar de Fala e Silenciamento)', tipo: 'Filosofia Crítica / Antirracismo', re: /\b(djamila ribeiro|lugar de fala|pequeno manual antirracista)\b/i, fonte: 'RIBEIRO, Djamila. O que é lugar de fala? (2017)' },
+  { nome: 'Darcy Ribeiro (O Povo Brasileiro e a Educação)', tipo: 'Antropologia e Educação Brasileira', re: /\b(darcy ribeiro|o povo brasileiro|cieps?)\b/i, fonte: 'RIBEIRO, Darcy. O Povo Brasileiro (1995)' },
+  { nome: 'Ulrich Beck (Sociedade de Risco Global)', tipo: 'Sociologia do Risco e da Tecnologia', re: /\b(ulrich beck|sociedade de risco)\b/i, fonte: 'BECK, Ulrich. Sociedade de Risco (1986)' },
+  { nome: 'Anísio Teixeira (Escola Pública e Democrática)', tipo: 'História da Educação Brasileira', re: /\b(anisio teixeira|pioneiros da educacao|escola nova)\b/i, fonte: 'TEIXEIRA, Anísio. Educação não é privilégio (1957)' },
+  { nome: 'Legislação Educacional (LDB e PNE)', tipo: 'Legislação da Educação', re: /\b(ldb|lei 9\.?394|plano nacional de educacao|pne|lei 13\.?005)\b/i, fonte: 'LDB (Lei nº 9.394/1996) e PNE (Lei nº 13.005/2014)' },
+  { nome: 'bell hooks (Educação como Prática da Liberdade)', tipo: 'Pedagogia Crítica e Engajada', re: /\b(bell hooks|ensinando a transgredir)\b/i, fonte: 'HOOKS, bell. Ensinando a Transgredir (1994)' },
+  { nome: 'Lev Vygotsky / John Dewey (Aprendizagem Ativa e Interação)', tipo: 'Psicologia e Filosofia Educacional', re: /\b(vygotsky|zona de desenvolvimento proximal|john dewey|aprender fazendo)\b/i, fonte: 'VYGOTSKY, L. (1978); DEWEY, J. Democracia e Educação (1916)' },
+  { nome: 'Ailton Krenak (Ideias para Adiar o Fim do Mundo)', tipo: 'Filosofia Socioambiental Ancestral', re: /\b(ailton krenak|krenak|ideias para adiar o fim do mundo)\b/i, fonte: 'KRENAK, Ailton. Ideias para Adiar o Fim do Mundo (2019)' },
+  { nome: 'Marco Legal Socioambiental (PNRS e Código Florestal)', tipo: 'Legislação Ambiental Brasileira', re: /\b(pnrs|lei 12\.?305|residuos solidos|codigo florestal|lei 12\.?651)\b/i, fonte: 'Lei nº 12.305/2010 (PNRS) e Lei nº 12.651/2012' },
+  { nome: 'Acordo de Paris e Agenda 2030 (ODS / ONU)', tipo: 'Direito Internacional do Clima e Desenvolvimento', re: /\b(acordo de paris|agenda 2030|ods\s+\d+|objetivos de desenvolvimento sustentavel)\b/i, fonte: 'ONU. Acordo de Paris (2015) e Agenda 2030' },
+  { nome: 'Desastres de Mariana e Brumadinho', tipo: 'Memória Socioambiental e Regulação Industrial', re: /\b(mariana|brumadinho|rio doce|paraopeba|barragem de rejeitos)\b/i, fonte: 'Relatórios Periciais Oficiais e Acórdãos Judiciais' },
+  { nome: 'Legislação da Saúde (Lei do SUS e Reforma Psiquiátrica)', tipo: 'Legislação Sanitária Brasileira', re: /\b(lei 8\.?080|lei organica da saude|reforma psiquiatrica|lei 10\.?216|lei paulo delgado|caps)\b/i, fonte: 'Lei nº 8.080/1990 (SUS) e Lei nº 10.216/2001' },
+  { nome: 'Revolta da Vacina e Fiocruz / Oswaldo Cruz', tipo: 'Historiografia da Saúde Pública', re: /\b(revolta da vacina|fiocruz|oswaldo cruz|carlos chagas)\b/i, fonte: 'Memória da Saúde Pública no Brasil' },
+  { nome: 'Lei Áurea de 1888 e Joaquim Nabuco', tipo: 'Historiografia Social Brasileira', re: /\b(lei aurea|13 de maio de 1888|joaquim nabuco|o abolicionismo)\b/i, fonte: 'NABUCO, Joaquim. O Abolicionismo (1883)' },
+  { nome: 'Consolidação das Leis do Trabalho (CLT de 1943)', tipo: 'Direito do Trabalho e História Republicana', re: /\b(clt|consolidacao das leis do trabalho|decreto 5\.?452|era vargas)\b/i, fonte: 'BRASIL. Decreto-Lei nº 5.452/1943' },
+  { nome: 'Diretas Já (1984) e Ulysses Guimarães (1988)', tipo: 'História da Redemocratização Brasileira', re: /\b(diretas ja|ulysses guimaraes|constituicao cidada)\b/i, fonte: 'Discurso de Promulgação da Carta Magna de 1988' },
+  { nome: 'Euclides da Cunha (Os Sertões e Canudos)', tipo: 'Literatura e Sociologia Sertaneja', re: /\b(euclides da cunha|os sertoes|canudos)\b/i, fonte: 'CUNHA, Euclides da. Os Sertões (1902)' },
+  { nome: 'Thomas Piketty (O Capital no Século XXI)', tipo: 'Economia Política Contemporânea', re: /\b(thomas piketty|piketty|capital no seculo xxi)\b/i, fonte: 'PIKETTY, Thomas. O Capital no Século XXI (2013)' },
+  { nome: 'Adam Smith / John Maynard Keynes', tipo: 'Teoria Econômica Clássica e Keynesiana', re: /\b(adam smith|riqueza das nacoes|keynes|john maynard keynes|demanda efetiva)\b/i, fonte: 'SMITH, A. (1776); KEYNES, J. M. (1936)' },
+  { nome: 'Josué de Castro / Celso Furtado', tipo: 'Economia e Sociologia do Desenvolvimento', re: /\b(josue de castro|geografia da fome|celso furtado|formacao economica do brasil|sudene)\b/i, fonte: 'CASTRO, J. (1946); FURTADO, C. (1959)' },
+  { nome: 'OIT (Trabalho Decente) e Uberização das Plataformas', tipo: 'Sociologia do Trabalho e Gig Economy', re: /\b(oit|trabalho decente|uberizacao|gig economy|ludmila abilio)\b/i, fonte: 'OIT (1998); ABÍLIO, L. C. (2020)' },
+  { nome: 'Eli Pariser (O Filtro Invisível e Bolhas Algorítmicas)', tipo: 'Sociologia da Tecnologia e Esfera Digital', re: /\b(eli pariser|filtro invisivel|filter bubble|bolha algoritmica|bolhas algoritmicas)\b/i, fonte: 'PARISER, Eli. The Filter Bubble (2011)' },
+  { nome: 'Legislação Cibernética (Leis 12.737/12 e 14.155/21)', tipo: 'Direito Digital e Penal Eletrônico', re: /\b(carolina dieckmann|lei 12\.?737|estelionato eletronico|lei 14\.?155|golpe do pix)\b/i, fonte: 'Legislação Federal sobre Crimes Cibernéticos' },
+  { nome: 'Yuval Noah Harari / Cathy O\'Neil (Ética dos Algoritmos)', tipo: 'Filosofia e Ciência de Dados', re: /\b(yuval harari|harari|21 licoes|cathy o\'neil|algoritmos de destruicao)\b/i, fonte: 'HARARI, Y. N. (2018); O\'NEIL, C. (2016)' },
+  { nome: 'O Dilema das Redes / George Orwell (1984)', tipo: 'Audiovisual e Distopia Literária', re: /\b(dilema das redes|the social dilemma|george orwell|1984|grande irmao|big brother)\b/i, fonte: 'ORWELL, G. (1949); Netflix (2020)' },
 ];
 
 function analisarRepertorioContextual(texto, paragrafos, tema, nucleosTema){
@@ -234,6 +267,10 @@ function analisarRepertorioContextual(texto, paragrafos, tema, nucleosTema){
    3. REGRAS DE ANÁLISE GRAMATICAL, SINTÁTICA E ARGUMENTATIVA EM CONTEXTO
       (Sem falsos positivos e separando Erro Confirmado vs Fragilidade vs Sugestão)
    ===================================================================== */
+// Lista de verbos comuns após pronome oblíquo para validação rigorosa de próclise inicial (Sem falsos positivos)
+const VERBOS_COMUNS_PROCLISE = "mostra|mostram|faz|fazem|leva|levam|obriga|obrigam|permite|permitem|ensina|ensinam|revela|revelam|indica|indicam|cabe|parece|resta|falta|diz|dizem|pede|pedem|dá|da|dão|dao|traz|trazem|impõe|impoe|impõem|impoem|afeta|afetam|preocupa|preocupam|chama|chamam|deixa|deixam|torna|tornam|coloca|colocam|lembra|lembram|impede|impedem|observa|observam|constata|constatam|nota|notam|percebe|percebem|sabe|sabem|verifica|verificam|conclui|concluem|deve|devem|pode|podem|vê|ve|veem|espera|esperam|pretende|pretendem|entende|entendem|julga|julgam|imagina|imaginam|depara|deparam|ocorre|ocorrem|foi|foram|trata|tratam";
+const LISTA_VERBOS_PROCLISE_SET = new Set(VERBOS_COMUNS_PROCLISE.split('|'));
+
 const REGRAS_CONTEXTUAIS = [
   /* --- ERROS GRAMATICAIS CONFIRMADOS --- */
   {
@@ -322,10 +359,10 @@ const REGRAS_CONTEXTUAIS = [
     id: 'g-crase-pronomes-masc',
     severidade: 'erro_confirmado',
     categoria: 'Crase',
-    re: /\bà\s+(todos|toda|todo|qualquer|ningu[eé]m|algu[eé]m|ela|elas|ele|eles|isso|isto|aquilo|esse|essa|este|esta|respeito|n[ií]vel|curto|longo|m[eé]dio|fim|cerca)\b/gi,
+    re: /\bà\s+(todos|todo|cada|qualquer|ningu[eé]m|algu[eé]m|ela|elas|ele|eles|isso|isto|aquilo|esse|este|respeito|n[ií]vel|curto|longo|m[eé]dio|prazo|fim|um|dois|tr[eê]s)\b/gi,
     diagnostico: 'Emprego indevido de crase antes de palavra masculina ou pronome que rejeita artigo.',
-    explicacao: 'Não ocorre crase diante de vocábulos masculinos ("a respeito", "a curto prazo") nem antes de pronomes pessoais, demonstrativos iniciados por "e/i" ou indefinidos ("a todos", "a toda", "a qualquer", "a essa").',
-    sugestao: (m) => m.replace(/^à/i, 'a'),
+    explicacao: 'Não ocorre crase diante de vocábulos masculinos ("a respeito", "a curto prazo") nem antes de pronomes pessoais, demonstrativos iniciados por "e/i" ou indefinidos ("a todos", "a qualquer", "a essa").',
+    sugestao: (m) => m.replace(/^[àÀ]/, 'a'),
     justificativa: 'Corrige emprego proibido do acento grave.'
   },
   {
@@ -335,7 +372,13 @@ const REGRAS_CONTEXTUAIS = [
     re: /\b(a\s+medida\s+que|a\s+propor[cç][aã]o\s+que|a\s+luz\s+d[aeo])\b/gi,
     validarContexto: (match, frase) => {
       const trechoOriginal = frase.slice(match.index, match.index + match[0].length);
-      return !/^[àÀ]/.test(trechoOriginal);
+      if(/^[àÀ]/.test(trechoOriginal)) return false;
+      // Evitar falso positivo: "adotar a medida que", "tomar a medida que"
+      const anterior = frase.slice(0, match.index).trim();
+      if(/(?:adotou|adotaram|adotar|tomou|tomaram|tomar|aprovou|aprovaram|aprovar|criou|criaram|criar|revogou|revogar|sancionou|sancionar)\s*$/i.test(anterior)){
+        return false;
+      }
+      return true;
     },
     diagnostico: 'Ausência de crase obrigatória em locução conjuntiva/prepositiva feminina.',
     explicacao: 'Locuções formadas por núcleo feminino como "à medida que", "à proporção que" e "à luz de" exigem obrigatoriamente o acento grave indicativo de crase.',
@@ -346,33 +389,76 @@ const REGRAS_CONTEXTUAIS = [
     id: 'g-proclise-inicial',
     severidade: 'erro_confirmado',
     categoria: 'Colocação Pronominal',
-    re: /(?:^|[.!?]\s+)(Me|Te|Se|Nos|Lhe|Lhes)\s+[a-záàâãéêíóôõúç]{3,}/g,
+    // REGRA AUDITADA: Apenas aciona se o pronome for seguido estritamente por verbo confirmado (Elimina falsos positivos com "Nos últimos", "Nos dias", "Nos casos", etc.)
+    re: new RegExp('(?:^|[.!?]\\s+)(Me|Te|Se|Lhe|Lhes|Nos)\\s+(' + VERBOS_COMUNS_PROCLISE + ')\\b', 'gi'),
+    validarContexto: (match, frase) => {
+      const partes = match[0].replace(/^[.!?]\s*/, '').trim().split(/\s+/);
+      if(partes.length < 2) return false;
+      const pron = partes[0].toLowerCase();
+      const verboNorm = norm(partes[1].toLowerCase());
+      const verboRaw = partes[1].toLowerCase();
+
+      // "Nos" só é pronome se a palavra seguinte for estritamente um verbo confirmado
+      // NUNCA acionar em "Nos últimos", "Nos dias", "Nos casos", "Nos países" (contração em + os)
+      if(pron === 'nos'){
+        return LISTA_VERBOS_PROCLISE_SET.has(verboNorm) || LISTA_VERBOS_PROCLISE_SET.has(verboRaw);
+      }
+
+      // "Se" só aciona se seguido comprovadamente de verbo (evita falso positivo com conjunção condicional "Se o Estado...", "Se a lei...")
+      if(pron === 'se'){
+        return LISTA_VERBOS_PROCLISE_SET.has(verboNorm) || LISTA_VERBOS_PROCLISE_SET.has(verboRaw);
+      }
+
+      return true;
+    },
     diagnostico: 'Início de período com pronome oblíquo átono (próclise em início absoluto de frase).',
-    explicacao: 'Pela norma-padrão da língua portuguesa, não se inicia período nem oração após pausa forte (ponto final) com pronome oblíquo átono. Deve-se empregar a ênclise (pronome após o verbo).',
+    explicacao: 'Pela norma-padrão da língua portuguesa, não se inicia período nem oração após pausa forte com pronome oblíquo átono. Deve-se empregar a ênclise (pronome posposto ao verbo).',
     sugestao: (m) => {
-      const partes = m.replace(/^[.!?]\s+/, '').trim().split(/\s+/);
+      const limpo = m.replace(/^[.!?]\s*/, '').trim();
+      const partes = limpo.split(/\s+/);
       if(partes.length >= 2){
         const pron = partes[0].toLowerCase();
         const verbo = partes[1];
-        return `${verbo.charAt(0).toUpperCase() + verbo.slice(1)}-${pron}`;
+        const verboNorm = norm(verbo.toLowerCase());
+        if(LISTA_VERBOS_PROCLISE_SET.has(verboNorm) || LISTA_VERBOS_PROCLISE_SET.has(verbo.toLowerCase())){
+          return `${verbo.charAt(0).toUpperCase() + verbo.slice(1)}-${pron}`;
+        }
       }
-      return 'Usar ênclise (ex.: Observa-se / Constata-se)';
+      return 'Usar ênclise após o verbo (ex.: Observa-se / Constata-se / Parece-nos)';
     },
-    justificativa: 'Adequa a colocação pronominal ao registro formal exigido nas bancas.'
+    justificativa: 'Adequa a colocação pronominal ao registro formal exigido nas bancas de concursos.'
   },
   {
     id: 'g-enclise-apos-atrativo',
     severidade: 'erro_confirmado',
     categoria: 'Colocação Pronominal',
-    re: /\b(n[aã]o|nunca|jamais|nada|ningu[eé]m|que|como|quando|embora|conforme|segundo)\s+[a-záàâãéêíóôõúç]+-(se|me|te|nos|lhe|lhes|o|a|os|as)\b/gi,
+    re: /\b(n[aã]o|nunca|jamais|nada|ningu[eé]m|que|quando|embora|j[aá]|ainda|sempre)\s+([a-záàâãéêíóôõúç]+)-(se|me|te|nos|lhe|lhes|o|a|os|as)\b/gi,
     diagnostico: 'Uso de ênclise após palavra atrativa que exige próclise.',
-    explicacao: 'Palavras de sentido negativo ("não", "nunca", "jamais") e conjunções subordinativas/pronomes relativos ("que", "quando", "embora", "conforme") atraem obrigatoriamente o pronome oblíquo para antes do verbo (próclise).',
+    explicacao: 'Palavras de sentido negativo ("não", "nunca", "jamais"), pronomes relativos ("que") e conjunções subordinativas atraem obrigatoriamente o pronome oblíquo para antes do verbo (próclise).',
     sugestao: (m) => {
-      const match = m.match(/^(\S+)\s+([a-záàâãéêíóôõúç]+)-(se|me|te|nos|lhe|lhes|o|a|os|as)$/i);
+      const match = m.match(/\b(n[aã]o|nunca|jamais|nada|ningu[eé]m|que|quando|embora|j[aá]|ainda|sempre)\s+([a-záàâãéêíóôõúç]+)-(se|me|te|nos|lhe|lhes|o|a|os|as)\b/i);
       if(match) return `${match[1]} ${match[3].toLowerCase()} ${match[2]}`;
       return 'Antepor o pronome oblíquo ao verbo (próclise)';
     },
     justificativa: 'A colocação pronominal é item expresso nos espelhos de correção (especialmente Cebraspe, AOCP e Vunesp).'
+  },
+  {
+    id: 'g-gerundismo-vicioso',
+    severidade: 'erro_confirmado',
+    categoria: 'Construção Sintática & Gerundismo',
+    re: /\b(vai|v[aã]o|vamos|ir[aá]|ir[aã]o|iremos)\s+estar\s+([a-záàâãéêíóôõúç]+(?:ando|endo|indo))\b/gi,
+    diagnostico: 'Uso de gerundismo vicioso (locução verbal com três verbos para expressar ação futura).',
+    explicacao: 'A estrutura "ir + estar + gerúndio" ("vai estar fazendo") constitui vício de linguagem no registro formal quando se refere a uma ação futura simples. Deve-se empregar o futuro simples ou locução com infinitivo ("vai fazer" ou "fará").',
+    sugestao: (m) => {
+      const match = m.match(/\b(vai|v[aã]o|vamos|ir[aá]|ir[aã]o|iremos)\s+estar\s+([a-záàâãéêíóôõúç]+(?:ando|endo|indo))\b/i);
+      if(match){
+        const gerundio = match[2].toLowerCase();
+        const infinitivo = gerundio.replace(/ando$/, 'ar').replace(/endo$/, 'er').replace(/indo$/, 'ir');
+        return `${match[1]} ${infinitivo} (ou futuro simples)`;
+      }
+      return 'Substituir por infinitivo ou futuro simples (ex.: "promoverá" ou "vai promover")';
+    },
+    justificativa: 'Elimina vício de linguagem penalizado nos critérios de modalidade e estilo.'
   },
   {
     id: 'g-regencia-acarretar-implicar',
@@ -531,6 +617,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
     pmpe: 'Critério 5: Modalidade gramatical (norma-padrão)',
     cbmpe: 'Critério 5: Modalidade gramatical (norma-padrão)',
     pcpe: 'Microestrutura (NE — Desconto na Fórmula Líquida)',
+    pppe: 'Microestrutura (NE — Desconto na Fórmula Líquida)',
     pmsp: 'Critério C: Expressão (Coesão e Modalidade)',
     enem: 'Competência I: Domínio da modalidade escrita formal'
   };
@@ -538,6 +625,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
     pmpe: 'Critério 4: Informatividade e argumentação',
     cbmpe: 'Critério 4: Informatividade e argumentação',
     pcpe: 'Macroestrutura (Conteúdo dos Tópicos — NC)',
+    pppe: 'Macroestrutura (Domínio do Conteúdo — NC)',
     pmsp: 'Critério B: Estrutura (Gênero e Coerência)',
     enem: 'Competência III: Projeto de texto e defesa de ponto de vista'
   };
@@ -557,13 +645,21 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
           if(regra.validarContexto && !regra.validarContexto(match, sent)){
             continue;
           }
-          const trechoExato = match[0];
+          let trechoExato = match[0];
+          let startOffset = match.index;
+          if(/^[.!?]\s+/.test(trechoExato)){
+            const leadMatch = trechoExato.match(/^[.!?]\s+/)[0];
+            trechoExato = trechoExato.slice(leadMatch.length);
+            startOffset += leadMatch.length;
+          }
+          trechoExato = trechoExato.trim();
+
           const isErro = regra.severidade === 'erro_confirmado';
           const isFrag = regra.severidade === 'fragilidade_argumentativa';
 
           let impactoNota = 'Sem desconto na nota (sugestão de refinamento estilístico)';
           if(isErro){
-            if(bancaKey === 'pcpe') impactoNota = 'Contabilizado como 1 erro de microestrutura (NE) na fórmula NPD = NC - (2 × NE / TL).';
+            if(bancaKey === 'pcpe' || bancaKey === 'pppe') impactoNota = 'Contabilizado como 1 erro de microestrutura (NE) na fórmula NPD = NC - (2 × NE / TL).';
             else if(bancaKey === 'enem') impactoNota = 'Impacta a avaliação de desvios na Competência I.';
             else if(bancaKey === 'pmsp') impactoNota = 'Impacta a pontuação do Critério C (Expressão).';
             else impactoNota = 'Impacta a pontuação do Critério 5 (Modalidade gramatical).';
@@ -572,8 +668,9 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
           }
 
           ocorrencias.push({
-            id: `${regra.id}-p${pIdx+1}-s${sIdx+1}-${match.index}`,
+            id: `${regra.id}-p${pIdx+1}-s${sIdx+1}-${startOffset}`,
             severidade: regra.severidade,
+            tipoGlau: isErro ? 'erro' : (isFrag ? 'coesao' : 'estilo'),
             categoria: regra.categoria,
             trechoOriginal: trechoExato,
             contextoSentenca: sent,
@@ -596,6 +693,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
         ocorrencias.push({
           id: `sintaxe-longa-p${pIdx+1}-s${sIdx+1}`,
           severidade: 'fragilidade_argumentativa',
+          tipoGlau: 'coesao',
           categoria: 'Construção Sintática & Clareza',
           trechoOriginal: sent.slice(0, 85) + '...',
           contextoSentenca: sent,
@@ -621,6 +719,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
         ocorrencias.push({
           id: `rep-lexical-p${pIdx+1}-${palavra}`,
           severidade: 'sugestao_estilistica',
+          tipoGlau: 'coesao',
           categoria: 'Coesão Referencial & Vocabulário',
           trechoOriginal: `"${palavra}" (${cont}x no Parágrafo ${pIdx + 1})`,
           contextoSentenca: par,
@@ -1008,6 +1107,73 @@ function calcularNotasPorRubrica(dadosAnalise){
   }
 
   /* -------------------------------------------------------------------
+     RUBRICA 2.1: CEBRASPE (PPPE) — 10,00 PTS (FÓRMULA EDITAL PPPE 2026: NPD = NC - 2×NE/TL)
+     ------------------------------------------------------------------- */
+  else if(bancaKey === 'pppe'){
+    // 1. Apresentação, estrutura textual e legibilidade: max 1.0
+    let apres = 1.0;
+    if(numPar < 3) apres -= 0.35;
+    if(linhasEstimadas < spec.minLines) apres -= 0.25;
+    apres = anulacao.anulada ? 0 : clamp(Math.round(apres * 100) / 100, 0, 1.0);
+
+    // 2. Desenvolvimento do tema e conhecimento do assunto: max 3.0
+    let top1 = aderencia.status === 'tangenciamento' ? 1.5 : (aderencia.percentualNucleos >= 65 ? 2.85 : 2.3);
+    if(!temTeseClara) top1 -= 0.35;
+    top1 = anulacao.anulada ? 0 : clamp(Math.round(top1 * 100) / 100, 0, 3.0);
+
+    // 3. Qualidade e consistência dos argumentos: max 3.0
+    let top2 = 1.9;
+    if(repertorio.temProdutivo) top2 += 1.0;
+    else if(repertorio.temAlgum) top2 += 0.5;
+    top2 -= fragilidades.length * 0.2;
+    top2 = anulacao.anulada ? 0 : clamp(Math.round(top2 * 100) / 100, 0, 3.0);
+
+    // 4. Progressão temática e propostas de encaminhamento: max 3.0
+    const ultPar = analiseParagrafos[analiseParagrafos.length - 1];
+    let top3 = ultPar && !ultPar.relacaoTese.includes('abrupta') ? 2.6 : 1.7;
+    if(numPar >= 3 && totalConectivosDistintos >= 4) top3 += 0.3;
+    if(aderencia.status === 'tangenciamento') top3 = Math.min(top3, 1.5);
+    top3 = anulacao.anulada ? 0 : clamp(Math.round(top3 * 100) / 100, 0, 3.0);
+
+    const nc = Math.round((apres + top1 + top2 + top3) * 100) / 100;
+    const ne = errosConfirmados.length;
+    const tl = Math.max(1, linhasEstimadas);
+    const penalidade = anulacao.anulada ? 0 : Math.round(((2 * ne) / tl) * 100) / 100;
+    notaTotalCalculada = anulacao.anulada ? 0 : clamp(Math.round((nc - penalidade) * 100) / 100, 0, 10.0);
+
+    const notasMacro = [apres, top1, top2, top3];
+    spec.criteriaList.forEach((cr, i) => {
+      const nota = notasMacro[i];
+      espelhoCriterios.push({
+        id: cr.id,
+        nome: cr.title,
+        max: cr.pts,
+        nota,
+        justificativa: i === 0
+          ? `Apresentação em ${numPar} parágrafo(s) e ${linhasEstimadas} linha(s) efetivamente escritas (TL = ${tl}).`
+          : (i === 1 ? aderencia.diagnostico : (i === 2 ? repertorio.resumoGeral : 'Avaliação dos encaminhamentos e propostas em conformidade com a LEP e direitos fundamentais.')),
+        evidencias: i === 0
+          ? `Parágrafos: ${numPar} | Linhas (TL): ${tl}.`
+          : (i === 1 ? `Núcleos temáticos: "${aderencia.nucleosEncontrados.slice(0, 5).join(', ') || 'nenhum'}".`
+          : (i === 2 ? (repertorio.temAlgum ? repertorio.lista.map(r => r.nome).join(', ') : 'Sem citação de doutrina ou legislação penitenciária.')
+          : `Parágrafo conclusivo com ${ultPar ? ultPar.palavras : 0} palavras.`)),
+        positivos: nota >= cr.pts * 0.75 ? 'Aspecto abordado com consistência técnica e fundamentação adequada.' : 'Abordagem inicial do tema presente.',
+        problemas: nota < cr.pts * 0.75 ? 'Necessita aprofundar a fundamentação com foco na realidade penitenciária e segurança pública.' : 'Sem lacunas graves na macroestrutura.',
+        acaoRecomendada: 'No Cebraspe PPPE, estruture o texto respondendo de forma direta, clara e fundamentada a cada aspecto solicitado pela banca.'
+      });
+    });
+
+    detalhesEspecificos = {
+      tipo: 'cebraspe',
+      nc,
+      ne,
+      tl,
+      penalidade,
+      notasMacro: { apres, top1, top2, top3 }
+    };
+  }
+
+  /* -------------------------------------------------------------------
      RUBRICA 3: VUNESP (PMSP) — 100,0 PONTOS (Critérios A=30, B=40, C=30)
      ------------------------------------------------------------------- */
   else if(bancaKey === 'pmsp'){
@@ -1185,7 +1351,7 @@ function validarNotasCorrecao(resultadoBruto, spec, ocorrencias){
 
   // 2. Verificar se a soma dos critérios corresponde exatamente à nota total
   const somaCriterios = Math.round(resultadoBruto.espelhoCriterios.reduce((acc, c) => acc + c.nota, 0) * 100) / 100;
-  if(spec.id === 'pcpe'){
+  if(spec.id === 'pcpe' || spec.id === 'pppe'){
     // No Cebraspe, somaCriterios = NC, e Nota Final = max(0, NC - penalidade)
     const d = resultadoBruto.detalhesEspecificos;
     d.nc = somaCriterios;
@@ -1214,6 +1380,102 @@ function validarNotasCorrecao(resultadoBruto, spec, ocorrencias){
     verificacoes,
     avisoEstimativa: 'Nota gerada por estimativa automatizada calibrada pela rubrica documental. A avaliação humana oficial da banca examinadora pode apresentar variações interpretativas.'
   };
+}
+
+
+/* =====================================================================
+   NOVO: GERADOR DE TEXTO ANOTADO COM GRIFOS INTERATIVOS (PADRÃO GLAU.COM)
+   ===================================================================== */
+function gerarTextoAnotadoGlau(texto, ocorrencias = [], repertorios = [], analiseParagrafos = []){
+  const paragrafos = String(texto || '').split(/\n+/).map(p => p.trim()).filter(Boolean);
+  const repLista = Array.isArray(repertorios) ? repertorios : (repertorios.lista || []);
+
+  return paragrafos.map((par, pIdx) => {
+    const numP = pIdx + 1;
+    const intervals = [];
+
+    // 1. Ocorrências gramaticais e de coesão
+    ocorrencias.forEach(o => {
+      if(o.paragrafo === numP && o.trechoOriginal){
+        const idx = par.indexOf(o.trechoOriginal);
+        if(idx !== -1){
+          const tipo = o.tipoGlau || (o.severidade === 'erro_confirmado' ? 'erro' : (o.severidade === 'fragilidade_argumentativa' ? 'coesao' : 'estilo'));
+          intervals.push({
+            start: idx,
+            end: idx + o.trechoOriginal.length,
+            tipo,
+            id: o.id || `occ_${numP}_${idx}`
+          });
+        }
+      }
+    });
+
+    // 2. Citações de repertório sociocultural
+    repLista.forEach((r, rIdx) => {
+      if(r.paragrafo === numP){
+        const termos = [r.nome, r.fonte, 'Constituição', 'Artigo', 'Art.', 'Lei', 'Código', 'Hobbes', 'Platão', 'Freire', 'SUS', 'Beccaria', 'Durkheim', 'Bauman', 'Arendt', 'Weber', 'Krenak', 'Bourdieu', 'Harari', 'Piketty', 'Aristóteles', 'Locke', 'Rousseau', 'Sartre'];
+        for(const t of termos){
+          if(!t || t.length < 3) continue;
+          const idx = par.toLowerCase().indexOf(t.toLowerCase());
+          if(idx !== -1){
+            intervals.push({
+              start: idx,
+              end: idx + t.length,
+              tipo: 'rep',
+              id: `rep_${rIdx}`
+            });
+            break;
+          }
+        }
+      }
+    });
+
+    // 3. Tese no primeiro parágrafo
+    if(numP === 1 && analiseParagrafos[0] && !analiseParagrafos[0].relacaoTese.includes('implícita')){
+      const sentences = par.match(/[^.!?]+[.!?]*/g) || [];
+      if(sentences.length >= 2){
+        const lastSent = sentences[sentences.length - 1].trim();
+        const sIdx = par.lastIndexOf(lastSent);
+        if(sIdx !== -1 && lastSent.length > 25){
+          intervals.push({
+            start: sIdx,
+            end: sIdx + lastSent.length,
+            tipo: 'ok',
+            id: 'tese_p1'
+          });
+        }
+      }
+    }
+
+    // Ordenar decrescente para filtrar colisões
+    intervals.sort((a, b) => b.start - a.start);
+    const nonOverlapping = [];
+    let lastStart = Infinity;
+    for(const inv of intervals){
+      if(inv.end <= lastStart && inv.start >= 0){
+        nonOverlapping.push(inv);
+        lastStart = inv.start;
+      }
+    }
+
+    // Renderizar parágrafo com marks interativos
+    let pResult = '';
+    let cursor = 0;
+    nonOverlapping.sort((a, b) => a.start - b.start);
+    for(const inv of nonOverlapping){
+      if(inv.start > cursor){
+        pResult += esc(par.slice(cursor, inv.start));
+      }
+      const trecho = par.slice(inv.start, inv.end);
+      pResult += `<mark class="glau-mark glau-mark-${inv.tipo}" data-target-id="${inv.id}" tabindex="0" role="button" aria-label="Ver detalhes">${esc(trecho)}</mark>`;
+      cursor = inv.end;
+    }
+    if(cursor < par.length){
+      pResult += esc(par.slice(cursor));
+    }
+
+    return `<p class="glau-paragraph" data-par-num="${numP}"><span class="glau-par-badge">P${numP}</span>${pResult}</p>`;
+  }).join('\n');
 }
 
 /* =====================================================================
@@ -1406,9 +1668,11 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
     planoMelhoria,
     reescritaOrientada,
     proximaAtividade,
+    textoAnotadoGlau: gerarTextoAnotadoGlau(texto, ocorrencias, repertorio, analiseParagrafos),
 
     // Compatibilidade com renderizadores e testes
-    tipo: resultadoCalculo.detalhesEspecificos.tipo,
+    tipo: (resultadoCalculo.detalhesEspecificos && resultadoCalculo.detalhesEspecificos.tipo) || bancaKey,
+    detalhesEspecificos: resultadoCalculo.detalhesEspecificos || {},
     ...resultadoCalculo.detalhesEspecificos,
     conectivos: CONECTIVOS_LISTA.filter(c => norm(texto).includes(c)),
     modeloReescrito: reescritaOrientada.modeloIntegralEstudo
@@ -1423,6 +1687,15 @@ function gerarModeloIntegralEstudo(tema, bancaKey){
       `[Desenvolvimento 1] Em primeiro lugar, cabe pontuar que a atuação estatal ainda se mostra fragmentada diante da complexidade do problema. Segundo o filósofo Thomas Hobbes, em "O Leviatã", o Estado surge do pacto social justamente para assegurar a proteção, a ordem e o bem-estar coletivo. Contudo, quando o Poder Público falha na fiscalização das leis e na oferta de infraestrutura adequada, fragiliza-se a proteção dos grupos mais vulneráveis e amplia-se a desigualdade social.`,
       `[Desenvolvimento 2] Ademais, a falta de letramento crítico e de informação qualificada na sociedade agrava os impactos dessa problemática. Na "Alegoria da Caverna", de Platão, os indivíduos acorrentados tomam sombras como verdades por desconhecerem a realidade luminosa do conhecimento. Analogamente, a naturalização de preconceitos e a ausência de educação cidadã — defendida por Paulo Freire como prática emancipadora — impedem que a coletividade compreenda a gravidade do tema e atue de modo solidário.`,
       `[Conclusão — 5 Elementos C5] Portanto, medidas urgentes são necessárias para reverter esse quadro. Para tanto, cabe ao Poder Executivo Federal, em ação articulada entre os Ministérios competentes e as secretarias estaduais (Agente), implementar um Programa Nacional de Enfrentamento e Conscientização acerca de ${t} (Ação), por meio da ampliação de verbas orçamentárias, da fiscalização rigorosa e de oficinas educativas nas escolas e comunidades (Meio/Modo) — especificamente com equipes multidisciplinares e canais acessíveis de atendimento ao cidadão (Detalhamento) —, a fim de efetivar os direitos previstos na Carta Magna e consolidar uma sociedade justa (Efeito).`
+    ].join('\n\n');
+  }
+
+  if(bancaKey === 'pppe'){
+    return [
+      `[Introdução & Contextualização] No Estado Democrático de Direito assegurado pela Constituição Federal de 1988, o sistema penitenciário desempenha papel primordial na execução penal, na salvaguarda dos direitos fundamentais e na promoção da segurança social. Nesse contexto, a discussão sobre "${t}" exige reflexão crítica a respeito da eficácia das políticas públicas prisionais e da atuação da Polícia Penal na garantia da ordem, da integridade física dos custodiados e da disciplina institucional.`,
+      `[Desenvolvimento 1 — Diagnóstico Estrutural & LEP] Em primeiro lugar, cumpre examinar os desafios estruturais que afetam a gestão carcerária brasileira. Conforme preconiza a Lei de Execução Penal (Lei nº 7.210/1984), a pena privativa de liberdade possui a dupla finalidade de punir e proporcionar condições para a harmônica reintegração social do condenado. Contudo, a superlotação crônica e a pressão exercida por facções criminosas comprometem esse mandamento legal, exigindo ações preventivas e reforço contínuo da inteligência penitenciária integrada aos demais órgãos de segurança.`,
+      `[Desenvolvimento 2 — Trabalho, Educação & Dignidade] Ademais, a reinserção social efetiva depende da oferta regular de instrução escolar e trabalho digno no interior das unidades penais. Sob a perspectiva de Cesare Beccaria em "Dos Delitos e das Penas", a certeza e a justiça da sanção sobrepõem-se à mera crueldade punitiva. Assim, transformar as unidades prisionais em ambientes de qualificação técnica e ressocialização é a ferramenta mais eficaz para neutralizar a cooptação pelo crime organizado e reduzir os índices de reincidência.`,
+      `[Conclusão — Encaminhamentos Institucionais] Portanto, a consolidação de um sistema prisional resolutivo demanda investimentos estratégicos na valorização e capacitação técnica dos policiais penais, modernização de recursos tecnológicos e articulação intersetorial com o Poder Judiciário. Somente por meio do equilíbrio entre segurança orgânica rigorosa e respeito indeclinável à dignidade da pessoa humana será possível consolidar a paz social e a tutela da cidadania.`
     ].join('\n\n');
   }
 
@@ -1445,6 +1718,7 @@ function gerarModeloIntegralEstudo(tema, bancaKey){
 
 global.MotorCorrecao = {
   avaliarRedacao,
+  gerarTextoAnotadoGlau,
   analisarAderenciaAoTema,
   analisarRepertorioContextual,
   analisarOcorrenciasPorSentenca,

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redação Aprovada 2.0 | Concursos Públicos & ENEM</title>
-<meta name="description" content="Plataforma profissional de correção e treino de redação especializada por banca organizadora: Instituto AOCP (PMPE/CBMPE), Cebraspe (PCPE), Vunesp (PMSP) e INEP (ENEM).">
+<title>Redação Aprovada 2.0 | Concursos Públicos</title>
+<meta name="description" content="Plataforma profissional de correção e treino de redação especializada por banca organizadora: Instituto AOCP (PMPE/CBMPE), Cebraspe (PCPE) e Vunesp (PMSP).">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&family=Cinzel:wght@700&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
    SISTEMA DE DESIGN MULTI-TEMA POR BANCA ORGANIZADORA
    ===================================================================== */
 :root {
-  --th-name: "Portal Concursos & ENEM";
+  --th-name: "Portal Concursos Públicos";
   --th-banca: "Multi-Bancas";
   --th-primary: #4f46e5;
   --th-primary-dark: #3730a3;
@@ -666,19 +666,366 @@ footer {
 }
 footer b { color: #fff; }
 
-/* RESPONSIVIDADE */
-@media (max-width: 960px) {
+/* =====================================================================
+   FOLHA DE CORREÇÃO INTERATIVA (GRIFOS COLORIDOS E INSPETOR INTELIGENTE)
+   ===================================================================== */
+.glau-interactive-container {
+  background: var(--card);
+  border: 1px solid var(--th-card-border);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  margin-bottom: 24px;
+}
+.glau-header-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+}
+.glau-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.glau-title-box h3 {
+  font-size: 19px;
+  font-weight: 800;
+  margin-top: 4px;
+  color: var(--ink);
+}
+.glau-title-box small {
+  color: var(--muted);
+  font-size: 13px;
+}
+.glau-legend-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.glau-pill-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.glau-pill-legend:hover {
+  transform: translateY(-1px);
+}
+.legend-erro { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+.legend-coesao { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.legend-rep { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
+.legend-ok { background: #dcfce7; color: #166534; border-color: #86efac; }
+
+.glau-split-view {
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr;
+  gap: 22px;
+  align-items: start;
+}
+.glau-text-col {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+  max-height: 720px;
+  overflow-y: auto;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+}
+.glau-reader {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 15.5px;
+  line-height: 2.15;
+  color: #1e293b;
+}
+.glau-paragraph {
+  margin-bottom: 20px;
+  position: relative;
+  padding-left: 38px;
+}
+.glau-par-badge {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  user-select: none;
+}
+
+/* MARCAÇÕES COLORIDAS (GRIFOS CLICÁVEIS) */
+.glau-mark {
+  padding: 3px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.glau-mark:hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+.glau-mark:focus, .glau-mark.active {
+  outline: 3px solid var(--th-primary);
+  outline-offset: 1px;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+  z-index: 2;
+  position: relative;
+}
+.glau-mark-erro {
+  background: #fee2e2;
+  color: #991b1b;
+  border-bottom: 2.5px solid #ef4444;
+}
+.glau-mark-coesao {
+  background: #fef3c7;
+  color: #92400e;
+  border-bottom: 2.5px solid #f59e0b;
+}
+.glau-mark-rep {
+  background: #e0f2fe;
+  color: #0369a1;
+  border-bottom: 2.5px solid #0284c7;
+}
+.glau-mark-ok {
+  background: #dcfce7;
+  color: #166534;
+  border-bottom: 2.5px solid #10b981;
+}
+
+/* PAINEL DE INSPEÇÃO INTERATIVO (COLUNA DIREITA) */
+.glau-feedback-col {
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+  position: sticky;
+  top: 90px;
+  min-height: 380px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+.glau-empty-state {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--muted);
+}
+.glau-empty-state b {
+  color: var(--ink);
+  font-size: 15px;
+  display: block;
+  margin-bottom: 6px;
+}
+.glau-empty-state p {
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.glau-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.glau-card-body {
+  display: grid;
+  gap: 10px;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+.glau-nav-btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+/* ================= RESPONSIVIDADE TOTAL (MOBILE, TABLET E DESKTOP) ================= */
+html, body {
+  overflow-x: hidden;
+}
+
+@media (max-width: 1024px) {
+  .glau-split-view {
+    grid-template-columns: 1fr;
+  }
+  .glau-feedback-col {
+    position: static;
+    min-height: auto;
+  }
   .g4 { grid-template-columns: repeat(2, 1fr); }
   .g3 { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 680px) {
-  .g2, .g3, .g4 { grid-template-columns: 1fr; }
-  .hero { padding: 30px 20px; }
-  .hform { grid-template-columns: 1fr; }
-  .hform .full { grid-column: span 1; }
-  .page-title { font-size: 25px; }
-  .topbar .wrap { flex-direction: column; align-items: stretch; }
-  nav { width: 100%; justify-content: flex-start; }
+
+@media (max-width: 768px) {
+  .wrap {
+    padding: 0 14px;
+  }
+  /* Topbar Mobile Compacta */
+  .topbar .wrap {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 12px;
+    gap: 8px;
+    min-height: auto;
+  }
+  .brand {
+    font-size: 15.5px;
+  }
+  .brand-logo-box {
+    width: 38px;
+    height: 38px;
+  }
+  nav {
+    width: 100%;
+    justify-content: flex-start;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  nav button {
+    padding: 8px 12px;
+    font-size: 12.5px;
+    min-height: 40px;
+  }
+
+  /* Evitar auto-zoom no iOS Safari (font-size >= 16px nos inputs) */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+  .field {
+    min-height: 44px;
+    padding: 8px 12px;
+  }
+  .field label {
+    font-size: 11px;
+  }
+
+  /* Áreas de toque recomendadas (mínimo de 44px para cliques) */
+  .btn {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+  .btn-sm {
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+  .target-pill-btn {
+    min-height: 38px;
+  }
+
+  /* Formulário e Editor Mobile */
+  .g2, .g3, .g4 {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .hform {
+    grid-template-columns: 1fr;
+  }
+  .hform .full {
+    grid-column: span 1;
+  }
+  .page-title {
+    font-size: 24px;
+  }
+  .hero {
+    padding: 24px 16px;
+    border-radius: 18px;
+  }
+  .hero h1 {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .hero p {
+    font-size: 14px;
+  }
+  .sheet {
+    padding: 18px 14px;
+    border-radius: 16px;
+  }
+  .banca-alert-bar {
+    padding: 10px 12px;
+  }
+
+  .editor-container {
+    border-radius: 12px;
+  }
+  .gutter {
+    width: 36px;
+    font-size: 11px;
+  }
+  .essay {
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+
+  /* Scorebox Mobile */
+  .scorebox {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px 14px;
+    gap: 16px;
+  }
+  .scorebox .ring {
+    margin: 0 auto;
+  }
+
+  /* Modais no Mobile */
+  .modal-card {
+    width: 96%;
+    max-width: 96vw;
+    max-height: 90vh;
+    border-radius: 18px;
+  }
+  .modal-header {
+    padding: 18px 18px;
+  }
+  .modal-header h2 {
+    font-size: 19px;
+  }
+  .modal-body {
+    padding: 18px 16px;
+  }
+
+  /* Glau Reader Mobile */
+  .glau-interactive-container {
+    padding: 16px 12px;
+  }
+  .glau-paragraph {
+    padding-left: 28px;
+    font-size: 14.5px;
+    line-height: 2.0;
+  }
+  .glau-par-badge {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
 }
 
 @media print {
@@ -712,15 +1059,14 @@ footer b { color: #fff; }
       </button>
       <div id="googleAuthBox" style="display:inline-flex;align-items:center;gap:6px"></div>
       <select id="profileSelect" class="profile-select" aria-label="Selecionar perfil de aluno" style="display:none"></select>
-      <button type="button" class="btn btn-light btn-sm" id="btnOpenAiConfig" title="Configurar Chaves de API das IAs (Google Gemini / OpenAI)" style="padding:5px 11px;font-size:12px;background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25)">⚙️ Chaves de IA</button>
-      <button type="button" class="btn btn-light btn-sm" id="btnOpenTests" title="Suíte de Testes Obrigatórios e Auditoria de Qualidade" style="padding:5px 11px;font-size:12px;background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25)">🧪 Testes</button>
+      <button type="button" class="btn btn-light btn-sm" id="btnOpenAiConfig" title="Configurar Chaves de API das IAs (Google Gemini / OpenAI)" style="display:none !important">⚙️ Chaves de IA</button>
+      <button type="button" class="btn btn-light btn-sm" id="btnOpenTests" title="Suíte de Testes Obrigatórios e Auditoria de Qualidade" style="display:none !important">🧪 Testes</button>
     </div>
 
     <nav id="nav" aria-label="Navegação principal">
       <button type="button" data-go="inicio">Início</button>
       <button type="button" data-go="escrever">Folha & Corretor</button>
       <button type="button" data-go="criterios">Critérios da Banca</button>
-      <button type="button" data-go="aulas">Aulas & Método PDF</button>
       <button type="button" data-go="temas">Temas</button>
       <button type="button" data-go="repertorio">Repertório</button>
       <button type="button" data-go="portugues">Português</button>
@@ -734,7 +1080,7 @@ footer b { color: #fff; }
 <section class="view" id="v-inicio"><div class="wrap">
   <div class="hero">
     <div class="hero-header">
-      <span class="badge" id="heroBadge">🎯 Foco Atual: Concursos & ENEM</span>
+      <span class="badge" id="heroBadge">🎯 Foco Atual: Concursos Públicos</span>
       <div class="hero-crest-badge" id="heroCrestBadge">
         <div id="heroCrestSvg">
           <img src="4060864b87ab4736e6efeda0032a7a40.jpg" alt="Logotipo Institucional" class="inst-logo-img">
@@ -747,7 +1093,7 @@ footer b { color: #fff; }
     </div>
 
     <h1 id="heroHeadline">Domine a redação da sua banca com <em>rigor cirúrgico</em></h1>
-    <p id="heroSubtext">Motor contextual calibrado por rubricas versionadas: INEP para ENEM, Cebraspe para PCPE, Instituto AOCP para PMPE/CBMPE e VUNESP para PMSP. Relatório completo em 9 seções (A–I), biblioteca ampla de repertórios e histórico analítico.</p>
+    <p id="heroSubtext">Motor contextual calibrado por rubricas versionadas: Cebraspe para PCPE, Instituto AOCP para PMPE/CBMPE e VUNESP para PMSP. Relatório completo em 9 seções (A–I), biblioteca ampla de repertórios e histórico analítico.</p>
 
     <div class="cta">
       <button type="button" class="btn btn-primary" data-go="escrever">✍️ Escrever & Corrigir Agora</button>
@@ -760,7 +1106,7 @@ footer b { color: #fff; }
   <div id="userWelcomeBanner"></div>
 
   <!-- AVISO DA BANCA ATIVA -->
-  <div id="targetBannerNotice"></div>
+  <div id="targetBannerNotice" style="display:none"></div>
 
   <!-- ESTATÍSTICAS DO ALUNO -->
   <div class="grid g4" id="homeStats"></div>
@@ -780,12 +1126,7 @@ footer b { color: #fff; }
     <div class="card feat" data-go="criterios" style="cursor:pointer">
       <div style="font-size:30px;margin-bottom:8px">⚖️</div>
       <h3>Rubricas Documentadas por Banca</h3>
-      <p>Consulte os critérios versionados da AOCP (40 pts), Cebraspe (fórmula líquida NPD), Vunesp (100 pts) e Matriz INEP/ENEM (1000 pts).</p>
-    </div>
-    <div class="card feat" data-go="aulas" style="cursor:pointer">
-      <div style="font-size:30px;margin-bottom:8px">💡</div>
-      <h3>Método dos PDFs (3 Aulas)</h3>
-      <p>Pensar para Argumentar (Platão e método socrático), os 6 tipos de desenvolvimento argumentativo e a estrutura da conclusão.</p>
+      <p>Consulte os critérios versionados da AOCP (40 pts), Cebraspe (fórmula líquida NPD) e Vunesp (100 pts).</p>
     </div>
     <div class="card feat" data-go="temas" style="cursor:pointer">
       <div style="font-size:30px;margin-bottom:8px">🎯</div>
@@ -801,6 +1142,11 @@ footer b { color: #fff; }
       <div style="font-size:30px;margin-bottom:8px">🔤</div>
       <h3>Português & Exercícios Reais</h3>
       <p>Questões comentadas com regra e exemplo extra, conectivos clicáveis e exercícios gerados a partir dos erros reais das suas redações.</p>
+    </div>
+    <div class="card feat" data-go="evolucao" style="cursor:pointer">
+      <div style="font-size:30px;margin-bottom:8px">📈</div>
+      <h3>Painel de Evolução & Histórico</h3>
+      <p>Acompanhe sua progressão de notas, gráficos por competência, média ponderada e histórico detalhado de redações corrigidas.</p>
     </div>
   </div>
 </div></section>
@@ -833,10 +1179,10 @@ footer b { color: #fff; }
       <div class="field"><label for="inTarget">Banca / Concurso</label>
         <select id="inTarget">
           <option value="pmpe">PMPE · Instituto AOCP (15 a 20 linhas · 40 pts)</option>
-          <option value="cbmpe">CBMPE · Instituto AOCP (15 a 20 linhas · 40 pts)</option>
           <option value="pcpe">PCPE · Cebraspe / CESPE (Até 30 linhas · 30 pts)</option>
+          <option value="pppe">PPPE · CEBRASPE / Polícia Penal PE (20 a 30 linhas · 10 pts)</option>
+          <option value="cbmpe">CBMPE · Instituto AOCP (15 a 20 linhas · 40 pts)</option>
           <option value="pmsp">PMSP / VUNESP (Até 30 linhas · 100 pts)</option>
-          <option value="enem">INEP / ENEM (8 a 30 linhas · 1000 pts)</option>
         </select>
       </div>
       <div class="field full"><label for="inTema">Tema da Redação</label><input id="inTema" type="text" placeholder="Digite o tema ou escolha no Banco de Temas" maxlength="260"></div>
@@ -879,13 +1225,7 @@ footer b { color: #fff; }
         <button type="button" class="btn btn-light btn-sm" id="btnCopy">📋 Copiar texto</button>
         <button type="button" class="btn btn-light btn-sm" id="btnClear">🗑️ Limpar folha</button>
       </div>
-      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-        <div class="ai-status-pill" id="aiStatusPill" title="Avaliação via Inteligência Artificial com cascata multi-modelo automática">
-          <span class="ai-pulse-dot"></span>
-          <span id="aiStatusText">IA Multi-Modelo: <b>Gemini Pro/Flash ➔ OpenAI ➔ Motor Local</b></span>
-        </div>
-        <button type="button" class="btn btn-primary" id="btnEval">📝 Avaliar Redação & Gerar Relatório (Seções A–I)</button>
-      </div>
+      <button type="button" class="btn btn-primary" id="btnEval">📝 Avaliar Redação & Gerar Relatório (Seções A–I)</button>
     </div>
   </div>
 
@@ -901,223 +1241,12 @@ footer b { color: #fff; }
   <div class="chips" id="criteriaChips">
     <button type="button" class="chipbtn on" data-target-tab="pmpe">PMPE (Instituto AOCP)</button>
     <button type="button" class="chipbtn" data-target-tab="pcpe">PCPE (CESPE/Cebraspe)</button>
+    <button type="button" class="chipbtn" data-target-tab="pppe">PPPE (CEBRASPE 2026)</button>
     <button type="button" class="chipbtn" data-target-tab="cbmpe">CBMPE (Instituto AOCP)</button>
     <button type="button" class="chipbtn" data-target-tab="pmsp">PMSP (VUNESP)</button>
-    <button type="button" class="chipbtn" data-target-tab="enem">ENEM (INEP)</button>
   </div>
 
   <div id="criteriaContentBox"></div>
-</div></section>
-
-<!-- ================= AULAS & MÉTODO PDFS ================= -->
-<section class="view" id="v-aulas"><div class="wrap">
-  <h1 class="page-title">Método dos PDFs | <span>Pensar para Argumentar</span></h1>
-  <p class="page-sub">Conteúdo pedagógico integral das 3 aulas: raciocínio filosófico e socrático, os 6 tipos de desenvolvimento com exemplos práticos e as 5 maneiras de concluir o texto dissertativo.</p>
-
-  <div class="pdf-tab-nav">
-    <button type="button" class="pdf-tab-btn active" data-pdf="pensar">🧠 Aula 1: Pensar para Argumentar (Filosofia & Método)</button>
-    <button type="button" class="pdf-tab-btn" data-pdf="desenv">⚖️ Aula 2: Desenvolvimento & Tipos de Argumento</button>
-    <button type="button" class="pdf-tab-btn" data-pdf="concl">🏁 Aula 3: Conclusão no Texto Dissertativo</button>
-  </div>
-
-  <!-- MÓDULO 1: PENSAR PARA ARGUMENTAR -->
-  <div class="pdf-module active" id="pdf-pensar">
-    <div class="grid g2" style="margin-bottom:20px">
-      <div class="card" style="border-left:5px solid var(--th-primary)">
-        <h3>🏛️ A Filosofia no Pensamento Argumentativo</h3>
-        <p>A filosofia não é mera teoria abstrata: ela é a ferramenta para enxergar a verdade, compreender dilemas sociais e estruturar argumentos consistentes.</p>
-        <ul class="list" style="margin-top:10px">
-          <li><b>Enxergar a existência:</b> Compreender melhor a vida e as relações humanas.</li>
-          <li><b>Entender dilemas sociais:</b> Perceber a raiz dos problemas cotidianos e institucionais.</li>
-          <li><b>Refletir racionalmente:</b> Trocar achismos por análise lógica fundamentada.</li>
-        </ul>
-      </div>
-
-      <div class="card" style="border-left:5px solid var(--gold)">
-        <h3>✍️ Antes de escrever bem, pense bem!</h3>
-        <p><i>"A clareza do texto nasce antes da primeira palavra, nasce no pensamento."</i></p>
-        <p style="margin-top:8px">Um texto gramaticalmente correto pode ser fraco se as ideias estiverem confusas. Escrever bem é organizar pensamentos, não apenas usar vocabulário rebuscado.</p>
-      </div>
-    </div>
-
-    <h2 class="section-title">🔍 O Método Socrático: Questione Tudo</h2>
-    <div class="grid g3">
-      <div class="card">
-        <h4>1. A Afirmação Inicial</h4>
-        <p>Exemplo: <i>"A internet prejudicou o pensamento das pessoas."</i> — Soa convincente até ser questionada.</p>
-      </div>
-      <div class="card">
-        <h4>2. As Perguntas Essenciais</h4>
-        <p>Sempre? Em que condições? O que significa "prejudicar"? Quem é mais afetado?</p>
-      </div>
-      <div class="card">
-        <h4>3. Refinar para Convencer</h4>
-        <p>Qual a contraposição? Como reformular a tese para torná-la precisa, defensável e consistente?</p>
-      </div>
-    </div>
-
-    <h2 class="section-title">🕯️ A Alegoria da Caverna de Platão: Leitura Contemporânea</h2>
-    <div class="card" style="margin-bottom:20px">
-      <p>Prisioneiros acorrentados veem apenas sombras projetadas e as tomam como a única realidade. Ao saírem para a luz, sentem desconforto; ao voltarem, sofrem resistência dos que preferem a ignorância confortável.</p>
-      <div class="grid g3" style="margin-top:16px">
-        <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
-          <b style="color:var(--red)">📱 Desinformação:</b> Representações falsas tomadas como verdades absolutas — as sombras do século XXI.
-        </div>
-        <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
-          <b style="color:#0284c7">🌐 Redes Sociais:</b> Ambientes algorítmicos que limitam e distorcem a percepção do mundo real.
-        </div>
-        <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
-          <b style="color:var(--green)">🎓 Educação:</b> A verdadeira saída da caverna: ampliação da consciência crítica e emancipação cidadã.
-        </div>
-      </div>
-    </div>
-
-    <h2 class="section-title">🌉 O Método "Referência → Ponte → O que ela Prova"</h2>
-    <div class="card" style="background:var(--th-card-highlight);border:2px solid var(--th-card-border)">
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
-        <span class="badge badge-gold">REGRA DE OURO DOS REPERTÓRIOS</span>
-        <b>Citar um filósofo não basta. A referência precisa trabalhar para a sua tese!</b>
-      </div>
-      <div class="grid g2">
-        <div class="card" style="border-left:4px solid var(--red)">
-          <b style="color:var(--red)">❌ Erro Comum (Uso Decorativo):</b>
-          <p>Citar Platão ou Hobbes e passar imediatamente para outro assunto sem explicar o conceito e sem vinculá-lo ao problema do tema.</p>
-        </div>
-        <div class="card" style="border-left:4px solid var(--green)">
-          <b style="color:var(--green)">✅ Uso Produtivo (Nota Máxima):</b>
-          <p>Explicar o conceito do autor, estabelecer a ponte direta com o tema proposto e demonstrar o que ele comprova na realidade brasileira.</p>
-        </div>
-      </div>
-    </div>
-
-    <h2 class="section-title">🪜 Anatomia do Raciocínio Argumentativo (5 Passos)</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px">
-      <div class="step-card"><div class="step-num">1</div><div><b>Afirmação:</b><br><small>O que estou defendendo?</small></div></div>
-      <div class="step-card"><div class="step-num">2</div><div><b>Razão:</b><br><small>Por que acredito nisso?</small></div></div>
-      <div class="step-card"><div class="step-num">3</div><div><b>Fundamentação:</b><br><small>O que sustenta essa razão?</small></div></div>
-      <div class="step-card"><div class="step-num">4</div><div><b>Explicação:</b><br><small>Por que essa evidência é relevante?</small></div></div>
-      <div class="step-card"><div class="step-num">5</div><div><b>Inferência:</b><br><small>O que posso concluir disso?</small></div></div>
-    </div>
-
-    <h2 class="section-title">🎯 O Verbo Muda o Grau de Certeza</h2>
-    <div class="card">
-      <table style="width:100%;border-collapse:collapse">
-        <thead>
-          <tr style="text-align:left;border-bottom:2px solid var(--line)"><th style="padding:10px">Tipo</th><th style="padding:10px">Exemplo</th><th style="padding:10px">Efeito no Avaliador</th></tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom:1px solid var(--line)"><td style="padding:10px"><b>Categórico</b></td><td style="padding:10px"><i>"A inteligência artificial prejudica o aprendizado."</i></td><td style="padding:10px">Afirmação absoluta, exige prova sólida.</td></tr>
-          <tr style="border-bottom:1px solid var(--line)"><td style="padding:10px"><b>Cauteloso</b></td><td style="padding:10px"><i>"A inteligência artificial <u>pode prejudicar</u> o aprendizado."</i></td><td style="padding:10px">Abre espaço para nuances, condições e maturidade argumentativa.</td></tr>
-          <tr><td style="padding:10px"><b>Necessidade</b></td><td style="padding:10px"><i>"O Estado <u>deve</u> buscar soluções."</i></td><td style="padding:10px">Indica obrigação institucional, imperativo ético ou legal.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- MÓDULO 2: DESENVOLVIMENTO & TIPOS DE ARGUMENTO -->
-  <div class="pdf-module" id="pdf-desenv">
-    <div class="card" style="margin-bottom:20px;border-left:5px solid var(--th-primary)">
-      <h3>O Coração da Redação Dissertativo-Argumentativa</h3>
-      <p>Se a introdução situa o tema e apresenta a tese, <b>o desenvolvimento é a própria defesa desse ponto de vista</b>. É a parte responsável por demonstrar ao avaliador que sua tese é fundamentada.</p>
-      <div class="notice notice-crimson" style="margin-top:14px;margin-bottom:0">
-        <b>⚠️ Erro nº 1: Opinar sem provar!</b> Lembre-se: opinião solta não é argumento. É indispensável fundamentar suas afirmações com dados, fatos históricos, normas ou raciocínios lógicos.
-      </div>
-    </div>
-
-    <h2 class="section-title">📚 Os 6 Tipos de Argumento (Com Exemplos Práticos do PDF)</h2>
-    <div class="grid g2">
-      <div class="card">
-        <span class="badge" style="background:#e0e7ff;color:#4338ca">1. Comparação</span>
-        <h4 style="margin:8px 0">Confronto entre Realidades</h4>
-        <p>Estabelece confronto entre duas realidades distintas no tempo, espaço ou características, demonstrando perspectivas comparadas.</p>
-        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
-          <b>Exemplo do PDF:</b> <i>"Numa lista de 82 países pesquisados pela ICAP em Washington, a lei seca brasileira com limite de 2 decigramas é mais rígida que 63 nações, iguala-se a 5 e é mais tolerante que 13..."</i>
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="badge" style="background:#fef3c7;color:#b45309">2. Alusão Histórica</span>
-        <h4 style="margin:8px 0">O Poder da Ponte Temporal</h4>
-        <p>Retoma acontecimentos do passado para explicar a gênese e os contornos dos problemas contemporâneos.</p>
-        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
-          <b>Exemplo do PDF:</b> <i>"Há exatos 150 anos, na Sociedade Lineana de Londres, naturalistas anunciavam a teoria de evolução da seleção natural de Darwin e Wallace, alterando o modo de compreender a variedade de vida..."</i>
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="badge" style="background:#dcfce7;color:#15803d">3. Provas Concretas</span>
-        <h4 style="margin:8px 0">Dados Estatísticos e Fatos Objetivos</h4>
-        <p>Apresentação de pesquisas, relatórios oficiais e cifras comprovadas. São argumentos objetivos de alta densidade informativa.</p>
-        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
-          <b>Exemplo do PDF:</b> <i>"Segundo a Cepal, estudo realizado na América Latina mostrou que o Brasil gasta 17% com os 20% mais pobres e 27% com os 20% mais ricos em educação, demonstrando a má distribuição..."</i>
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="badge" style="background:#fee2e2;color:#b91c1c">4. Argumentos Consensuais</span>
-        <h4 style="margin:8px 0">Verdades Socialmente Aceitas</h4>
-        <p>Afirmações que representam valores universais da sociedade (ex: todo ser humano precisa de saúde e segurança).</p>
-        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
-          <b>Atenção do PDF:</b> Usar apenas argumentos consensuais empobrece a redação. É vital combiná-los com provas concretas ou autoridade!
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="badge" style="background:#f3e8ff;color:#7e22ce">5. Autoridade ou Exemplo</span>
-        <h4 style="margin:8px 0">Citação de Especialistas</h4>
-        <p>Apresenta a perspectiva ou estudos de cientistas, juristas, filósofos e pensadores reconhecidos, em discurso direto ou indireto.</p>
-        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
-          <b>Exemplo do PDF:</b> <i>"Montaigne, em seus Ensaios, reflete sobre a intimidade sem reservas na amizade, lançando luz sobre o individualismo da sociedade ocidental contemporânea..."</i>
-        </div>
-      </div>
-
-      <div class="card">
-        <span class="badge" style="background:#ccfbf1;color:#0f766e">6. Argumentos de Presença</span>
-        <h4 style="margin:8px 0">Ilustração e Narrativas de Impacto</h4>
-        <p>Ilustra com exemplos concretos ou analogias a tese defendida, tornando o texto claro e aproximando o leitor do contexto fático.</p>
-        <div style="background:#f8fafc;padding:12px;border-radius:10px;margin-top:10px;font-size:13.5px">
-          <b>Exemplo do PDF:</b> <i>"Nossas avós casavam-se aos 15 anos e procriavam sem estranheza, revelando como os contextos culturais redefinem comportamentos sociais ao longo das décadas."</i>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MÓDULO 3: CONCLUSÃO NO TEXTO DISSERTATIVO -->
-  <div class="pdf-module" id="pdf-concl">
-    <div class="grid g2" style="margin-bottom:20px">
-      <div class="card" style="border-left:5px solid var(--green)">
-        <h3>A Estrutura Básica da Conclusão (4 Elementos)</h3>
-        <ol class="list" style="margin-top:10px">
-          <li><b>Conectivo Conclusivo:</b> <i>Portanto, Desse modo, Assim sendo, Em suma.</i></li>
-          <li><b>Retomada da Tese:</b> Reafirme o ponto de vista sem copiar literalmente a introdução.</li>
-          <li><b>Síntese dos Argumentos:</b> Resumo conciso dos eixos desenvolvidos.</li>
-          <li><b>Fechamento / Proposta:</b> Desfecho analítico ou proposta de intervenção detalhada.</li>
-        </ol>
-      </div>
-
-      <div class="card" style="border-left:5px solid var(--red)">
-        <h3>🚫 7 Erros Capitais na Conclusão</h3>
-        <ul class="list" style="margin-top:10px;font-size:13.5px">
-          <li><b>1. Apresentar argumento novo:</b> Lugar de argumento novo é no desenvolvimento.</li>
-          <li><b>2. Copiar a introdução:</b> Repetição literal demonstra pobreza vocabular.</li>
-          <li><b>3. Terminar de forma abrupta:</b> O texto necessita de fechamento estruturado.</li>
-          <li><b>4. Frases vagas e clichês:</b> "Cada um deve fazer sua parte" enfraquece o desfecho.</li>
-          <li><b>5. Contradizer a tese:</b> Jamais invalide seu posicionamento no último parágrafo.</li>
-          <li><b>6. Citação desconexa:</b> Inserir pensador sem relação com o fechamento.</li>
-          <li><b>7. Pergunta aberta sem resposta:</b> Demonstra hesitação argumentativa.</li>
-        </ul>
-      </div>
-    </div>
-
-    <h2 class="section-title">5 Maneiras de Concluir Seu Texto</h2>
-    <div class="grid g3">
-      <div class="card"><b>01. Por Síntese:</b><p>Resume os aspectos abordados no desenvolvimento de forma integrada e concisa.</p></div>
-      <div class="card"><b>02. Por Agregação:</b><p>Finaliza elevando o debate para uma reflexão cidadã ou constitucional abrangente.</p></div>
-      <div class="card"><b>03. Por Proposta (Intervenção):</b><p>Apresenta ações concretas com Agente, Ação, Meio, Detalhamento e Finalidade (obrigatória no ENEM).</p></div>
-      <div class="card"><b>04. Por Pergunta Retórica:</b><p>Pergunta provocativa cuja resposta já foi demonstrada e fundamentada ao longo do texto.</p></div>
-      <div class="card"><b>05. Por Fechamento Cíclico:</b><p>Retoma o repertório ou imagem da introdução para demonstrar a superação do problema.</p></div>
-    </div>
-  </div>
 </div></section>
 
 <!-- ================= BANCO DE TEMAS ================= -->
@@ -1125,7 +1254,7 @@ footer b { color: #fff; }
   <h1 class="page-title">Banco de <span>Temas por Banca & Eixo</span></h1>
   <p class="page-sub">36 temas estruturados com enunciado, banca associada, eixo temático, problema central, comando da proposta, possíveis teses e repertórios pertinentes.</p>
 
-  <input class="search" id="tSearch" aria-label="Buscar tema" placeholder="🔎 Pesquisar tema por palavra-chave, banca (AOCP, Cebraspe, Vunesp, ENEM), filósofo ou lei...">
+  <input class="search" id="tSearch" aria-label="Buscar tema" placeholder="🔎 Pesquisar tema por palavra-chave, banca (AOCP, Cebraspe, Vunesp), filósofo ou lei...">
   <div class="chips" id="tChips"></div>
   <div class="grid g2" id="tGrid"></div>
 </div></section>
@@ -1244,6 +1373,18 @@ footer b { color: #fff; }
           <span class="choice-banca-badge" style="background:#ca8a04;color:#000">CEBRASPE</span>
         </div>
 
+        <!-- OPÇÃO PPPE -->
+        <div class="target-choice-card" data-set-target="pppe">
+          <div class="choice-logo-box">
+            <img src="logo_pppe.jpg" alt="Brasão PPPE" class="inst-logo-img">
+          </div>
+          <div class="choice-info">
+            <b>PPPE · Polícia Penal de Pernambuco</b>
+            <small>Rubrica CEBRASPE (Edital 2026) · 20 a 30 linhas · 10,00 pts</small>
+          </div>
+          <span class="choice-banca-badge" style="background:#ca8a04;color:#000">CEBRASPE</span>
+        </div>
+
         <!-- OPÇÃO CBMPE -->
         <div class="target-choice-card" data-set-target="cbmpe">
           <div class="choice-logo-box">
@@ -1266,18 +1407,6 @@ footer b { color: #fff; }
             <small>Rubrica Fundação VUNESP · Até 30 linhas · 100 pts</small>
           </div>
           <span class="choice-banca-badge" style="background:#1e3a8a;color:#fff">VUNESP</span>
-        </div>
-
-        <!-- OPÇÃO ENEM -->
-        <div class="target-choice-card" data-set-target="enem">
-          <div class="choice-logo-box">
-            <img src="images.png" alt="Logotipo ENEM" class="inst-logo-img">
-          </div>
-          <div class="choice-info">
-            <b>ENEM · Exame Nacional do Ensino Médio</b>
-            <small>Matriz INEP / ENEM · 8 a 30 linhas · 1000 pts</small>
-          </div>
-          <span class="choice-banca-badge" style="background:#6366f1;color:#fff">INEP</span>
         </div>
       </div>
 
@@ -1394,8 +1523,8 @@ footer b { color: #fff; }
 </div>
 
 <footer><div class="wrap">
-  <b>Redação Aprovada 2.0 | Concursos Públicos & ENEM</b> · Plataforma profissional de correção contextual e estudo orientado por rubricas.<br>
-  Critérios documentados para Instituto AOCP (PMPE/CBMPE), Cebraspe (PCPE), Vunesp (PMSP) e INEP (ENEM).
+  <b>Redação Aprovada 2.0 | Concursos Públicos</b> · Plataforma profissional de correção contextual e estudo orientado por rubricas.<br>
+  Critérios documentados para Instituto AOCP (PMPE/CBMPE), Cebraspe (PCPE) e Vunesp (PMSP).
 </div></footer>
 
 <div id="toast"></div>

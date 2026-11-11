@@ -32,6 +32,7 @@ const store = {
 
 let currentGoogleUser = store.get('redacao_google_user', null);
 let isGoogleFirstLogin = false;
+let pendingEvaluationAfterLogin = false;
 let activeProfileId = currentGoogleUser
   ? `google_${currentGoogleUser.googleId || currentGoogleUser.id}`
   : store.get('redacao_active_profile', 'default');
@@ -217,6 +218,15 @@ async function processGoogleLogin(payload){
     } else {
       toast(`✨ Bem-vindo(a) de volta, ${userObj.nome}! ${histList.length} redação(ões) e seus assuntos foram restaurados.`);
     }
+
+    if(pendingEvaluationAfterLogin){
+      pendingEvaluationAfterLogin = false;
+      toast('🔒 Login com Google verificado! Retomando correção criteriosa...');
+      setTimeout(() => {
+        const btn = $('#btnEval');
+        if(btn) btn.click();
+      }, 400);
+    }
   } catch(e){
     console.error('[Google Auth Error]', e);
     toast('Ocorreu um erro ao processar o login com o Google.');
@@ -283,10 +293,10 @@ function fallbackCopy(text, msg){
    3. GERENCIADOR DE OBJETIVO / BANCA E LOGOTIPOS OFICIAIS (SEÇÃO 11)
    ===================================================================== */
 let currentTarget = getUserData('redacao_target', 'pmpe');
-if(!BANCA_SPECS[currentTarget]) currentTarget = 'pmpe';
+if(!BANCA_SPECS[currentTarget] || currentTarget === 'enem') currentTarget = 'pmpe';
 
 function applyTarget(tId, save = true){
-  if(!BANCA_SPECS[tId]) tId = 'pmpe';
+  if(!BANCA_SPECS[tId] || tId === 'enem') tId = 'pmpe';
   currentTarget = tId;
   if(save) setUserData('redacao_target', tId);
 
@@ -308,14 +318,9 @@ function applyTarget(tId, save = true){
   if($('#heroHeadline')) $('#heroHeadline').innerHTML = `Domine a redação para <em>${esc(spec.short)}</em> na banca <em>${esc(spec.banca)}</em>`;
   if($('#heroSubtext')) $('#heroSubtext').textContent = spec.description;
 
-  // Banner de aviso da rubrica ativa
+  // Banner de aviso da rubrica ativa (ocultado a pedido do usuário)
   if($('#targetBannerNotice')){
-    const cls = tId === 'pcpe' ? 'notice-gold' : (tId === 'pmpe' ? 'notice-militar' : (tId === 'cbmpe' ? 'notice-crimson' : 'notice-blue'));
-    $('#targetBannerNotice').innerHTML = `
-      <div class="notice ${cls}">
-        <b>Rubrica Versionada Ativa (${esc(spec.rubricaVersion)}):</b> Você está no modo <b>${esc(spec.name)}</b>. O motor contextual aplica exclusivamente os critérios documentados da banca <b>${esc(spec.banca)}</b> (Extensão: ${esc(spec.linesRange)} · Pontuação Máxima: ${spec.maxScore.toFixed(0)} pts).
-      </div>
-    `;
+    $('#targetBannerNotice').innerHTML = '';
   }
 
   // Editor com <img> oficial
@@ -351,14 +356,22 @@ function renderizarFolhaPautada(){
   const essayEl = $('#essay');
 
   if(gutterEl){
+    const essayVal = (essayEl && essayEl.value) ? essayEl.value : '';
+    const lineBreaks = essayVal ? essayVal.split('\n').length : 0;
+    const totalLines = Math.max(maxLines, lineBreaks + 4);
+
     gutterEl.innerHTML = '';
-    for(let i = 1; i <= maxLines; i++){
+    for(let i = 1; i <= totalLines; i++){
       const div = document.createElement('div');
       div.textContent = i;
-      if(minLines > 1 && i >= minLines){
+      if(minLines > 1 && i >= minLines && i <= maxLines){
         div.style.color = 'var(--th-primary)';
         div.style.fontWeight = '800';
-        div.title = `Faixa obrigatória (${spec.linesRange})`;
+        div.title = `Faixa obrigatória oficial (${spec.linesRange})`;
+      } else if(i > maxLines){
+        div.style.color = '#ef4444';
+        div.style.fontWeight = '700';
+        div.title = `Linha excedente à folha oficial (${maxLines} linhas)`;
       }
       gutterEl.appendChild(div);
     }
@@ -412,8 +425,206 @@ function atualizarMetricas(){
 
 /* =====================================================================
    4. RENDERIZADOR COMPLETO DO RELATÓRIO PÓS-CORREÇÃO (SEÇÕES A a I)
-      Ordem Obrigatória: Seção A → B → C → D → E → F → G → H → I
+      Com Folha Corrigida Interativa Padrão Glau.com (Grifos & Inspetor)
    ===================================================================== */
+function initGlauInteractiveInspector(res){
+  const reader = $('#glauReader');
+  const cardBox = $('#glauInspectorCard');
+  const filterBar = $('#glauFilterBar');
+  if(!reader || !cardBox) return;
+
+  const marks = Array.from(reader.querySelectorAll('.glau-mark'));
+  if(marks.length === 0) return;
+
+  let currentActiveIndex = 0;
+  let activeFilter = 'all';
+
+  function renderInspectorForMark(markEl, scrollMobile = false){
+    marks.forEach(m => m.classList.remove('active'));
+    markEl.classList.add('active');
+    currentActiveIndex = marks.indexOf(markEl);
+
+    const targetId = markEl.getAttribute('data-target-id') || '';
+    const markText = markEl.textContent.trim();
+    const isErro = markEl.classList.contains('glau-mark-erro');
+    const isCoesao = markEl.classList.contains('glau-mark-coesao');
+    const isRep = markEl.classList.contains('glau-mark-rep');
+    const isOk = markEl.classList.contains('glau-mark-ok');
+
+    // 1. Ocorrência gramatical ou coesiva
+    let occ = (res.ocorrencias || []).find(o => o.id === targetId || o.trechoOriginal === markText || markText.includes(o.trechoOriginal) || (o.trechoOriginal && o.trechoOriginal.includes(markText)));
+
+    // 2. Repertório sociocultural
+    let rep = null;
+    if(!occ && (isRep || targetId.startsWith('rep_'))){
+      const repList = Array.isArray(res.repertorio) ? res.repertorio : (res.repertorio?.lista || []);
+      const idx = parseInt(targetId.replace('rep_', ''), 10);
+      rep = (!isNaN(idx) && repList[idx]) ? repList[idx] : repList.find(r => r.nome && (r.nome.toLowerCase().includes(markText.toLowerCase()) || markText.toLowerCase().includes(r.nome.toLowerCase())));
+    }
+
+    let badgeClass = 'legend-erro';
+    let badgeTxt = '🔴 Desvio Gramatical';
+    let localizacao = occ?.localizacao || 'Trecho selecionado';
+    let diagnostico = '';
+    let regra = '';
+    let sugestao = '';
+    let justificativa = '';
+    let criterio = occ?.criterioAfetado || 'Microestrutura & Gramática';
+    let impacto = occ?.impactoNota || 'Penalização na nota documental';
+    let corImpacto = '#dc2626';
+
+    if(occ){
+      if(occ.severidade === 'erro_confirmado'){
+        badgeClass = 'legend-erro';
+        badgeTxt = '🔴 Erro Gramatical Confirmado';
+        corImpacto = '#dc2626';
+      } else if(occ.severidade === 'fragilidade_argumentativa'){
+        badgeClass = 'legend-coesao';
+        badgeTxt = '🟡 Fragilidade / Coesão Sintática';
+        corImpacto = '#d97706';
+      } else {
+        badgeClass = 'legend-coesao';
+        badgeTxt = '💡 Sugestão Estilística';
+        corImpacto = '#0284c7';
+      }
+      diagnostico = occ.diagnostico || 'Desvio identificado na construção oracional.';
+      regra = occ.explicacaoRegra || 'Regra oficial de correção documental da banca.';
+      sugestao = occ.sugestaoCorrecao || '';
+      justificativa = occ.justificativaCorrecao || '';
+    } else if(rep){
+      badgeClass = 'legend-rep';
+      badgeTxt = '🏛️ Repertório Sociocultural Legitimado';
+      localizacao = `Parágrafo ${rep.paragrafo || '—'} · ${rep.tipo || 'Referência Externa'}`;
+      diagnostico = `Citação de <b>${esc(rep.nome)}</b> (${esc(rep.tipo || 'Área do Saber')}). ${rep.produtivo ? 'Repertório validado como produtivo e legitimado.' : 'Repertório legítimo, porém requer maior articulação com a tese.'}`;
+      regra = `Critério de Repertório da Banca: Todo repertório deve ser Legitimado (área do saber reconhecida), Pertinente ao tema e Produtivo (vinculado à argumentação do aluno).`;
+      sugestao = rep.produtivo ? 'Excelente utilização argumentativa. Mantenha essa correlação lógica nos próximos parágrafos.' : 'Estabeleça uma ponte causal explícita entre a citação e a tese defendida.';
+      justificativa = `Avaliação factual: ${rep.correcaoFactual || 'Referência verídica'}. Explicação: ${rep.explicado ? 'Conceito bem explicitado' : 'Conceito pouco aprofundado'}. Integração: ${rep.integrado ? 'Conectado à proposta' : 'Falta vínculo explícito com o tema'}.`;
+      criterio = 'Macroestrutura / Repertório';
+      impacto = rep.produtivo ? '+ Pontuação Máxima no Critério' : 'Aproveitamento parcial';
+      corImpacto = rep.produtivo ? '#16a34a' : '#d97706';
+    } else if(isOk || targetId === 'tese_p1'){
+      badgeClass = 'legend-ok';
+      badgeTxt = '🟢 Estrutura & Tese Central';
+      localizacao = 'Parágrafo 1 · Introdução';
+      diagnostico = 'Tese dissertativa clara e explicitada na introdução do texto.';
+      regra = 'Macroestrutura Dissertativa: O parágrafo de introdução deve apresentar o tema e explicitar o ponto de vista (tese) que norteará o desenvolvimento.';
+      sugestao = 'Manter a tese dividida em dois núcleos argumentativos para serem aprofundados no D1 e D2.';
+      justificativa = 'Posicionamento delimitado que dá rumo e unidade temática a toda a dissertação.';
+      criterio = 'Macroestrutura / Projeto de Texto';
+      impacto = 'Positivo (+ Pontuação estrutural)';
+      corImpacto = '#16a34a';
+    } else {
+      badgeClass = 'legend-coesao';
+      badgeTxt = '🔍 Apontamento Textual';
+      diagnostico = 'Trecho identificado pela auditoria sintática e discursiva.';
+      regra = 'Clareza, concisão e progressão temática.';
+      sugestao = 'Revisar para assegurar ritmo e fluidez textual.';
+      justificativa = 'A clareza frasal facilita a leitura do examinador.';
+      criterio = 'Aspectos Gerais';
+      impacto = 'Aprimoramento';
+      corImpacto = '#0284c7';
+    }
+
+    cardBox.innerHTML = `
+      <div class="glau-card-header">
+        <span class="glau-pill-legend ${badgeClass}">${badgeTxt}</span>
+        <span class="pill" style="font-size:11.5px">📍 ${esc(localizacao)}</span>
+      </div>
+      <div class="glau-card-body">
+        <div>
+          <b style="color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Trecho Original no Texto:</b>
+          <div class="mark-bad" style="margin-top:3px;font-size:14px">${esc(markText)}</div>
+        </div>
+        ${sugestao ? `
+          <div>
+            <b style="color:#15803d;font-size:12px;text-transform:uppercase;letter-spacing:0.5px">Sugestão de Correção:</b>
+            <div class="mark-good" style="margin-top:3px;font-size:14px">${esc(sugestao)}</div>
+          </div>
+        ` : ''}
+        <div><b>Diagnóstico:</b> ${diagnostico}</div>
+        <div><b>Regra Oficial da Banca:</b> ${esc(regra)}</div>
+        ${justificativa ? `<div><b>Justificativa Pedagógica:</b> ${esc(justificativa)}</div>` : ''}
+        <div style="font-size:12.5px;color:var(--muted);margin-top:4px;padding-top:8px;border-top:1px dashed var(--line)">
+          <b>Critério Afetado:</b> ${esc(criterio)}<br>
+          <b>Impacto na Nota:</b> <span style="font-weight:700;color:${corImpacto}">${esc(impacto)}</span>
+        </div>
+      </div>
+      <div class="glau-nav-btns">
+        <button type="button" class="btn btn-light btn-sm" id="btnGlauPrev">⬅ Anterior</button>
+        <span style="font-size:12px;color:var(--muted);align-self:center">Marcação ${currentActiveIndex + 1} de ${marks.length}</span>
+        <button type="button" class="btn btn-light btn-sm" id="btnGlauNext">Próximo ➔</button>
+      </div>
+    `;
+
+    const prevBtn = $('#btnGlauPrev');
+    const nextBtn = $('#btnGlauNext');
+    if(prevBtn){
+      prevBtn.onclick = () => {
+        let prevIdx = currentActiveIndex - 1;
+        if(prevIdx < 0) prevIdx = marks.length - 1;
+        renderInspectorForMark(marks[prevIdx], scrollMobile);
+      };
+    }
+    if(nextBtn){
+      nextBtn.onclick = () => {
+        let nextIdx = (currentActiveIndex + 1) % marks.length;
+        renderInspectorForMark(marks[nextIdx], scrollMobile);
+      };
+    }
+
+    if(scrollMobile && window.innerWidth <= 768){
+      $('#glauFeedbackCol')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  marks.forEach(m => {
+    m.onclick = (e) => {
+      e.stopPropagation();
+      renderInspectorForMark(m, true);
+    };
+    m.onkeydown = (e) => {
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        renderInspectorForMark(m, true);
+      }
+    };
+  });
+
+  if(filterBar){
+    const filterBtns = Array.from(filterBar.querySelectorAll('.glau-pill-legend'));
+    filterBtns.forEach(btn => {
+      btn.onclick = () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const filter = btn.getAttribute('data-filter');
+        activeFilter = filter;
+
+        marks.forEach(m => {
+          if(filter === 'all'){
+            m.style.opacity = '1';
+            m.style.filter = 'none';
+          } else if(m.classList.contains(`glau-mark-${filter}`)){
+            m.style.opacity = '1';
+            m.style.filter = 'none';
+          } else {
+            m.style.opacity = '0.22';
+            m.style.filter = 'grayscale(60%)';
+          }
+        });
+
+        const visibleMarks = marks.filter(m => filter === 'all' || m.classList.contains(`glau-mark-${filter}`));
+        if(visibleMarks.length > 0 && !visibleMarks.includes(marks[currentActiveIndex])){
+          renderInspectorForMark(visibleMarks[0], false);
+        }
+      };
+    });
+  }
+
+  if(marks.length > 0){
+    renderInspectorForMark(marks[0], false);
+  }
+}
+
 function renderizarResultado(res, nome, tema, bancaKey){
   const spec = BANCA_SPECS[bancaKey] || BANCA_SPECS.pmpe;
   const box = $('#resultado');
@@ -425,6 +636,17 @@ function renderizarResultado(res, nome, tema, bancaKey){
   const fragilidades = (res.ocorrencias || []).filter(o => o.severidade === 'fragilidade_argumentativa');
   const sugestoes = (res.ocorrencias || []).filter(o => o.severidade === 'sugestao_estilistica');
 
+  // Texto anotado padrão Glau.com com grifos coloridos por categoria
+  const textoAnotado = res.textoAnotadoGlau || (global.MotorCorrecao && typeof global.MotorCorrecao.gerarTextoAnotadoGlau === 'function'
+    ? global.MotorCorrecao.gerarTextoAnotadoGlau(res.texto || $('#essay')?.value || '', res.ocorrencias, res.repertorio, res.analiseParagrafos)
+    : '');
+
+  const numErros = (res.ocorrencias || []).filter(o => o.tipoGlau === 'erro' || o.severidade === 'erro_confirmado').length;
+  const numCoesao = (res.ocorrencias || []).filter(o => o.tipoGlau === 'coesao' || o.severidade === 'fragilidade_argumentativa' || o.severidade === 'sugestao_estilistica').length;
+  const numRep = Array.isArray(res.repertorio) ? res.repertorio.length : (res.repertorio?.lista?.length || 0);
+  const numOk = (res.analiseParagrafos && res.analiseParagrafos.length > 0 && !res.analiseParagrafos[0].relacaoTese?.includes('implícita')) ? 1 : 0;
+  const totalGrifos = numErros + numCoesao + numRep + numOk;
+
   // Bloco complementar da fórmula Cebraspe ou 5 elementos do ENEM na Seção C
   let blocoEspecialBanca = '';
   if(res.tipo === 'cebraspe'){
@@ -433,11 +655,11 @@ function renderizarResultado(res, nome, tema, bancaKey){
         <h4>📐 MEMÓRIA DE CÁLCULO — FÓRMULA LÍQUIDA DOCUMENTAL CEBRASPE</h4>
         <p style="font-size:15px;margin-bottom:8px"><strong>NPD = NC − (2 × NE ÷ TL)</strong></p>
         <div style="font-size:13px;line-height:1.75">
-          • <b>NC (Nota de Conteúdo / Soma da Macroestrutura):</b> ${res.nc.toFixed(2)} de 30,00 pts<br>
+          • <b>NC (Nota de Conteúdo / Soma da Macroestrutura):</b> ${res.nc.toFixed(2)} de ${spec.maxScore.toFixed(2)} pts<br>
           • <b>NE (Número de Erros Gramaticais Confirmados na Microestrutura):</b> ${res.ne} erro(s)<br>
           • <b>TL (Total de Linhas Efetivamente Escritas):</b> ${res.tl} linha(s)<br>
           • <b>Desconto Proporcional (2 × ${res.ne} ÷ ${res.tl}):</b> −${res.penalidade.toFixed(2)} pts<br>
-          • <b>Nota Final na Prova Discursiva (NPD):</b> <span style="color:#fde047;font-weight:800">${res.total.toFixed(2)} / 30,00 pts</span>
+          • <b>Nota Final na Prova Discursiva (NPD):</b> <span style="color:#fde047;font-weight:800">${res.total.toFixed(2)} / ${spec.maxScore.toFixed(2)} pts</span>
         </div>
       </div>
     `;
@@ -490,6 +712,42 @@ function renderizarResultado(res, nome, tema, bancaKey){
   };
 
   box.innerHTML = `
+    <!-- ================= FOLHA CORRIGIDA COM GRIFOS DINÂMICOS ================= -->
+    <div class="report-section" id="sec-glau" style="margin-bottom:24px">
+      <div class="glau-interactive-container">
+        <div class="glau-header-toolbar">
+          <div class="glau-title-box">
+            <span class="glau-live-badge">⚡ CORREÇÃO INTERATIVA</span>
+            <h3>Folha Corrigida com Grifos & Inspetor Inteligente</h3>
+            <small>Toque ou clique em qualquer marcação colorida no texto para auditar regras de banca, diagnóstico e reescrita recomendada.</small>
+          </div>
+          <div class="glau-legend-bar" id="glauFilterBar">
+            <button type="button" class="glau-pill-legend legend-all active" data-filter="all">Todos (${totalGrifos})</button>
+            <button type="button" class="glau-pill-legend legend-erro" data-filter="erro">🔴 Erros Gramaticais (${numErros})</button>
+            <button type="button" class="glau-pill-legend legend-coesao" data-filter="coesao">🟡 Coesão & Vocabulário (${numCoesao})</button>
+            <button type="button" class="glau-pill-legend legend-rep" data-filter="rep">🔵 Repertório Legitimado (${numRep})</button>
+            <button type="button" class="glau-pill-legend legend-ok" data-filter="ok">🟢 Estrutura & Tese (${numOk})</button>
+          </div>
+        </div>
+        <div class="glau-split-view">
+          <div class="glau-text-col">
+            <div class="glau-reader" id="glauReader">
+              ${textoAnotado || '<p style="color:var(--muted)">Texto não disponível para anotação.</p>'}
+            </div>
+          </div>
+          <div class="glau-feedback-col" id="glauFeedbackCol">
+            <div id="glauInspectorCard">
+              <div class="glau-empty-state">
+                <div style="font-size:36px;margin-bottom:10px">👆</div>
+                <b>Clique em qualquer trecho grifado no texto</b>
+                <p>Selecione uma marcação colorida (Vermelho, Amarelo, Azul ou Verde) para ver a regra da banca, o diagnóstico detalhado e a reescrita ideal.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ================= SEÇÃO A — RESULTADO GERAL ================= -->
     <div class="report-section" id="sec-a">
       <div class="section-header-tag">SEÇÃO A — RESULTADO GERAL</div>
@@ -729,7 +987,7 @@ function renderizarResultado(res, nome, tema, bancaKey){
         <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
           <b>2. Exercício de Argumentação:</b>
           <p style="font-size:13.5px;margin:4px 0 8px">${esc(res.proximaAtividade.exercicioArgumentacao)}</p>
-          <button type="button" class="btn btn-light btn-sm" data-go="aulas">💡 Revisar Método dos PDFs</button>
+          <button type="button" class="btn btn-light btn-sm" data-go="criterios">⚖️ Consultar Rubricas & Critérios</button>
         </div>
         <div style="background:#f8fafc;padding:14px;border-radius:12px;border:1px solid var(--line)">
           <b>3. Atividade de Repertório:</b>
@@ -772,6 +1030,9 @@ function renderizarResultado(res, nome, tema, bancaKey){
       toast('Novo tema carregado na folha de redação!');
     };
   }
+
+  // Inicializa o Inspetor Inteligente com Grifos Clicáveis (Padrão Glau.com)
+  initGlauInteractiveInspector(res);
 }
 
 /* =====================================================================
@@ -793,9 +1054,24 @@ function configurarCorretor(){
       return;
     }
 
+    // Autenticação Google Obrigatória para Avaliar e Salvar
+    if(!currentGoogleUser){
+      pendingEvaluationAfterLogin = true;
+      const modal = $('#googleAuthModal');
+      if(modal){
+        modal.classList.add('show');
+        const notice = $('#googleAuthStatusNotice');
+        if(notice){
+          notice.innerHTML = '🔒 <b>Autenticação Obrigatória:</b> Para avaliar sua redação com rigor oficial de banca e salvar seu histórico de notas e evolução, faça login com sua conta Google.';
+        }
+      }
+      toast('Faça login com o Google para avaliar sua redação.');
+      return;
+    }
+
     btnEval.disabled = true;
     const originalText = btnEval.innerHTML;
-    btnEval.innerHTML = '⏳ Conectando aos modelos de IA (Cascata Multi-Modelo)...';
+    btnEval.innerHTML = '⏳ Avaliando redação com Inteligência Artificial...';
 
     let res = null;
     let usedModel = null;
@@ -837,6 +1113,11 @@ function configurarCorretor(){
       res = avaliarRedacao(texto, tema, bancaKey, comando);
       res.modeloUtilizado = 'Motor Contextual Especializado da Banca (Modo Local)';
       usedModel = res.modeloUtilizado;
+    }
+
+    // Garante que o texto anotado com o padrão Glau.com esteja disponível
+    if(!res.textoAnotadoGlau && global.MotorCorrecao && typeof global.MotorCorrecao.gerarTextoAnotadoGlau === 'function'){
+      res.textoAnotadoGlau = global.MotorCorrecao.gerarTextoAnotadoGlau(texto, res.ocorrencias, res.repertorio, res.analiseParagrafos);
     }
 
     try {
@@ -1437,7 +1718,7 @@ function renderHome(){
 /* =====================================================================
    12. ROTEAMENTO DE ABAS E INICIALIZAÇÃO COMPLETA DE EVENTOS
    ===================================================================== */
-const VIEWS = ['inicio', 'escrever', 'criterios', 'aulas', 'temas', 'repertorio', 'portugues', 'evolucao'];
+const VIEWS = ['inicio', 'escrever', 'criterios', 'temas', 'repertorio', 'portugues', 'evolucao'];
 
 function go(id){
   if(!VIEWS.includes(id)) id = 'inicio';
@@ -1464,11 +1745,13 @@ function inicializarApp(){
   const gutterEl = $('#gutter');
   renderizarFolhaPautada();
   if(essayEl && gutterEl){
-    essayEl.addEventListener('scroll', () => { gutterEl.scrollTop = essayEl.scrollTop; });
+    essayEl.addEventListener('scroll', () => { gutterEl.scrollTop = essayEl.scrollTop; }, { passive: true });
+    window.addEventListener('resize', () => { gutterEl.scrollTop = essayEl.scrollTop; }, { passive: true });
   }
 
   function carregarDadosPerfilAtivo(){
     currentTarget = getUserData('redacao_target', 'pmpe');
+    if(!BANCA_SPECS[currentTarget] || currentTarget === 'enem') currentTarget = 'pmpe';
     applyTarget(currentTarget, false);
 
     if($('#inNome')) $('#inNome').value = getUserData('redacao_nome', '');
@@ -1484,6 +1767,8 @@ function inicializarApp(){
   if(essayEl){
     essayEl.addEventListener('input', () => {
       atualizarMetricas();
+      renderizarFolhaPautada();
+      if(gutterEl) gutterEl.scrollTop = essayEl.scrollTop;
       setUserData('redacao_draft', essayEl.value);
       if($('#pSave')) $('#pSave').textContent = 'Rascunho salvo ✓';
     });
@@ -1886,14 +2171,31 @@ function inicializarApp(){
 
   // Handlers do Modal de Autenticação Google
   if($('#btnCloseGoogleModal')){
-    $('#btnCloseGoogleModal').onclick = () => $('#googleAuthModal')?.classList.remove('show');
+    $('#btnCloseGoogleModal').onclick = () => {
+      pendingEvaluationAfterLogin = false;
+      $('#googleAuthModal')?.classList.remove('show');
+    };
   }
   if($('#btnSkipGoogleLogin')){
     $('#btnSkipGoogleLogin').onclick = () => {
+      pendingEvaluationAfterLogin = false;
       $('#googleAuthModal')?.classList.remove('show');
-      toast('Continuando em modo visitante. Para salvar suas redações e assuntos, faça login com o Google.');
+      toast('Atenção: O login com o Google é obrigatório para solicitar a correção da redação.');
     };
   }
+
+  // Fechamento de modais ao clicar no backdrop escuro externo
+  ['targetModal', 'testModal', 'googleAuthModal', 'aiConfigModal'].forEach(id => {
+    const m = $('#' + id);
+    if(m){
+      m.addEventListener('click', (e) => {
+        if(e.target === m){
+          m.classList.remove('show');
+          if(id === 'googleAuthModal') pendingEvaluationAfterLogin = false;
+        }
+      });
+    }
+  });
   if($('#btnConfirmGoogleLogin')){
     $('#btnConfirmGoogleLogin').onclick = () => {
       const email = $('#googleModalEmail')?.value.trim();

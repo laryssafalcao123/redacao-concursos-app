@@ -10,6 +10,7 @@ const LOGO_FILES = {
   pmpe: '4060864b87ab4736e6efeda0032a7a40.jpg',
   cbmpe: 'logo_cbmpe.png',
   pcpe: 'images (1).jfif',
+  pppe: 'logo_pppe.jpg',
   pmsp: 'Logo_PMESP.jpg',
   enem: 'images.png'
 };
@@ -20,11 +21,12 @@ function renderLogoImg(targetKey, customClass = 'inst-logo-img'){
     pmpe: 'Brasão Polícia Militar de Pernambuco (PMPE)',
     cbmpe: 'Brasão Corpo de Bombeiros Militar de Pernambuco (CBMPE)',
     pcpe: 'Brasão Polícia Civil de Pernambuco (PCPE)',
+    pppe: 'Brasão Polícia Penal de Pernambuco (PPPE)',
     pmsp: 'Brasão Polícia Militar do Estado de São Paulo (PMSP)',
     enem: 'Logotipo Oficial ENEM'
   };
   const alt = altMap[targetKey] || 'Logotipo Institucional';
-  return `<img src="${file}" alt="${alt}" class="${customClass}" loading="eager">`;
+  return `<img src="${file}" alt="${alt}" class="${customClass}" loading="eager" onerror="this.onerror=null;this.src='images.png';">`;
 }
 
 /* 2. RUBRICAS INDEPENDENTES E VERSIONADAS POR BANCA (SEÇÃO 6) */
@@ -86,6 +88,36 @@ const BANCA_SPECS = {
       'Nota final líquida NPD calculada pela fórmula documental: NPD = NC - (2 × NE / TL), sendo limitada a no mínimo 0,00.',
       'Quanto maior o Total de Linhas Efetivamente Escritas (TL, até o limite de 30 linhas), menor o impacto proporcional de cada erro (NE).',
       'Fuga total ao tema ou texto em branco implica nota zero.'
+    ]
+  },
+  pppe: {
+    id: 'pppe',
+    name: 'PPPE · Polícia Penal de Pernambuco',
+    short: 'PPPE',
+    banca: 'CEBRASPE',
+    rubricaVersion: 'CEBRASPE-PPPE-v1.0 (Edital 2026 · NPD = NC - 2×NE/TL · 10,00 pts)',
+    genero: 'Texto Dissertativo em prosa com atendimento a aspectos temáticos',
+    maxScore: 10.0,
+    minPass: 5.0,
+    minPassRule: 'Critério oficial do Edital PPPE 2026: NPD ≥ 5,00 pontos para aprovação. Nota zero em caso de fuga total ao tema ou ausência de texto.',
+    minLines: 20,
+    maxLines: 30,
+    zeroMinLines: 7,
+    requiresIntervention: false,
+    badgeClass: 'badge-gold',
+    linesRange: '20 a 30 linhas',
+    description: 'Avaliação conforme o Edital da Polícia Penal de PE 2026 (CEBRASPE): Domínio do Conteúdo (NC até 10,00 pts: apresentação, estrutura, conhecimento e consistência dos argumentos) e Domínio da Língua Portuguesa com desconto líquido proporcional: NPD = NC - 2 × NE ÷ TL.',
+    criteriaList: [
+      { id: 'apres', title: '1. Apresentação, estrutura textual e legibilidade (Macro)', pts: 1.0, desc: 'Respeito às margens, paragrafação nítida, organização lógica dos blocos e adequação formal.' },
+      { id: 'topico1', title: '2. Desenvolvimento do tema e conhecimento do assunto (Macro)', pts: 3.0, desc: 'Domínio técnico sobre segurança pública, sistema penitenciário, execução penal e direitos fundamentais.' },
+      { id: 'topico2', title: '3. Qualidade e consistência dos argumentos (Macro)', pts: 3.0, desc: 'Fundamentação consistente em causas, consequências, dados concretos e normas (ex.: LEP - Lei nº 7.210/1984 e CF/88).' },
+      { id: 'topico3', title: '4. Progressão temática e propostas de encaminhamento (Macro)', pts: 3.0, desc: 'Articulação lógica entre os parágrafos, encaminhamentos institucionais e respeito à dignidade humana.' }
+    ],
+    regrasAnulacao: [
+      'Nota final da prova discursiva calculada pela fórmula oficial do Edital PPPE 2026: NPD = NC - 2 × (NE / TL).',
+      'Nota mínima para aprovação: 5,00 pontos (reprovação automática se NPD < 5,00).',
+      'Fuga total ao tema ou texto em branco implica nota zero (0,00).',
+      'Extensão padrão da folha de redação: até 30 linhas.'
     ]
   },
   cbmpe: {
@@ -504,7 +536,1361 @@ const REPERTORIO_LIBRARY = [
     fonte: 'BRASIL. CF/88, Art. 227 e Art. 230; Lei nº 8.069/1990 (ECA); Lei nº 10.741/2003.',
     tags: ['infância', 'adolescência', 'idosos', 'família', 'educação', 'vulnerabilidade']
   }
-];
+,
+  {
+    "id": "rep-cf88-art5",
+    "titulo": "Igualdade Formal e Direitos Fundamentais (Art. 5º)",
+    "autor": "Assembleia Nacional Constituinte (Brasil)",
+    "categoria": "direito",
+    "conceito": "Isonomia Material e Inviolabilidade dos Direitos",
+    "explicacao": "O artigo 5º da CF/88 proclama que todos são iguais perante a lei, sem distinção de qualquer natureza, garantindo-se a inviolabilidade do direito à vida, à liberdade, à igualdade, à segurança e à propriedade.",
+    "aplicacao": "À luz do artigo 5º da Constituição Federal de 1988, a igualdade de todos perante a lei é garantia basilar do Estado Democrático de Direito; todavia, desigualdades históricas perpetuam a vulnerabilidade de grupos marginalizados.",
+    "fonte": "BRASIL. Constituição da República Federativa do Brasil de 1988, Art. 5º, caput.",
+    "tags": [
+      "igualdade",
+      "direitos fundamentais",
+      "isonomia",
+      "constituição",
+      "cidadania",
+      "liberdade"
+    ]
+  },
+  {
+    "id": "rep-cf88-art225",
+    "titulo": "Direito ao Meio Ambiente Ecologicamente Equilibrado (Art. 225)",
+    "autor": "Assembleia Nacional Constituinte (Brasil)",
+    "categoria": "direito",
+    "conceito": "Bem de Uso Comum do Povo e Solidariedade Intergeracional",
+    "explicacao": "O artigo 225 da Carta Magna consagra o direito ao meio ambiente ecologicamente equilibrado, impondo ao Poder Público e à coletividade o dever de defendê-lo e preservá-lo para as presentes e futuras gerações.",
+    "aplicacao": "Conforme preceitua o artigo 225 da Constituição de 1988, o meio ambiente sadio é direito difuso inalienável, competindo ao Estado e à sociedade civil coibir práticas predatórias que comprometam as futuras gerações.",
+    "fonte": "BRASIL. Constituição da República Federativa do Brasil de 1988, Art. 225.",
+    "tags": [
+      "meio ambiente",
+      "sustentabilidade",
+      "constituição",
+      "gerações futuras",
+      "políticas públicas"
+    ]
+  },
+  {
+    "id": "rep-cf88-art196",
+    "titulo": "Saúde como Direito de Todos e Dever do Estado (Art. 196)",
+    "autor": "Assembleia Nacional Constituinte (Brasil)",
+    "categoria": "direito",
+    "conceito": "Universalidade e Acesso Igualitário aos Serviços de Saúde",
+    "explicacao": "O artigo 196 da CF/88 determina que a saúde é direito de todos e dever do Estado, garantido mediante políticas sociais e econômicas que visem à redução do risco de doença e ao acesso universal e igualitário.",
+    "aplicacao": "O artigo 196 da Constituição Federal estabelece a saúde como prerrogativa universal e dever estatal indeclinável, o que evidencia a urgência de fortalecer a atenção primária e o atendimento em regiões periféricas.",
+    "fonte": "BRASIL. Constituição da República Federativa do Brasil de 1988, Art. 196.",
+    "tags": [
+      "saúde",
+      "sus",
+      "dever do estado",
+      "constituição",
+      "direitos sociais",
+      "acesso"
+    ]
+  },
+  {
+    "id": "rep-dudh-1948",
+    "titulo": "Declaração Universal dos Direitos Humanos (1948)",
+    "autor": "Organização das Nações Unidas (ONU)",
+    "categoria": "direito",
+    "conceito": "Universalidade, Indivisibilidade e Interdependência dos Direitos",
+    "explicacao": "Adotada em 1948 pela Assembleia Geral da ONU, a DUDH estabelece que todo ser humano nasce livre e igual em dignidade e direitos, constituindo marco normativo global contra a tirania e a opressão.",
+    "aplicacao": "Proclamada pela ONU em 1948, a Declaração Universal dos Direitos Humanos assevera que a liberdade e a dignidade pertencem a todos os indivíduos, exigindo o repúdio a qualquer forma de discriminação institucional.",
+    "fonte": "ONU. Declaração Universal dos Direitos Humanos (1948), Artigo 1º.",
+    "tags": [
+      "direitos humanos",
+      "onu",
+      "dignidade",
+      "universalidade",
+      "justiça internacional"
+    ]
+  },
+  {
+    "id": "rep-estatuto-pcd",
+    "titulo": "Estatuto da Pessoa com Deficiência (Lei nº 13.146/2015)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "direito",
+    "conceito": "Acessibilidade, Desenho Universal e Autonomia Cidadã",
+    "explicacao": "A Lei Brasileira de Inclusão da Pessoa com Deficiência redefine a deficiência sob o modelo social (biopsicossocial), atribuindo as barreiras ao meio ambiente e não ao indivíduo, exigindo acessibilidade integral.",
+    "aplicacao": "Nos termos da Lei Brasileira de Inclusão (Lei nº 13.146/2015), as limitações não residem na pessoa com deficiência, mas nas barreiras arquitetônicas e atitudinais impostas por uma sociedade que ainda falha em garantir acessibilidade.",
+    "fonte": "BRASIL. Lei nº 13.146, de 6 de julho de 2015 (Estatuto da Pessoa com Deficiência).",
+    "tags": [
+      "inclusão",
+      "acessibilidade",
+      "pcd",
+      "cidadania",
+      "igualdade de oportunidades"
+    ]
+  },
+  {
+    "id": "rep-lei-execucao-penal",
+    "titulo": "Lei de Execução Penal (Lei nº 7.210/1984 - LEP)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "direito",
+    "conceito": "Humanização da Pena e Efetiva Ressocialização do Apenado",
+    "explicacao": "A LEP prevê que o objetivo da execução penal é efetivar as disposições da sentença condenatória e proporcionar condições para a harmônica integração social do condenado e do internado.",
+    "aplicacao": "Conforme dispõe a Lei de Execução Penal (Lei nº 7.210/1984), a sanção estatal deve conciliar punição e reintegração social; no entanto, a superlotação carcerária contraria a finalidade ressocializadora da lei.",
+    "fonte": "BRASIL. Lei nº 7.210, de 11 de julho de 1984 (LEP), Art. 1º.",
+    "tags": [
+      "sistema prisional",
+      "ressocialização",
+      "lep",
+      "direitos humanos",
+      "justiça"
+    ]
+  },
+  {
+    "id": "rep-cf88-art205",
+    "titulo": "Educação como Direito Público Subjetivo (Art. 205 da CF/88)",
+    "autor": "Assembleia Nacional Constituinte (Brasil)",
+    "categoria": "direito",
+    "conceito": "Pleno Desenvolvimento da Pessoa e Preparo para o Exercício da Cidadania",
+    "explicacao": "O artigo 205 estabelece a educação como direito de todos e dever do Estado e da família, visando ao pleno desenvolvimento da pessoa, seu preparo para a cidadania e sua qualificação para o trabalho.",
+    "aplicacao": "Em conformidade com o artigo 205 da Constituição Federal, a educação é pilar de emancipação e exercício da cidadania, tornando inaceitável a persistência de abismos na qualidade do ensino entre diferentes estratos sociais.",
+    "fonte": "BRASIL. Constituição da República Federativa do Brasil de 1988, Art. 205.",
+    "tags": [
+      "educação",
+      "cidadania",
+      "constituição",
+      "desenvolvimento humano",
+      "escola"
+    ]
+  },
+  {
+    "id": "rep-max-weber-forca",
+    "titulo": "O Monopólio Legítimo da Força Física pelo Estado",
+    "autor": "Max Weber (1864–1920)",
+    "categoria": "seguranca",
+    "conceito": "Legitimidade, Racionalidade Jurídica e Limites da Coação Estatal",
+    "explicacao": "Na conferência \"A Política como Vocação\", o sociólogo alemão Max Weber define o Estado moderno como a comunidade humana que reivindica, nos limites de um território, o monopólio do uso legítimo da força física subordinado à lei.",
+    "aplicacao": "Segundo o sociólogo Max Weber, o Estado detém o monopólio legítimo da coação física; todavia, a legitimidade dessa prerrogativa depende da estrita observância da legalidade e do controle democrático da atuação policial.",
+    "fonte": "WEBER, Max. Ciência e Política: duas vocações (1919).",
+    "tags": [
+      "weber",
+      "monopólio da força",
+      "estado",
+      "polícia",
+      "legalidade",
+      "ordem pública"
+    ]
+  },
+  {
+    "id": "rep-teoria-janelas-quebradas",
+    "titulo": "Teoria das Janelas Quebradas (Broken Windows Theory)",
+    "autor": "James Q. Wilson e George L. Kelling (1982)",
+    "categoria": "seguranca",
+    "conceito": "Prevenção Primária da Desordem Urbana e Segurança Comunitária",
+    "explicacao": "A teoria sustenta que sinais visíveis de desordem, vandalismo e negligência no espaço público incentivam pequenos delitos que gradativamente escalam para crimes graves se não houver pronta intervenção estatal.",
+    "aplicacao": "De acordo com a Teoria das Janelas Quebradas, formulada por Wilson e Kelling, a desordem urbana e a sensação de abandono abrem margem para a escalada da criminalidade, reforçando a relevância do policiamento comunitário preventivo.",
+    "fonte": "WILSON, James Q.; KELLING, George L. Broken Windows: The Police and Neighborhood Safety (1982).",
+    "tags": [
+      "policiamento comunitário",
+      "prevenção",
+      "ordem urbana",
+      "segurança",
+      "criminologia"
+    ]
+  },
+  {
+    "id": "rep-anuario-fbsp",
+    "titulo": "Anuário Brasileiro de Segurança Pública",
+    "autor": "Fórum Brasileiro de Segurança Pública (FBSP)",
+    "categoria": "seguranca",
+    "conceito": "Evidências Científicas e Diagnóstico Estatístico da Violência",
+    "explicacao": "Publicação de referência que compila dados oficiais de criminalidade, letalidade violenta, violência contra a mulher e sistema penitenciário de todas as unidades federativas do país.",
+    "aplicacao": "Dados do Anuário Brasileiro de Segurança Pública evidenciam a necessidade premente de substituir políticas reativas por investimentos em inteligência policial, perícia técnica e programas de proteção à juventude vulnerável.",
+    "fonte": "FÓRUM BRASILEIRO DE SEGURANÇA PÚBLICA (FBSP). Anuário Brasileiro de Segurança Pública.",
+    "tags": [
+      "estatísticas",
+      "fbsp",
+      "criminalidade",
+      "inteligência policial",
+      "dados oficiais"
+    ]
+  },
+  {
+    "id": "rep-atlas-violencia-ipea",
+    "titulo": "Atlas da Violência (IPEA / FBSP)",
+    "autor": "Instituto de Pesquisa Econômica Aplicada (IPEA)",
+    "categoria": "seguranca",
+    "conceito": "Vulnerabilidade Social e Perfil das Vítimas de Violência Letal",
+    "explicacao": "O relatório anual do IPEA mapeia a dinâmica dos homicídios no Brasil, demonstrando que a violência armada incide desproporcionalmente sobre jovens pretos e pardos de baixa renda das periferias urbanas.",
+    "aplicacao": "Conforme revela o Atlas da Violência, elaborado pelo IPEA, a letalidade violenta no Brasil atinge de forma seletiva a juventude negra e periférica, demonstrando que a segurança pública não se dissocia do enfrentamento da desigualdade social.",
+    "fonte": "IPEA; FBSP. Atlas da Violência (edições anuais).",
+    "tags": [
+      "atlas da violência",
+      "ipea",
+      "juventude",
+      "desigualdade",
+      "homicídios",
+      "periferia"
+    ]
+  },
+  {
+    "id": "rep-estatuto-desarmamento",
+    "titulo": "Estatuto do Desarmamento (Lei nº 10.826/2003)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "seguranca",
+    "conceito": "Regulação, Registro e Controle Social de Armas e Munições",
+    "explicacao": "Marco legislativo que regulamentou a posse e o porte de armas de fogo no Brasil, estabelecendo critérios rigorosos com o objetivo de conter os índices de homicídios e violência armada.",
+    "aplicacao": "A promulgação do Estatuto do Desarmamento (Lei nº 10.826/2003) consolidou o entendimento científico de que a circulação descontrolada de armas de fogo potencializa crimes letais e agrava conflitos interpessoais.",
+    "fonte": "BRASIL. Lei nº 10.826, de 22 de dezembro de 2003.",
+    "tags": [
+      "armas",
+      "desarmamento",
+      "homicídios",
+      "violência armada",
+      "legislação penal"
+    ]
+  },
+  {
+    "id": "rep-loic-wacquant",
+    "titulo": "As Prisões da Miséria e a Gestão Punitiva da Pobreza",
+    "autor": "Loïc Wacquant (1960–presente)",
+    "categoria": "seguranca",
+    "conceito": "Hiperencarceramento e Substituição do Estado Social pelo Estado Penal",
+    "explicacao": "O sociólogo francês analisa como a retração das redes de proteção social (Estado de bem-estar) estimula a hipertrofia do sistema prisional, transformando a cadeia em instrumento de contenção da miséria.",
+    "aplicacao": "Em \"As Prisões da Miséria\", Loïc Wacquant alerta que o recuo dos investimentos sociais converte o encarceramento em ferramenta de gestão da pobreza, desvio que sobrecarrega as corporações de segurança sem resolver as causas do delito.",
+    "fonte": "WACQUANT, Loïc. As Prisões da Miséria (2001).",
+    "tags": [
+      "sistema prisional",
+      "encarceramento",
+      "pobreza",
+      "sociologia do crime",
+      "estado penal"
+    ]
+  },
+  {
+    "id": "rep-lei-perseguicao-stalking",
+    "titulo": "Tipificação do Crime de Perseguição / Stalking (Lei nº 14.132/2021)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "seguranca",
+    "conceito": "Proteção à Liberdade Pessoal e Privacidade contra Ameaças Físicas e Digitais",
+    "explicacao": "Inseriu o artigo 147-A no Código Penal para criminalizar a conduta de perseguir alguém reiteradamente por qualquer meio, ameaçando a integridade física ou psicológica ou invadindo a esfera de liberdade.",
+    "aplicacao": "A criminalização do \"stalking\" pela Lei nº 14.132/2021 reflete a adaptação necessária das forças de segurança diante das novas modalidades de coação psicológica e perseguição no ambiente virtual.",
+    "fonte": "BRASIL. Lei nº 14.132, de 31 de março de 2021 (Art. 147-A do Código Penal).",
+    "tags": [
+      "perseguição",
+      "stalking",
+      "segurança digital",
+      "violência contra mulher",
+      "código penal"
+    ]
+  },
+  {
+    "id": "rep-aristoteles-politica",
+    "titulo": "O Homem como Animal Político e a Justiça Distributiva",
+    "autor": "Aristóteles (384 a.C.–322 a.C.)",
+    "categoria": "filosofia",
+    "conceito": "Zoon Politikon e Equidade Social",
+    "explicacao": "Em \"A Política\" e \"Ética a Nicômaco\", Aristóteles postula que o ser humano só se realiza plenamente na vida comunitária (Polis) e que a justiça consiste em tratar igualmente os iguais e desigualmente os desiguais, na medida de sua desigualdade.",
+    "aplicacao": "Para Aristóteles, o indivíduo é um ser naturalmente político cuja plena dignidade requer a convivência cidadã na Polis; quando o Estado falha na justiça distributiva, compromete a própria harmonia social.",
+    "fonte": "ARISTÓTELES. A Política; Ética a Nicômaco (Livro V).",
+    "tags": [
+      "aristóteles",
+      "justiça",
+      "ética",
+      "cidadania",
+      "polis",
+      "bem comum"
+    ]
+  },
+  {
+    "id": "rep-john-locke-direitos",
+    "titulo": "Direitos Naturais Inalienáveis e Limites do Poder Político",
+    "autor": "John Locke (1632–1704)",
+    "categoria": "filosofia",
+    "conceito": "Direito à Vida, à Liberdade e à Propriedade como Limite Estatal",
+    "explicacao": "Pai do liberalismo político clássico, Locke assevera que os direitos à vida, à liberdade e aos bens são inatos ao ser humano, devendo o governo civil ser dissolvido ou reformado caso viole essa confiança fundamental.",
+    "aplicacao": "Conforme concebeu John Locke no \"Segundo Tratado sobre o Governo Civil\", o Poder Público é instituído para proteger os direitos inatos à vida e à liberdade, sendo ilegítima qualquer inércia que exponha os governados ao desamparo.",
+    "fonte": "LOCKE, John. Segundo Tratado sobre o Governo Civil (1689).",
+    "tags": [
+      "locke",
+      "direitos naturais",
+      "liberdade",
+      "contrato social",
+      "estado",
+      "filosofia"
+    ]
+  },
+  {
+    "id": "rep-rousseau-contrato",
+    "titulo": "A Vontade Geral e a Soberania Popular",
+    "autor": "Jean-Jacques Rousseau (1712–1778)",
+    "categoria": "filosofia",
+    "conceito": "Vontade Geral, Desigualdade e Cidadania Participativa",
+    "explicacao": "Em \"Do Contrato Social\", Rousseau afirma que a soberania reside no povo e que a lei deve expressar o interesse coletivo (Vontade Geral), condenando as desigualdades artificiais criadas pela concentração de poder.",
+    "aplicacao": "À luz da teoria do filósofo iluminista Jean-Jacques Rousseau, as instituições devem exprimir a vontade geral e priorizar o interesse público sobre privilégios corporativos ou privados.",
+    "fonte": "ROUSSEAU, Jean-Jacques. Do Contrato Social (1762).",
+    "tags": [
+      "rousseau",
+      "vontade geral",
+      "democracia",
+      "soberania",
+      "desigualdade",
+      "pacto social"
+    ]
+  },
+  {
+    "id": "rep-habermas-comunicativa",
+    "titulo": "A Teoria da Ação Comunicativa e a Esfera Pública",
+    "autor": "Jürgen Habermas (1929–presente)",
+    "categoria": "filosofia",
+    "conceito": "Racionalidade Dialógica e Democracia Deliberativa",
+    "explicacao": "O filósofo alemão propõe que a legitimidade das normas decorre do debate público livre de coerções, no qual argumentos racionais são confrontados para alcançar o consenso democrático.",
+    "aplicacao": "Sob a ótica de Jürgen Habermas em sua Teoria da Ação Comunicativa, a superação de impasses sociais demanda uma esfera pública inclusiva, onde o diálogo racional substitua o autoritarismo e a intolerância.",
+    "fonte": "HABERMAS, Jürgen. Teoria do Agir Comunicativo (1981).",
+    "tags": [
+      "habermas",
+      "esfera pública",
+      "democracia",
+      "diálogo",
+      "comunicação",
+      "ética"
+    ]
+  },
+  {
+    "id": "rep-sartre-responsabilidade",
+    "titulo": "A Condenação à Liberdade e a Responsabilidade Universal",
+    "autor": "Jean-Paul Sartre (1905–1980)",
+    "categoria": "filosofia",
+    "conceito": "Existencialismo e Escolha Ética",
+    "explicacao": "Ao sustentar que a \"existência precede a essência\", Sartre pontua que o homem não pode transferir para o destino ou para outrem a culpa de suas ações: ao escolher a si mesmo, o indivíduo engaja toda a humanidade.",
+    "aplicacao": "Como sintetizou o filósofo existencialista Jean-Paul Sartre, ao fazer uma escolha, o ser humano responsabiliza-se perante toda a sociedade, tornando a omissão cívica uma escolha política com consequências diretas na coletividade.",
+    "fonte": "SARTRE, Jean-Paul. O Existencialismo é um Humanismo (1946).",
+    "tags": [
+      "sartre",
+      "existencialismo",
+      "liberdade",
+      "responsabilidade",
+      "ética",
+      "sociedade"
+    ]
+  },
+  {
+    "id": "rep-schopenhauer-etica",
+    "titulo": "A Compaixão como Fundamento da Moralidade",
+    "autor": "Arthur Schopenhauer (1788–1860)",
+    "categoria": "filosofia",
+    "conceito": "Superação do Egoísmo e Empatia com o Sofrimento do Outro",
+    "explicacao": "Schopenhauer defende que a verdadeira moralidade não nasce do dever frio, mas do sentimento de compaixão imediata diante da dor e da vulnerabilidade de outros seres humanos.",
+    "aplicacao": "Segundo a reflexão ética de Arthur Schopenhauer, a compaixão e o reconhecimento do sofrimento alheio constituem a base indispensável da justiça, desafiando a indiferença social diante das vulnerabilidades urbanas.",
+    "fonte": "SCHOPENHAUER, Arthur. Sobre o Fundamento da Moral (1840).",
+    "tags": [
+      "ética",
+      "empatia",
+      "moral",
+      "compaixão",
+      "vulnerabilidade",
+      "filosofia"
+    ]
+  },
+  {
+    "id": "rep-pierre-bourdieu",
+    "titulo": "A Violência Simbólica e a Reprodução Social",
+    "autor": "Pierre Bourdieu (1930–2002)",
+    "categoria": "sociologia",
+    "conceito": "Capital Cultural, Habitus e Dominação Invisível",
+    "explicacao": "Bourdieu demonstra como as estruturas dominantes impõem significados e hierarquias sem recorrer à força física, fazendo com que as próprias vítimas naturalizem sua condição de subordinação.",
+    "aplicacao": "De acordo com o sociólogo Pierre Bourdieu, a violência simbólica se consolida quando desigualdades sociais são naturalizadas pela sociedade, perpetuando desvantagens históricas sem necessidade de coação física explícita.",
+    "fonte": "BOURDIEU, Pierre. A Reprodução: elementos para uma teoria do sistema de ensino (1970).",
+    "tags": [
+      "bourdieu",
+      "violência simbólica",
+      "capital cultural",
+      "reprodução social",
+      "desigualdade"
+    ]
+  },
+  {
+    "id": "rep-djamila-ribeiro",
+    "titulo": "O Lugar de Fala e a Desconstrução de Silenciamentos",
+    "autor": "Djamila Ribeiro (1980–presente)",
+    "categoria": "sociologia",
+    "conceito": "Epistemologia Crítica e Democratização do Discurso",
+    "explicacao": "A filósofa e socióloga brasileira examina as condições sociais que historicamente determinaram quem tinha autorização para falar e quem era silenciado, defendendo a pluralidade de vozes nas decisões públicas.",
+    "aplicacao": "Conforme analisa a pensadora Djamila Ribeiro em \"O que é lugar de fala?\", as políticas públicas tornam-se ineficazes quando desconsideram a escuta direta dos grupos que vivenciam as vulnerabilidades na pele.",
+    "fonte": "RIBEIRO, Djamila. O que é lugar de fala? (2017).",
+    "tags": [
+      "djamila ribeiro",
+      "lugar de fala",
+      "minorias",
+      "cidadania",
+      "democracia",
+      "direitos"
+    ]
+  },
+  {
+    "id": "rep-darcy-ribeiro",
+    "titulo": "O Povo Brasileiro e a Fratura das Desigualdades",
+    "autor": "Darcy Ribeiro (1922–1997)",
+    "categoria": "sociologia",
+    "conceito": "Matriz Étnica, Colonização e a Dívida Social Histórica",
+    "explicacao": "Em sua obra clássica, o antropólogo Darcy Ribeiro descreve a formação do povo brasileiro a partir da confluência de matrizes indígenas, africanas e europeias, denunciando o descaso das elites com a educação e com o bem-estar popular.",
+    "aplicacao": "Em \"O Povo Brasileiro\", Darcy Ribeiro advertiu que as carências educacionais e sociais do país decorrem de um projeto deliberado de exclusão, cuja reversão exige compromisso prioritário do Estado com as maiorias populares.",
+    "fonte": "RIBEIRO, Darcy. O Povo Brasileiro: a formação e o sentido do Brasil (1995).",
+    "tags": [
+      "darcy ribeiro",
+      "formação do brasil",
+      "identidade",
+      "povo brasileiro",
+      "educação",
+      "desigualdade"
+    ]
+  },
+  {
+    "id": "rep-bauman-cegueira",
+    "titulo": "Cegueira Moral e a Perda da Sensibilidade na Contemporaneidade",
+    "autor": "Zygmunt Bauman e Leonidas Donskis",
+    "categoria": "sociologia",
+    "conceito": "Adiaforização e Naturalização da Indiferença",
+    "explicacao": "Bauman analisa o fenômeno da adiaforização: o distanciamento moral em relação ao sofrimento de terceiros, no qual problemas humanos graves passam a ser tratados como estatísticas impessoais.",
+    "aplicacao": "Na obra \"Cegueira Moral\", Zygmunt Bauman diagnostica a anestesia da empatia na contemporaneidade, na qual a dor dos invisibilizados é normalizada e tratada como mera externalidade urbana.",
+    "fonte": "BAUMAN, Zygmunt; DONSKIS, Leonidas. Cegueira Moral: a perda da sensibilidade na modernidade líquida (2013).",
+    "tags": [
+      "bauman",
+      "cegueira moral",
+      "empatia",
+      "indiferença",
+      "ética social",
+      "modernidade"
+    ]
+  },
+  {
+    "id": "rep-norbert-elias",
+    "titulo": "O Processo Civilizador e o Autocontrole dos Conflitos",
+    "autor": "Norbert Elias (1897–1990)",
+    "categoria": "sociologia",
+    "conceito": "Controle de Pulsões, Relações Interpessoais e Pacificação Social",
+    "explicacao": "O sociólogo alemão estuda como a transição histórica para sociedades pacíficas esteve vinculada à internalização de regras de autocontrole individual e à centralização da justiça pelo Estado.",
+    "aplicacao": "Segundo a perspectiva de Norbert Elias em \"O Processo Civilizador\", a maturidade democrática exige a substituição de desfechos violentos pelo autocontrole cívico e pela confiança nas instituições legais.",
+    "fonte": "ELIAS, Norbert. O Processo Civilizador (1939).",
+    "tags": [
+      "norbert elias",
+      "processo civilizador",
+      "violência",
+      "pacificação",
+      "cultura cívica"
+    ]
+  },
+  {
+    "id": "rep-ulrich-beck-risco",
+    "titulo": "A Sociedade de Risco Global",
+    "autor": "Ulrich Beck (1944–2015)",
+    "categoria": "sociologia",
+    "conceito": "Incertezas Manufaturadas e Ameaças Tecnológicas e Ambientais",
+    "explicacao": "Beck formula que a modernidade contemporânea produz riscos globais (climáticos, industriais, nucleares e biológicos) que não respeitam fronteiras nacionais nem classes sociais, exigindo governança cooperativa.",
+    "aplicacao": "Consoante a tese da Sociedade de Risco de Ulrich Beck, as decisões de gestão pública devem pautar-se pela precaução científica, haja vista que os danos socioambientais e tecnológicos afetam toda a coletividade.",
+    "fonte": "BECK, Ulrich. Sociedade de Risco: rumo a uma outra modernidade (1986).",
+    "tags": [
+      "ulrich beck",
+      "sociedade de risco",
+      "modernidade",
+      "meio ambiente",
+      "tecnologia"
+    ]
+  },
+  {
+    "id": "rep-ldb-9394",
+    "titulo": "Lei de Diretrizes e Bases da Educação Nacional (LDB - Lei nº 9.394/1996)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "educacao",
+    "conceito": "Gestão Democrática e Direito à Aprendizagem Significativa",
+    "explicacao": "A LDB estabelece os princípios da educação brasileira, consagrando a igualdade de condições para acesso e permanência na escola, a liberdade de aprender e a valorização do profissional docente.",
+    "aplicacao": "A Lei de Diretrizes e Bases da Educação Nacional (Lei nº 9.394/1996) assevera que o ensino deve vincular-se ao mundo do trabalho e à prática social, finalidade comprometida pela precariedade estrutural de muitas unidades de ensino.",
+    "fonte": "BRASIL. Lei nº 9.394, de 20 de dezembro de 1996 (LDB).",
+    "tags": [
+      "ldb",
+      "educação",
+      "escola pública",
+      "docência",
+      "aprendizagem",
+      "políticas educacionais"
+    ]
+  },
+  {
+    "id": "rep-anisio-teixeira",
+    "titulo": "Escola Pública, Democrática e Integral",
+    "autor": "Anísio Teixeira (1900–1971)",
+    "categoria": "educacao",
+    "conceito": "Educação Pública como Condição Inegociável da Democracia",
+    "explicacao": "Líder do movimento dos Pioneiros da Educação Nova, Anísio Teixeira sustentava que a democracia só se sustenta sobre uma rede de escolas públicas, gratuitas, laicas e em tempo integral de excelente qualidade para todas as classes.",
+    "aplicacao": "Como preconizava o educador Anísio Teixeira, \"só existirá democracia no Brasil no dia em que se montar no país a máquina que prepara as democracias: a escola pública de tempo integral\".",
+    "fonte": "TEIXEIRA, Anísio. Educação não é privilégio (1957).",
+    "tags": [
+      "anísio teixeira",
+      "escola pública",
+      "democracia",
+      "tempo integral",
+      "educação"
+    ]
+  },
+  {
+    "id": "rep-plano-nacional-educacao",
+    "titulo": "Plano Nacional de Educação (PNE - Lei nº 13.005/2014)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "educacao",
+    "conceito": "Metas Decenais de Financiamento, Qualidade e Equidade Escolar",
+    "explicacao": "Estabelece 20 metas decenais estratégicas para a educação básica e superior no Brasil, incluindo a erradicação do analfabetismo, a universalização do atendimento escolar e a aplicação de percentual do PIB em educação.",
+    "aplicacao": "O descumprimento de metas basilares do Plano Nacional de Educação (Lei nº 13.005/2014) evidencia o subfinanciamento crônico do setor, obstáculo que amplia a defasagem entre o ensino público e o privado.",
+    "fonte": "BRASIL. Lei nº 13.005, de 25 de junho de 2014 (Plano Nacional de Educação).",
+    "tags": [
+      "pne",
+      "metas educacionais",
+      "financiamento",
+      "pib",
+      "qualidade do ensino"
+    ]
+  },
+  {
+    "id": "rep-pisa-ocde",
+    "titulo": "Programa Internacional de Avaliação de Estudantes (PISA / OCDE)",
+    "autor": "Organização para a Cooperação e Desenvolvimento Econômico (OCDE)",
+    "categoria": "educacao",
+    "conceito": "Letramento Leitor, Científico e Matemático em Escala Comparada",
+    "explicacao": "Avaliação internacional padronizada aplicada a jovens de 15 anos para mensurar a capacidade de aplicar conhecimentos escolares na resolução de problemas do cotidiano em sociedade.",
+    "aplicacao": "Os relatórios periódicos do PISA, divulgados pela OCDE, demonstram a fragilidade do letramento leitor e do raciocínio analítico no Brasil, apontando para a urgência de reformulações curriculares e pedagógicas profundas.",
+    "fonte": "OCDE. Programme for International Student Assessment (PISA).",
+    "tags": [
+      "pisa",
+      "ocde",
+      "leitura",
+      "matemática",
+      "avaliação educacional",
+      "dados"
+    ]
+  },
+  {
+    "id": "rep-bell-hooks-ensinar",
+    "titulo": "Ensinando a Transgredir: A Educação como Prática da Liberdade",
+    "autor": "bell hooks (1952–2021)",
+    "categoria": "educacao",
+    "conceito": "Pedagogia Engajada, Afeto e Descolonização do Conhecimento",
+    "explicacao": "A teórica e ativista propõe uma pedagogia participativa e engajada na qual a sala de aula se torna um espaço aberto para o pensamento crítico, a inclusão de identidades diversas e o bem-estar mútuo.",
+    "aplicacao": "Em \"Ensinando a Transgredir\", a pensadora bell hooks ressalta que a educação deve transcender a memorização mecânica, operando como espaço acolhedor e libertador capaz de romper com silenciamentos históricos.",
+    "fonte": "HOOKS, bell. Ensinando a Transgredir: a educação como prática da liberdade (1994).",
+    "tags": [
+      "bell hooks",
+      "pedagogia crítica",
+      "liberdade",
+      "antirracismo",
+      "inclusão"
+    ]
+  },
+  {
+    "id": "rep-vygotsky-interacao",
+    "titulo": "A Teoria Histórico-Cultural e a Zona de Desenvolvimento Proximal",
+    "autor": "Lev Vygotsky (1896–1934)",
+    "categoria": "educacao",
+    "conceito": "Mediação Social, Linguagem e Construção do Conhecimento",
+    "explicacao": "Vygotsky comprova que o aprendizado humano é produto da mediação cultural e da interação social com outros indivíduos, destacando o papel indispensável do educador e do ambiente cooperativo.",
+    "aplicacao": "Conforme a psicologia sociointeracionista de Lev Vygotsky, o conhecimento humano constrói-se na mediação com os pares e com o meio cultural, reforçando a importância de ambientes escolares estimulantes e colaborativos.",
+    "fonte": "VYGOTSKY, Lev. A Formação Social da Mente (1978).",
+    "tags": [
+      "vygotsky",
+      "interação social",
+      "aprendizagem",
+      "mediação",
+      "desenvolvimento cognitivo"
+    ]
+  },
+  {
+    "id": "rep-john-dewey-democracia",
+    "titulo": "Democracia e Educação: A Aprendizagem Prática pela Ação",
+    "autor": "John Dewey (1859–1952)",
+    "categoria": "educacao",
+    "conceito": "Escola Progressista, Pensamento Crítico e \"Aprender Fazendo\"",
+    "explicacao": "Dewey argumenta que a educação não é mera preparação para o futuro, mas a própria experiência vivida no presente, onde os estudantes aprendem a solucionar problemas reais cooperativamente.",
+    "aplicacao": "Como afirmava o filósofo pragmatista John Dewey em \"Democracia e Educação\", a escola não deve ser um refúgio teórico isolado, mas um laboratório democrático onde os jovens aprendem a construir soluções para dilemas sociais reais.",
+    "fonte": "DEWEY, John. Democracia e Educação (1916).",
+    "tags": [
+      "john dewey",
+      "aprendizagem ativa",
+      "democracia",
+      "pensamento reflexivo"
+    ]
+  },
+  {
+    "id": "rep-rubem-alves",
+    "titulo": "A Alegria de Ensinar e a Educação dos Sentidos",
+    "autor": "Rubem Alves (1933–2014)",
+    "categoria": "educacao",
+    "conceito": "Curiosidade Epistêmica, Humanização Escolar e Afeto",
+    "explicacao": "O pedagogo e escritor defende que o objetivo supremo da escola é despertar a curiosidade e o gosto pelo saber, transformando o ato de ensinar em uma experiência estética e humanizadora.",
+    "aplicacao": "Nas palavras do educador Rubem Alves, \"ensinar é um exercício de imortalidade\", premissa que desafia o modelo escolar engessado e reafirma a urgência de cultivar o pensamento criativo nas salas de aula.",
+    "fonte": "ALVES, Rubem. A Alegria de Ensinar (1994).",
+    "tags": [
+      "rubem alves",
+      "humanização",
+      "curiosidade",
+      "leitura",
+      "criatividade"
+    ]
+  },
+  {
+    "id": "rep-cieps-brizola-darcy",
+    "titulo": "Os Centros Integrados de Educação Pública (CIEPs)",
+    "autor": "Darcy Ribeiro e Leonel Brizola",
+    "categoria": "educacao",
+    "conceito": "Educação Integral com Alimentação, Saúde e Atividades Esportivas",
+    "explicacao": "Projeto pioneiro implantado na década de 1980 no Rio de Janeiro (os \"Brizolões\") projetados por Oscar Niemeyer, que ofereciam jornada escolar de 8 horas com quatro refeições, assistência médica e odontológica.",
+    "aplicacao": "A experiência histórica dos CIEPs, idealizados por Darcy Ribeiro, comprovou que a escola em tempo integral aliada a serviços básicos de nutrição e esporte é o mais potente antídoto contra a vulnerabilidade juvenil.",
+    "fonte": "RIBEIRO, Darcy. O Livro dos CIEPs (1986).",
+    "tags": [
+      "ciep",
+      "tempo integral",
+      "darcy ribeiro",
+      "nutrição escolar",
+      "proteção social"
+    ]
+  },
+  {
+    "id": "rep-censo-escolar-inep",
+    "titulo": "Censo Escolar da Educação Básica (INEP)",
+    "autor": "Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)",
+    "categoria": "educacao",
+    "conceito": "Diagnóstico Infraestrutural, Evasão Escolar e Distorção Idade-Série",
+    "explicacao": "Pesquisa estatística anual que mapeia a realidade de todas as escolas do país, apontando carências de bibliotecas, saneamento, laboratórios e internet de alta velocidade.",
+    "aplicacao": "Registros do Censo Escolar do INEP revelam que milhares de escolas públicas brasileiras ainda carecem de bibliotecas, quadras esportivas e conectividade digital, impondo barreiras materiais ao pleno aprendizado.",
+    "fonte": "BRASIL. INEP. Censo Escolar da Educação Básica (edições anuais).",
+    "tags": [
+      "censo escolar",
+      "inep",
+      "infraestrutura",
+      "evasão escolar",
+      "estatísticas"
+    ]
+  },
+  {
+    "id": "rep-ailton-krenak",
+    "titulo": "Ideias para Adiar o Fim do Mundo",
+    "autor": "Ailton Krenak (1953–presente)",
+    "categoria": "ambiente",
+    "conceito": "Crítica ao Antropocentrismo Predatório e Saberes Ancestrais",
+    "explicacao": "O líder indígena e escritor denuncia a ilusão ocidental de que a humanidade é separada da natureza, demonstrando que a mercantilização desenfreada dos rios, florestas e solos ameaça a própria sobrevida da espécie humana.",
+    "aplicacao": "Em \"Ideias para Adiar o Fim do Mundo\", Ailton Krenak adverte que a voracidade do consumo moderno transformou a Terra em mero almoxarifado de recursos, urgindo a reconciliação do ser humano com os ciclos naturais.",
+    "fonte": "KRENAK, Ailton. Ideias para Adiar o Fim do Mundo (2019).",
+    "tags": [
+      "krenak",
+      "indígena",
+      "meio ambiente",
+      "sustentabilidade",
+      "antropoceno",
+      "natureza"
+    ]
+  },
+  {
+    "id": "rep-pnrs-12305",
+    "titulo": "Política Nacional de Resíduos Sólidos (PNRS - Lei nº 12.305/2010)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "ambiente",
+    "conceito": "Responsabilidade Compartilhada, Logística Reversa e Economia Circular",
+    "explicacao": "Determina a erradicação dos lixões a céu aberto, institui a logística reversa obrigatória para fabricantes e valoriza o papel econômico e social dos catadores de materiais recicláveis.",
+    "aplicacao": "Conforme estabelece a Política Nacional de Resíduos Sólidos (Lei nº 12.305/2010), fabricantes, governos e consumidores compartilham a responsabilidade pelo ciclo de vida dos produtos, princípio indispensável para viabilizar a reciclagem em larga escala.",
+    "fonte": "BRASIL. Lei nº 12.305, de 2 de agosto de 2010 (PNRS).",
+    "tags": [
+      "resíduos sólidos",
+      "lixo",
+      "reciclagem",
+      "logística reversa",
+      "saneamento",
+      "pnrs"
+    ]
+  },
+  {
+    "id": "rep-codigo-florestal-12651",
+    "titulo": "Código Florestal Brasileiro (Lei nº 12.651/2012)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "ambiente",
+    "conceito": "Áreas de Preservação Permanente (APP) e Reserva Legal (RL)",
+    "explicacao": "Regulamenta a proteção da vegetação nativa, nascentes, topos de morro e encostas, conciliando produção agrossilvipastoril sustentável com a conservação da biodiversidade e dos recursos hídricos.",
+    "aplicacao": "Nos termos da Lei de Proteção da Vegetação Nativa (Lei nº 12.651/2012), a salvaguarda das Áreas de Preservação Permanente é requisito técnico indeclinável para conter deslizamentos, proteger mananciais e manter o equilíbrio climático.",
+    "fonte": "BRASIL. Lei nº 12.651, de 25 de maio de 2012 (Código Florestal).",
+    "tags": [
+      "código florestal",
+      "preservação",
+      "nascentes",
+      "desmatamento",
+      "biodiversidade"
+    ]
+  },
+  {
+    "id": "rep-ipcc-clima",
+    "titulo": "Relatórios do Painel Intergovernamental sobre Mudanças Climáticas (IPCC)",
+    "autor": "Painel Intergovernamental sobre Mudanças Climáticas (IPCC / ONU)",
+    "categoria": "ambiente",
+    "conceito": "Aquecimento Global Antropogênico e Justiça Climática",
+    "explicacao": "O corpo científico da ONU compila evidências irrefutáveis de que a queima de combustíveis fósseis e o desmatamento provocam eventos climáticos extremos mais frequentes e severos, afetando principalmente populações vulneráveis.",
+    "aplicacao": "Os relatórios científicos do IPCC demonstram que as emissões de gases de efeito estufa aceleram eventos climáticos extremos (secas e enchentes), exigindo planos governamentais ambiciosos de mitigação e adaptação urbana.",
+    "fonte": "IPCC; ONU. Climate Change Assessment Reports (AR6).",
+    "tags": [
+      "ipcc",
+      "clima",
+      "aquecimento global",
+      "eventos extremos",
+      "ciência",
+      "onu"
+    ]
+  },
+  {
+    "id": "rep-desastres-mariana-brumadinho",
+    "titulo": "Tragédias Socioambientais de Mariana (2015) e Brumadinho (2019)",
+    "autor": "História Contemporânea Brasileira / Perícia Oficial",
+    "categoria": "ambiente",
+    "conceito": "Rompimento de Barragens de Rejeitos, Danos Ecossistêmicos e Falha na Fiscalização",
+    "explicacao": "Os maiores desastres socioambientais e trabalhistas da história minerária do Brasil resultaram na morte de centenas de pessoas e na devastação das bacias dos rios Doce e Paraopeba, evidenciando fragilidades na fiscalização estatal.",
+    "aplicacao": "As tragédias socioambientais de Mariana (2015) e Brumadinho (2019) evidenciaram os custos humanos e ecológicos da leniência regulatória, comprovando a urgência de auditorias técnicas rigorosas em atividades industriais de alto risco.",
+    "fonte": "MINISTÉRIO PÚBLICO FEDERAL; POLÍCIA FEDERAL. Relatórios Periciais sobre Mariana e Brumadinho.",
+    "tags": [
+      "barragens",
+      "mineração",
+      "brumadinho",
+      "mariana",
+      "desastre ambiental",
+      "fiscalização"
+    ]
+  },
+  {
+    "id": "rep-chico-mendes",
+    "titulo": "Reservas Extrativistas e a Aliança dos Povos da Floresta",
+    "autor": "Chico Mendes (1944–1988)",
+    "categoria": "ambiente",
+    "conceito": "Desenvolvimento Sustentável Comunitário e Conservação da Amazônia",
+    "explicacao": "Seringueiro, líder sindical e ambientalista acreano que concebeu o modelo de Reservas Extrativistas (RESEX), demonstrando que a floresta em pé e habitada por povos tradicionais é mais rentável do que sua devastação.",
+    "aplicacao": "Como demonstrou o ambientalista Chico Mendes, a proteção da Amazônia não exclui as comunidades tradicionais, mas depende diretamente da criação de reservas extrativistas que aliem subsistência digna e conservação ecológica.",
+    "fonte": "MENDES, Chico. Discursos e entrevistas reunidos; MEMORIAL CHICO MENDES.",
+    "tags": [
+      "chico mendes",
+      "amazônia",
+      "resex",
+      "sustentabilidade",
+      "povos da floresta"
+    ]
+  },
+  {
+    "id": "rep-acordo-de-paris",
+    "titulo": "O Acordo de Paris sobre o Clima (2015)",
+    "autor": "Convenção-Quadro das Nações Unidas sobre a Mudança do Clima (COP 21)",
+    "categoria": "ambiente",
+    "conceito": "Descarbonização da Economia e Contribuições Nacionalmente Determinadas (NDC)",
+    "explicacao": "Tratado internacional juridicamente vinculante firmado por 195 nações para limitar o aumento da temperatura média global bem abaixo de 2°C acima dos níveis pré-industriais.",
+    "aplicacao": "Ratificado pelo Brasil, o Acordo de Paris impõe metas estritas de neutralidade de carbono e combate ao desmatamento ilegal, compromissos que demandam a transição célere para matrizes energéticas limpas.",
+    "fonte": "ONU. Acordo de Paris sob a Convenção-Quadro da ONU sobre Mudança do Clima (2015).",
+    "tags": [
+      "acordo de paris",
+      "cop21",
+      "clima",
+      "transição energética",
+      "carbono zero"
+    ]
+  },
+  {
+    "id": "rep-agenda-2030-ods",
+    "titulo": "Agenda 2030 e os Objetivos de Desenvolvimento Sustentável (ODS)",
+    "autor": "Organização das Nações Unidas (ONU)",
+    "categoria": "ambiente",
+    "conceito": "Metas Universais de Erradicação da Pobreza e Sustentabilidade Planetária",
+    "explicacao": "Conjunto de 17 objetivos e 169 metas adotados pelos líderes mundiais para equilibrar o desenvolvimento econômico, a inclusão social e a preservação ambiental até o ano de 2030.",
+    "aplicacao": "Em conformidade com a Agenda 2030 da ONU, a preservação ambiental (ODS 13 e 15) é condição prévia para a erradicação da pobreza e a garantia de cidades resilientes e sustentáveis (ODS 11).",
+    "fonte": "ONU. Transformando Nosso Mundo: A Agenda 2030 para o Desenvolvimento Sustentável (2015).",
+    "tags": [
+      "agenda 2030",
+      "ods",
+      "sustentabilidade",
+      "onu",
+      "desenvolvimento global"
+    ]
+  },
+  {
+    "id": "rep-lei-8080-sus",
+    "titulo": "Lei Orgânica da Saúde (Lei nº 8.080/1990 - Criação do SUS)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "saude",
+    "conceito": "Universalidade, Integralidade e Equidade na Assistência",
+    "explicacao": "Regulamenta o Sistema Único de Saúde (SUS), garantindo a todos os cidadãos acesso a ações e serviços para promoção, proteção e recuperação da saúde, do atendimento básico a transplantes de alta complexidade.",
+    "aplicacao": "Instituído pela Lei nº 8.080/1990, o Sistema Único de Saúde é regido pelo princípio da equidade, determinando que o Estado ofereça atenção proporcional às necessidades individuais e coletivas da população.",
+    "fonte": "BRASIL. Lei nº 8.080, de 19 de setembro de 1990 (Lei Orgânica da Saúde).",
+    "tags": [
+      "sus",
+      "saúde pública",
+      "universalidade",
+      "equidade",
+      "sistema de saúde"
+    ]
+  },
+  {
+    "id": "rep-reforma-psiquiatrica-10216",
+    "titulo": "Lei da Reforma Psiquiátrica (Lei nº 10.216/2001 - Lei Paulo Delgado)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "saude",
+    "conceito": "Desinstitucionalização, Dignidade e Redes de Atenção Psicossocial (RAPS)",
+    "explicacao": "Redirecionou o modelo assistencial em saúde mental, substituindo o confinamento asilar em manicômios pelo tratamento em serviços comunitários abertos (CAPS), preservando os direitos civis e humanos dos pacientes.",
+    "aplicacao": "A Lei da Reforma Psiquiátrica (Lei nº 10.216/2001) consolidou o tratamento humanizado e em liberdade para pessoas em sofrimento mental, modelo que requer a contínua expansão e investimento nos Centros de Atenção Psicossocial (CAPS).",
+    "fonte": "BRASIL. Lei nº 10.216, de 6 de abril de 2001.",
+    "tags": [
+      "saúde mental",
+      "reforma psiquiátrica",
+      "caps",
+      "direitos humanos",
+      "inclusão social"
+    ]
+  },
+  {
+    "id": "rep-revolta-da-vacina-1904",
+    "titulo": "A Revolta da Vacina (Rio de Janeiro, 1904)",
+    "autor": "Historiografia da Saúde Pública no Brasil",
+    "categoria": "saude",
+    "conceito": "Comunicação Pública, Desinformação e Resistência Popular Sanitária",
+    "explicacao": "Conflito social eclodido no Rio de Janeiro contra a vacinação obrigatória anti-varíola capitaneada por Oswaldo Cruz, provocado pelo autoritarismo estatal e pela falta de informação clara à população.",
+    "aplicacao": "O episódio histórico da Revolta da Vacina (1904) ilustra que intervenções de saúde pública exigem, além de base científica sólida, comunicação transparente e combate incisivo à desinformação.",
+    "fonte": "CHALHOUB, Sidney. Cidade Febril: cortiços e epidemias na corte imperial (1996).",
+    "tags": [
+      "vacina",
+      "revolta da vacina",
+      "saúde coletiva",
+      "desinformação",
+      "história da medicina"
+    ]
+  },
+  {
+    "id": "rep-oswaldo-cruz-fiocruz",
+    "titulo": "Fundação Oswaldo Cruz (Fiocruz) e a Soberania Científica",
+    "autor": "Oswaldo Cruz (1872–1917) e Fundação Oswaldo Cruz",
+    "categoria": "saude",
+    "conceito": "Pesquisa Biomédica, Imunobiológicos e Defesa da Vida",
+    "explicacao": "Instituição secular de ciência e tecnologia em saúde pública, pioneira no controle da febre amarela e peste bubônica no início do século XX e peça-chave na produção de vacinas e medicamentos essenciais.",
+    "aplicacao": "O legado de Oswaldo Cruz e a atuação estratégica da Fiocruz comprovam que a autossuficiência científica e a produção nacional de vacinas são requisitos de soberania e segurança sanitária nacional.",
+    "fonte": "FUNDAÇÃO OSWALDO CRUZ (FIOCRUZ). Acervo Histórico e Memória da Saúde.",
+    "tags": [
+      "fiocruz",
+      "vacinas",
+      "ciência",
+      "pesquisa biomédica",
+      "saúde pública"
+    ]
+  },
+  {
+    "id": "rep-oms-saude-mental-jovens",
+    "titulo": "Relatório da OMS sobre Ansiedade e Saúde Mental da Juventude",
+    "autor": "Organização Mundial da Saúde (OMS)",
+    "categoria": "saude",
+    "conceito": "Depressão, Ansiedade e o Impacto das Mídias Digitais no Desenvolvimento",
+    "explicacao": "Documento global alertando que os transtornos de ansiedade e depressão aumentaram expressivamente entre adolescentes, potencializados pela solidão urbana, pressão por desempenho e uso abusivo de telas.",
+    "aplicacao": "Conforme alerta a Organização Mundial da Saúde (OMS), o aumento vertiginoso de transtornos ansiosos na juventude demanda a criação de programas multidisciplinares de acolhimento psicológico nas escolas.",
+    "fonte": "ORGANIZAÇÃO MUNDIAL DA SAÚDE (OMS). World Mental Health Report (2022).",
+    "tags": [
+      "saúde mental",
+      "ansiedade",
+      "depressão",
+      "juventude",
+      "oms",
+      "escola"
+    ]
+  },
+  {
+    "id": "rep-lei-lucas-13722",
+    "titulo": "Lei Lucas (Lei nº 13.722/2018 - Primeiros Socorros nas Escolas)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "saude",
+    "conceito": "Capacitação Preventiva em Primeiros Socorros e Preservação da Vida Infantil",
+    "explicacao": "Obriga estabelecimentos públicos e privados de educação básica e recreação a capacitar professores e funcionários em noções de primeiros socorros para evitar mortes por asfixia e engasgos.",
+    "aplicacao": "A promulgação da Lei Lucas (Lei nº 13.722/2018) evidencia a importância da cultura de prevenção primária e da integração entre conhecimentos de saúde e rotinas escolares para resguardar a integridade física de crianças.",
+    "fonte": "BRASIL. Lei nº 13.722, de 4 de outubro de 2018.",
+    "tags": [
+      "lei lucas",
+      "primeiros socorros",
+      "escola",
+      "infância",
+      "segurança",
+      "saúde"
+    ]
+  },
+  {
+    "id": "rep-drogas-reducao-danos",
+    "titulo": "Política de Redução de Danos em Saúde Pública",
+    "autor": "Ministério da Saúde do Brasil / OMS",
+    "categoria": "saude",
+    "conceito": "Cuidado em Saúde, Prevenção de Agravos e Atenção Integral ao Usuário",
+    "explicacao": "Estratégia de saúde pública que visa minimizar os prejuízos biológicos, sociais e econômicos associados ao uso de substâncias sem exigir como condição prévia imediata a abstinência total.",
+    "aplicacao": "Sob a ótica da saúde coletiva, a estratégia de redução de danos adota o acolhimento multiprofissional como instrumento de reinserção cidadã, superando o estigma punitivo e assegurando acesso aos serviços do SUS.",
+    "fonte": "BRASIL. Ministério da Saúde. Portaria nº 1.028/2005 (Ações de Redução de Danos).",
+    "tags": [
+      "redução de danos",
+      "saúde coletiva",
+      "drogas",
+      "acolhimento",
+      "sus"
+    ]
+  },
+  {
+    "id": "rep-determinantes-sociais-saude",
+    "titulo": "Comissão Nacional sobre Determinantes Sociais da Saúde (CNDSS)",
+    "autor": "Comissão sobre Determinantes Sociais da Saúde (OMS / Fiocruz)",
+    "categoria": "saude",
+    "conceito": "Saneamento, Moradia, Renda e Escolaridade como Fatores de Saúde",
+    "explicacao": "Demonstra que a saúde de uma população é reflexo direto das condições em que as pessoas nascem, crescem, vivem, trabalham e envelhecem, sendo o saneamento básico fator primordial de prevenção de endemias.",
+    "aplicacao": "Estudos da Comissão sobre Determinantes Sociais da Saúde revelam que garantir acesso a água tratada e esgotamento sanitário impacta mais a longevidade da população vulnerável do que a expansão de leitos hospitalares reativos.",
+    "fonte": "OMS; FIOCRUZ. As Causas Sociais das Iniquidades em Saúde (Relatório CNDSS).",
+    "tags": [
+      "determinantes sociais",
+      "saneamento",
+      "prevenção",
+      "saúde pública",
+      "desigualdade"
+    ]
+  },
+  {
+    "id": "rep-lei-aurea-1888",
+    "titulo": "A Incompletude da Abolição da Escravidão (1888)",
+    "autor": "Historiografia Brasileira / Joaquim Nabuco (1849–1910)",
+    "categoria": "historia",
+    "conceito": "Abolição Inacabada e Ausência de Reparação e Cidadania",
+    "explicacao": "A assinatura da Lei Áurea em 13 de maio de 1888 libertou formalmente os escravizados, mas não garantiu terras, indenizações, moradia ou educação, lançando a população negra na informalidade e na exclusão social.",
+    "aplicacao": "Como alertava o abolicionista Joaquim Nabuco em \"O Abolicionismo\", a mera extinção legal do cativeiro em 1888, desprovida de inclusão econômica e escolar, legou ao Brasil um abismo estrutural que ainda reverbera nas periferias.",
+    "fonte": "NABUCO, Joaquim. O Abolicionismo (1883).",
+    "tags": [
+      "lei áurea",
+      "abolição",
+      "escravidão",
+      "joaquim nabuco",
+      "racismo estrutural",
+      "história"
+    ]
+  },
+  {
+    "id": "rep-era-vargas-clt-1943",
+    "titulo": "A Era Vargas e a Consolidação das Leis do Trabalho (CLT - 1943)",
+    "autor": "Getúlio Vargas (1882–1954) e História do Trabalho no Brasil",
+    "categoria": "historia",
+    "conceito": "Cidadania Regulada, Direitos Trabalhistas e Industrialização",
+    "explicacao": "O Decreto-Lei nº 5.452/1943 unificou as normas trabalhistas (salário mínimo, férias, jornada de 8 horas), transformando a relação entre capital e trabalho no processo de urbanização do país.",
+    "aplicacao": "A instituição da CLT em 1943 estabeleceu patamares civilizatórios de dignidade ao trabalhador urbano, cuja proteção exige contínua atualização diante dos desafios da precarização e da economia digital.",
+    "fonte": "BRASIL. Decreto-Lei nº 5.452, de 1º de maio de 1943 (Consolidação das Leis do Trabalho).",
+    "tags": [
+      "era vargas",
+      "clt",
+      "trabalho",
+      "direitos trabalhistas",
+      "industrialização"
+    ]
+  },
+  {
+    "id": "rep-diretas-ja-1984",
+    "titulo": "A Campanha das Diretas Já (1984) e a Redemocratização",
+    "autor": "Movimento Social e Político Brasileiro",
+    "categoria": "historia",
+    "conceito": "Mobilização Popular, Soberania do Voto e Transição Democrática",
+    "explicacao": "O maior movimento de massa da história política recente do Brasil, mobilizando milhões de cidadãos em praça pública pela aprovação da Emenda Dante de Oliveira para restaurar eleições presidenciais diretas.",
+    "aplicacao": "A mobilização cívica das Diretas Já (1984) evidenciou que a cidadania plena decorre da participação ativa do povo nos destinos da nação, antecedendo o pacto consagrado na Constituição de 1988.",
+    "fonte": "MEMORIAL DA DEMOCRACIA. O movimento pelas Diretas Já (1984).",
+    "tags": [
+      "diretas já",
+      "redemocratização",
+      "voto direto",
+      "cidadania",
+      "democracia"
+    ]
+  },
+  {
+    "id": "rep-constituicao-cidada-1988",
+    "titulo": "A Promulgação da Constituição Cidadã (5 de outubro de 1988)",
+    "autor": "Ulysses Guimarães (1916–1992) / Assembleia Constituinte",
+    "categoria": "historia",
+    "conceito": "Superação do Autoritarismo e Consagração do Estado de Direito",
+    "explicacao": "No discurso histórico de promulgação, o deputado Ulysses Guimarães declarou a Carta Magna de 1988 como a \"Constituição Cidadã\", proclamando ódio e nojo à tirania e elevando a dignidade humana a valor central.",
+    "aplicacao": "Ao promulgar a Carta de 1988, Ulysses Guimarães denominou-a \"Constituição Cidadã\" pelo compromisso inequívoco com a justiça social, desafio que ainda demanda empenho estatal diário para concretizar suas promessas.",
+    "fonte": "GUIMARÃES, Ulysses. Discurso de Promulgação da Constituição de 1988 (Diário da Constituinte).",
+    "tags": [
+      "constituição cidadã",
+      "ulysses guimarães",
+      "democracia",
+      "constituinte",
+      "história"
+    ]
+  },
+  {
+    "id": "rep-revolta-canudos-euclides",
+    "titulo": "A Guerra de Canudos (1896–1897) e \"Os Sertões\"",
+    "autor": "Euclides da Cunha (1866–1909)",
+    "categoria": "historia",
+    "conceito": "Desigualdades Regionais, Fanatismo e Incompreensão do Sertão pelo Litoral",
+    "explicacao": "A destruição do arraial de Antônio Conselheiro pelo Exército expôs a violência estatal contra uma comunidade de sertanejos famintos, denunciada por Euclides da Cunha como crime de lesa-pátria.",
+    "aplicacao": "Em \"Os Sertões\", obra imortalizada pela máxima \"o sertanejo é, antes de tudo, um forte\", Euclides da Cunha denunciou a brutalidade estatal sobre populações excluídas da jovem República, reflexo de descompassos regionais que persistem.",
+    "fonte": "CUNHA, Euclides da. Os Sertões (1902).",
+    "tags": [
+      "canudos",
+      "euclides da cunha",
+      "sertão",
+      "desigualdade regional",
+      "literatura e história"
+    ]
+  },
+  {
+    "id": "rep-criacao-policia-militar-1809",
+    "titulo": "A Chegada da Família Real e a Criação da Guarda Real de Polícia (1809)",
+    "autor": "D. João VI / História das Forças de Segurança no Brasil",
+    "categoria": "historia",
+    "conceito": "Institucionalização da Ordem Pública e Gênese das Polícias Militares",
+    "explicacao": "Pelo Decreto de 13 de maio de 1809, o Príncipe Regente D. João criou a Divisão Militar da Guarda Real de Polícia no Rio de Janeiro, marco inaugural da organização policial militar brasileira.",
+    "aplicacao": "A criação da Guarda Real de Polícia em 1809 marca a institucionalização da segurança pública no Brasil, cuja evolução contemporânea exige aprimoramento contínuo em direitos humanos e inteligência preventiva.",
+    "fonte": "BRASIL. Decreto de 13 de maio de 1809 (Criação da Guarda Real de Polícia).",
+    "tags": [
+      "polícia militar",
+      "d joão vi",
+      "história da segurança",
+      "ordem pública",
+      "pmpe",
+      "pmsp"
+    ]
+  },
+  {
+    "id": "rep-ditadura-estado-novo-1937",
+    "titulo": "O Estado Novo de Getúlio Vargas (1937–1945)",
+    "autor": "Historiografia Política do Brasil",
+    "categoria": "historia",
+    "conceito": "Centralização Autoritária, Censura (DIP) e Modernização da Burocracia",
+    "explicacao": "Regime autoritário que fechou o Congresso, outorgou a Constituição \"Polaca\" de 1937 e criou o Departamento de Imprensa e Propaganda (DIP) para controle ideológico, paralelamente à criação do DASP para profissionalizar o serviço público.",
+    "aplicacao": "A experiência do Estado Novo (1937–1945) demonstra os perigos da censura e da hipertrofia executiva, reforçando por contraste a necessidade de manter o controle democrático e a transparência no serviço público.",
+    "fonte": "FAUSTO, Boris. História do Brasil (1994).",
+    "tags": [
+      "estado novo",
+      "vargas",
+      "autoritarismo",
+      "censura",
+      "história republicana"
+    ]
+  },
+  {
+    "id": "rep-plano-real-1994",
+    "titulo": "O Plano Real (1994) e a Estabilização Monetária",
+    "autor": "Equipe Econômica do Ministério da Fazenda / Brasil",
+    "categoria": "historia",
+    "conceito": "Superação da Hiperinflação e Preservação do Poder de Compra",
+    "explicacao": "Implementado com a Unidade Real de Valor (URV) e a nova moeda (Real), encerrou décadas de inflação galopante que corroía prioritariamente os salários das famílias mais vulneráveis do país.",
+    "aplicacao": "A estabilização econômica propiciada pelo Plano Real em 1994 demonstrou que a higidez da moeda é condição preliminar de justiça distributiva, já que a inflação descontrolada pune severamente as classes de menor renda.",
+    "fonte": "BANCO CENTRAL DO BRASIL. História do Plano Real e da Estabilização Econômica.",
+    "tags": [
+      "plano real",
+      "inflação",
+      "economia",
+      "história econômica",
+      "cidadania"
+    ]
+  },
+  {
+    "id": "rep-cidadania-mulher-voto-1932",
+    "titulo": "A Conquista do Voto Feminino no Brasil (Código Eleitoral de 1932)",
+    "autor": "Bertha Lutz (1894–1976) e Movimento Sufragista Brasileiro",
+    "categoria": "historia",
+    "conceito": "Sufrágio Universal Feminino e Reconhecimento dos Direitos Políticos",
+    "explicacao": "Pelo Decreto nº 21.076 de 1932, consolidado na Constituição de 1934, as mulheres brasileiras conquistaram o direito ao voto após décadas de mobilização da Federação Brasileira pelo Progresso Feminino.",
+    "aplicacao": "A conquista do voto feminino no Código Eleitoral de 1932, liderada por figuras como Bertha Lutz, assinalou um passo decisivo rumo à isonomia política, embora a paridade de gênero nos espaços de poder permaneça como desafio premente.",
+    "fonte": "BRASIL. Decreto nº 21.076, de 24 de fevereiro de 1932 (Código Eleitoral).",
+    "tags": [
+      "voto feminino",
+      "sufrágio",
+      "bertha lutz",
+      "direitos das mulheres",
+      "história"
+    ]
+  },
+  {
+    "id": "rep-thomas-piketty",
+    "titulo": "O Capital no Século XXI e a Concentração de Riqueza",
+    "autor": "Thomas Piketty (1971–presente)",
+    "categoria": "economia",
+    "conceito": "Taxa de Rendimento do Capital Superior ao Crescimento Econômico (r > g)",
+    "explicacao": "Apoiado em registros de três séculos, o economista francês demonstra que a rentabilidade do capital tende a superar o crescimento da renda e da produção, gerando concentração extrema de patrimônio se não houver tributação progressiva.",
+    "aplicacao": "Conforme demonstra Thomas Piketty em \"O Capital no Século XXI\", a ausência de tributação progressiva aprofunda a desigualdade estrutural, concentrando patrimônio nas mãos de uma minoria enquanto a maioria depende exclusivamente de salários.",
+    "fonte": "PIKETTY, Thomas. O Capital no Século XXI (2013).",
+    "tags": [
+      "piketty",
+      "desigualdade",
+      "capital",
+      "economia",
+      "tributação",
+      "riqueza"
+    ]
+  },
+  {
+    "id": "rep-adam-smith-nacoes",
+    "titulo": "A Riqueza das Nações e a Divisão do Trabalho",
+    "autor": "Adam Smith (1723–1790)",
+    "categoria": "economia",
+    "conceito": "Produtividade, Especialização e os Deveres do Soberano",
+    "explicacao": "Marco da economia clássica que analisa como a divisão do trabalho eleva a produtividade, frisando igualmente que compete ao Estado garantir a defesa, a justiça e a infraestrutura básica de transportes e educação pública.",
+    "aplicacao": "Pai da economia clássica, Adam Smith reconhecia em \"A Riqueza das Nações\" que a livre iniciativa necessita de um Estado apto a assegurar a justiça, a segurança e a educação básica como pré-requisitos do desenvolvimento.",
+    "fonte": "SMITH, Adam. Uma Investigação sobre a Natureza e as Causas da Riqueza das Nações (1776).",
+    "tags": [
+      "adam smith",
+      "economia clássica",
+      "divisão do trabalho",
+      "mercado",
+      "estado"
+    ]
+  },
+  {
+    "id": "rep-keynes-anticiclico",
+    "titulo": "Teoria Geral do Emprego e a Atuação Anticíclica do Estado",
+    "autor": "John Maynard Keynes (1883–1946)",
+    "categoria": "economia",
+    "conceito": "Demanda Efetiva, Pleno Emprego e Investimento Público",
+    "explicacao": "O economista britânico provou que o mercado livre não tem mecanismo de autocura instantânea em crises severas, devendo o Poder Público expandir gastos e obras públicas para reativar o emprego e o consumo.",
+    "aplicacao": "Em consonância com o pensamento de John Maynard Keynes, em cenários de recessão cabe ao Estado ampliar investimentos públicos para reaquecer a atividade produtiva e proteger os níveis de emprego.",
+    "fonte": "KEYNES, John Maynard. Teoria Geral do Emprego, do Juro e da Moeda (1936).",
+    "tags": [
+      "keynes",
+      "investimento público",
+      "emprego",
+      "políticas anticíclicas",
+      "economia"
+    ]
+  },
+  {
+    "id": "rep-josue-de-castro-fome",
+    "titulo": "Geografia da Fome: A Fome como Flagelo Político e Não Natural",
+    "autor": "Josué de Castro (1908–1973)",
+    "categoria": "economia",
+    "conceito": "Fome como Fenômeno Social e Econômico Decorrente da Má Distribuição",
+    "explicacao": "Médico, geógrafo e presidente da FAO/ONU, Josué de Castro desmistificou que a fome decorreria de clima ou superpopulação, comprovando que ela é produto da estrutura agrária concentrada e de baixos salários.",
+    "aplicacao": "Em \"Geografia da Fome\", o pioneiro Josué de Castro comprovou que a subnutrição não é um acidente geográfico, mas uma anomalia socioeconômica gerada pela má distribuição de renda e alimentos.",
+    "fonte": "CASTRO, Josué de. Geografia da Fome: o dilema brasileiro (1946).",
+    "tags": [
+      "josué de castro",
+      "fome",
+      "segurança alimentar",
+      "desigualdade",
+      "pobreza",
+      "fao"
+    ]
+  },
+  {
+    "id": "rep-celso-furtado",
+    "titulo": "Formação Econômica do Brasil e o Subdesenvolvimento Estrutural",
+    "autor": "Celso Furtado (1920–2004)",
+    "categoria": "economia",
+    "conceito": "Dependência do Centro-Periferia, Heterogeneidade e Planejamento Regional",
+    "explicacao": "Um dos maiores economistas do país e fundador da SUDENE, Furtado demonstrou que o subdesenvolvimento não é uma etapa anterior ao desenvolvimento, mas um processo histórico de dependência tecnológica e concentração de renda.",
+    "aplicacao": "Conforme lecionava o economista Celso Furtado, superar o subdesenvolvimento requer planejamento estatal focado em desconcentrar renda e modernizar a infraestrutura das regiões historicamente alijadas do progresso.",
+    "fonte": "FURTADO, Celso. Formação Econômica do Brasil (1959).",
+    "tags": [
+      "celso furtado",
+      "subdesenvolvimento",
+      "sudene",
+      "planejamento",
+      "economia brasileira"
+    ]
+  },
+  {
+    "id": "rep-oit-trabalho-decente",
+    "titulo": "A Convenção sobre o Trabalho Decente e Combate ao Trabalho Escravo",
+    "autor": "Organização Internacional do Trabalho (OIT)",
+    "categoria": "economia",
+    "conceito": "Dignidade Laboral, Liberdade Sindical e Proteção Social Integral",
+    "explicacao": "A OIT preconiza o conceito de \"Trabalho Decente\" como atividade produtiva adequadamente remunerada, exercida em condições de liberdade, equidade, segurança e dignidade humana.",
+    "aplicacao": "De acordo com as diretrizes da Organização Internacional do Trabalho (OIT), o desenvolvimento econômico sustentável pressupõe a garantia do trabalho decente e a fiscalização incansável de práticas análogas à escravidão contemporânea.",
+    "fonte": "OIT. Declaração sobre os Princípios e Direitos Fundamentais no Trabalho (1998).",
+    "tags": [
+      "oit",
+      "trabalho decente",
+      "trabalho escravo",
+      "dignidade laboral",
+      "direitos trabalhistas"
+    ]
+  },
+  {
+    "id": "rep-uberizacao-gig-economy",
+    "titulo": "A \"Uberização\" e a Precarização do Trabalho por Plataformas",
+    "autor": "Ludmila Costhek Abílio e Sociologia do Trabalho Contemporânea",
+    "categoria": "economia",
+    "conceito": "Trabalhador Just-in-Time, Desregulamentação e Transferência de Custos",
+    "explicacao": "Estudos sociológicos demonstram como as plataformas digitais convertem o trabalhador em suposto \"empreendedor de si mesmo\", transferindo custos e riscos operacionais sem contrapartida de seguridade social ou jornada limite.",
+    "aplicacao": "A chamada \"uberização do trabalho\", analisada pela socióloga Ludmila Abílio, exemplifica a erosão das garantias laborais na economia de aplicativo, gerando desproteção previdenciária em caso de acidentes ou enfermidades.",
+    "fonte": "ABÍLIO, Ludmila Costhek. Uberização: do empreendedorismo à viração (2020).",
+    "tags": [
+      "uberização",
+      "gig economy",
+      "plataformas",
+      "precarização",
+      "trabalho",
+      "seguridade"
+    ]
+  },
+  {
+    "id": "rep-karl-marx-alienacao",
+    "titulo": "A Alienação do Trabalho e a Mercantilização da Vida",
+    "autor": "Karl Marx (1818–1883)",
+    "categoria": "economia",
+    "conceito": "Coisificação das Relações Sociais e Fetichismo da Mercadoria",
+    "explicacao": "Nos \"Manuscritos Econômico-Filosóficos\", Marx formula que, no modelo industrial desregulado, o trabalhador se torna estranho ao produto de sua própria força de trabalho, convertendo a atividade humana em mera mercadoria.",
+    "aplicacao": "Sob a ótica de Karl Marx em seus Manuscritos Econômicos, quando o labor humano é desumanizado e despido de valor intrínseco, o trabalhador perde o protagonismo de sua própria existência.",
+    "fonte": "MARX, Karl. Manuscritos Econômico-Filosóficos de 1844.",
+    "tags": [
+      "marx",
+      "trabalho",
+      "alienação",
+      "capitalismo",
+      "filosofia econômica"
+    ]
+  },
+  {
+    "id": "rep-cepal-desigualdade",
+    "titulo": "Comissão Econômica para a América Latina (CEPAL / ONU)",
+    "autor": "CEPAL / Raúl Prebisch (1901–1986)",
+    "categoria": "economia",
+    "conceito": "Deterioração dos Termos de Troca e Diversificação Industrial",
+    "explicacao": "A comissão econômica da ONU analisa que países exportadores de commodities sofrem perdas constantes frente a nações de tecnologia avançada, exigindo diversificação produtiva e inovação científica nacional.",
+    "aplicacao": "Diagnósticos da CEPAL reiteram que a superação da dependência econômica na América Latina exige investimentos massivos em ciência, tecnologia e agregação de valor às cadeias produtivas internas.",
+    "fonte": "CEPAL; ONU. O Desenvolvimento Econômico da América Latina e seus Principais Problemas.",
+    "tags": [
+      "cepal",
+      "américa latina",
+      "industrialização",
+      "commodities",
+      "produtividade"
+    ]
+  },
+  {
+    "id": "rep-eli-pariser-bolha",
+    "titulo": "O Filtro Invisível (The Filter Bubble) e a Polarização Algorítmica",
+    "autor": "Eli Pariser (1980–presente)",
+    "categoria": "tecnologia",
+    "conceito": "Personalização Extrema e Isolamento em Câmaras de Eco",
+    "explicacao": "O ativista digital demonstra que os algoritmos das redes sociais selecionam conteúdos que confirmam vieses prévios dos usuários, isolando-os em bolhas informacionais que fragmentam o tecido democrático.",
+    "aplicacao": "Em \"O Filtro Invisível\", Eli Pariser alerta que os algoritmos de personalização aprisionam os indivíduos em câmaras de eco, incentivando a radicalização e dificultando a formação de consensos cívicos.",
+    "fonte": "PARISER, Eli. O Filtro Invisível: o que a internet está escondendo de você (2011).",
+    "tags": [
+      "bolha algorítmica",
+      "redes sociais",
+      "polarização",
+      "internet",
+      "algoritmos",
+      "desinformação"
+    ]
+  },
+  {
+    "id": "rep-lei-carolina-dieckmann",
+    "titulo": "Lei Carolina Dieckmann (Lei nº 12.737/2012 - Crimes Cibernéticos)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "tecnologia",
+    "conceito": "Invasão de Dispositivo Informático e Tipificação de Delitos Virtuais",
+    "explicacao": "Alterou o Código Penal brasileiro para tipificar a invasão de aparelhos celulares ou computadores alheios com o intuito de obter, adulterar ou destruir dados sem autorização do titular.",
+    "aplicacao": "A promulgação da Lei nº 12.737/2012 (Lei Carolina Dieckmann) representou marco inicial no combate a invasões de dados e fraudes cibernéticas, exigindo o contínuo aparelhamento das delegacias especializadas.",
+    "fonte": "BRASIL. Lei nº 12.737, de 30 de novembro de 2012 (Art. 154-A do Código Penal).",
+    "tags": [
+      "crimes cibernéticos",
+      "invasão",
+      "privacidade",
+      "segurança digital",
+      "código penal"
+    ]
+  },
+  {
+    "id": "rep-yuval-harari-21licoes",
+    "titulo": "21 Lições para o Século XXI: Inteligência Artificial e Biotecnologia",
+    "autor": "Yuval Noah Harari (1976–presente)",
+    "categoria": "tecnologia",
+    "conceito": "Ditaduras de Dados, Algoritmos Preditivos e a Nova Classe de Inúteis",
+    "explicacao": "O historiador israelense analisa como a fusão entre big data e inteligência artificial pode concentrar autoridade em algoritmos opacos, desestabilizando o mercado de trabalho e a soberania do livre-arbítrio humano.",
+    "aplicacao": "Em \"21 Lições para o Século XXI\", Yuval Noah Harari adverte que a automação desenfreada e a concentração de dados criam o risco de marginalização em massa, exigindo regulação ética transparente sobre o avanço da inteligência artificial.",
+    "fonte": "HARARI, Yuval Noah. 21 Lições para o Século XXI (2018).",
+    "tags": [
+      "harari",
+      "inteligência artificial",
+      "automação",
+      "futuro do trabalho",
+      "dados",
+      "ética"
+    ]
+  },
+  {
+    "id": "rep-dilema-das-redes",
+    "titulo": "O Dilema das Redes (The Social Dilemma)",
+    "autor": "Direção de Jeff Orlowski / Center for Humane Technology",
+    "categoria": "tecnologia",
+    "conceito": "Economia da Atenção, Dependência Psicológica e Desinformação como Modelo de Negócio",
+    "explicacao": "Documentário que reúne depoimentos de pioneiros do Vale do Silício revelando como plataformas digitais usam design persuasivo e neurociência para monetizar o tempo dos usuários, potencializando crises de saúde mental.",
+    "aplicacao": "O documentário \"O Dilema das Redes\" evidencia que as mídias sociais operam sob a lógica da economia da atenção, na qual o engajamento alimentado por polêmicas artificiais tem prevalecido sobre a veracidade dos fatos.",
+    "fonte": "THE SOCIAL DILEMMA. Direção: Jeff Orlowski. Netflix (2020).",
+    "tags": [
+      "dilema das redes",
+      "economia da atenção",
+      "mídias sociais",
+      "saúde mental",
+      "desinformação"
+    ]
+  },
+  {
+    "id": "rep-george-orwell-1984",
+    "titulo": "1984: Teletelas, Vigilância Total e Manipulação da Verdade",
+    "autor": "George Orwell (1903–1950)",
+    "categoria": "tecnologia",
+    "conceito": "O Grande Irmão (Big Brother), Vigilância Panóptica e Novilíngua",
+    "explicacao": "A distopia orwelliana retrata um regime totalitário onde o Estado vigia integralmente o comportamento e o pensamento de todos os cidadãos por meio de teletelas e altera sistematicamente os registros históricos.",
+    "aplicacao": "Na célebre distopia \"1984\", George Orwell profetizou os riscos da vigilância onipresente sobre a vida privada, metáfora que se atualiza na coleta massiva e indiscriminada de dados na sociedade digital contemporânea.",
+    "fonte": "ORWELL, George. 1984 (1949).",
+    "tags": [
+      "orwell",
+      "1984",
+      "vigilância",
+      "privacidade",
+      "totalitarismo",
+      "dados"
+    ]
+  },
+  {
+    "id": "rep-fraudes-digitais-14155",
+    "titulo": "Agravamento de Penas para Fraudes e Golpes Virtuais (Lei nº 14.155/2021)",
+    "autor": "Congresso Nacional do Brasil",
+    "categoria": "tecnologia",
+    "conceito": "Estelionato Eletrônico, Furto Mediante Fraude Digital e Defesa do Cidadão",
+    "explicacao": "Endureceu as penas para crimes de furto qualificado e estelionato praticados por meio eletrônico, redes sociais ou contatos telefônicos fraudulentos (golpe do Pix, clonagem de WhatsApp e engenharia social).",
+    "aplicacao": "A promulgação da Lei nº 14.155/2021 reforçou a resposta penal do Estado contra o estelionato eletrônico e golpes virtuais, tornando imperiosa a educação midiática do cidadão para prevenir fraudes informáticas.",
+    "fonte": "BRASIL. Lei nº 14.155, de 27 de maio de 2021 (Art. 171 do Código Penal).",
+    "tags": [
+      "fraudes virtuais",
+      "golpes digitais",
+      "estelionato eletrônico",
+      "segurança pública",
+      "pix"
+    ]
+  },
+  {
+    "id": "rep-cathy-oneil-algoritmos",
+    "titulo": "Algoritmos de Destruição em Massa (Weapons of Math Destruction)",
+    "autor": "Cathy O'Neil (1972–presente)",
+    "categoria": "tecnologia",
+    "conceito": "Opacidade Algorítmica, Viés Discriminatório e Desigualdade Automatizada",
+    "explicacao": "A matemática e cientista de dados norte-americana demonstra que sistemas automatizados de ranqueamento (crédito, contratação de pessoal e policiamento preditivo) frequentemente perpetuam preconceitos raciais e de classe sob aparência de neutralidade matemática.",
+    "aplicacao": "Em \"Algoritmos de Destruição em Massa\", Cathy O'Neil desfaz o mito da neutralidade computacional, demonstrando que softwares preditivos reproduzem discriminações prévias quando treinados com bases de dados desiguais.",
+    "fonte": "O'NEIL, Cathy. Algoritmos de Destruição em Massa (2016).",
+    "tags": [
+      "algoritmos",
+      "viés algorítmico",
+      "discriminação",
+      "inteligência artificial",
+      "dados"
+    ]
+  },
+  {
+    "id": "rep-unesco-etica-ia",
+    "titulo": "Recomendação sobre a Ética da Inteligência Artificial",
+    "autor": "UNESCO (Organização das Nações Unidas para a Educação, a Ciência e a Cultura)",
+    "categoria": "tecnologia",
+    "conceito": "Transparência, Direitos Humanos e Supervisão Humana da Tecnologia",
+    "explicacao": "Primeiro instrumento normativo global aprovado por 193 Estados-membros estabelecendo princípios éticos mandatórios para o ciclo de vida da IA, garantindo a dignidade humana, a sustentabilidade e a não discriminação.",
+    "aplicacao": "A Recomendação sobre a Ética da Inteligência Artificial da UNESCO estabelece que a tecnologia deve servir ao bem-estar coletivo sob constante supervisão humana, repudiando o uso de sistemas que violem liberdades fundamentais.",
+    "fonte": "UNESCO. Recomendação sobre a Ética da Inteligência Artificial (2021).",
+    "tags": [
+      "unesco",
+      "ética na ia",
+      "inteligência artificial",
+      "direitos humanos",
+      "regulação"
+    ]
+  }];
 
 /* 4. BANCO DE TEMAS AMPLIADO POR BANCA E EIXO TEMÁTICO (SEÇÃO 8) */
 const EIXOS = {
@@ -633,6 +2019,64 @@ const TEMAS = [
     f: 'Preservação do local de crime, rastreabilidade de vestígios, pacote anticrime (Lei 13.964/2019) e segurança jurídica.',
     r: 'CF/88 (Art. 5º, LIV e LVI - Devido Processo Legal e Provas Ilícitas); Código de Processo Penal (Arts. 158-A a 158-F); Cesare Beccaria.',
     p: 'Padronização de protocolos de isolamento de local de crime entre PM e PC, além de investimento em laboratórios forenses.'
+  },
+
+  /* --- PPPE / CEBRASPE --- */
+  {
+    e: 'pppe',
+    banca: 'CEBRASPE',
+    t: 'O sistema penitenciário brasileiro e os desafios contemporâneos para a ressocialização de pessoas privadas de liberdade',
+    problema: 'A elevada taxa de reincidência criminal e a escassez de oportunidades reais de reinserção social no cárcere.',
+    comando: 'Considerando a Lei de Execução Penal (Lei nº 7.210/1984), redija um texto dissertativo abordando: 1) o duplo caráter da pena privativa de liberdade; 2) o papel da educação e do trabalho no ambiente prisional; 3) medidas estatais e sociais para prevenir a reincidência.',
+    teses: [
+      'A ressocialização não é concessão leniente, mas estratégia fundamental de segurança pública para diminuir a criminalidade e desarticular a dependência de facções.',
+      'A garantia do trabalho e da instrução escolar nos estabelecimentos penais é mandamento legal indeclinável para a efetivação da dignidade humana.'
+    ],
+    f: 'Ressocialização, Lei de Execução Penal, trabalho carcerário, remição de pena, dignidade humana e redução da reincidência.',
+    r: 'CF/88 (Art. 1º, III - Dignidade da Pessoa Humana); Lei nº 7.210/1984 (LEP, Arts. 10 e 28); Cesare Beccaria (Dos Delitos e das Penas).',
+    p: 'Expansão de oficinas de trabalho e polos educacionais nos presídios em parceria com o Sistema S e empresas privadas, com incentivos fiscais para contratação de egressos.'
+  },
+  {
+    e: 'pppe',
+    banca: 'CEBRASPE',
+    t: 'O enfrentamento às facções criminosas e o fortalecimento da inteligência policial no sistema penitenciário',
+    problema: 'A utilização das penitenciárias como centros de comando para delitos extramuros e a expansão do crime organizado.',
+    comando: 'Discorra sobre: 1) os mecanismos de controle e cooptação utilizados pelo crime organizado nas prisões; 2) a importância do isolamento de lideranças e da inteligência penitenciária; 3) a integração operacional entre a Polícia Penal e os demais órgãos do SUSP.',
+    teses: [
+      'A retomada plena do controle estatal sobre os estabelecimentos prisionais é premissa indispensável para conter a violência urbana.',
+      'O fortalecimento da inteligência da Polícia Penal constitui elemento estratégico para neutralizar a comunicação e o fluxo financeiro das facções.'
+    ],
+    f: 'Regime Disciplinar Diferenciado (RDD), bloqueio de sinal de telecomunicações, inteligência penitenciária e integração com o SUSP.',
+    r: 'Lei nº 12.850/2013 (Organizações Criminosas); Lei nº 13.675/2018 (SUSP); Emenda Constitucional nº 104/2019 (Criação da Polícia Penal); Michel Foucault.',
+    p: 'Modernização de bloqueadores de sinal celular, escâneres corporais de alta precisão e criação de núcleos integrados de inteligência penitenciária com as Polícias Civil e Federal.'
+  },
+  {
+    e: 'pppe',
+    banca: 'CEBRASPE',
+    t: 'Superlotação carcerária no Brasil e a efetivação da dignidade da pessoa humana',
+    problema: 'Déficit de vagas nos estabelecimentos penais, proliferação de doenças e condições degradantes de custódia.',
+    comando: 'Aborde: 1) o estado de coisas inconstitucional reconhecido pelo STF no sistema prisional; 2) o impacto da superlotação na rotina e segurança dos servidores penitenciários; 3) alternativas penais e medidas estruturantes de gestão prisional.',
+    teses: [
+      'O reconhecimento do sistema prisional como estado de coisas inconstitucional impõe ao Poder Público investimentos estruturais inadiáveis.',
+      'A superlotação carcerária degrada a custódia do detento e compromete severamente a segurança e a integridade física e psíquica dos policiais penais.'
+    ],
+    f: 'Estado de coisas inconstitucional (ADPF 347 do STF), audiências de custódia, monitoração eletrônica e dignidade humana.',
+    r: 'STF (ADPF 347); Regras Mínimas da ONU para Tratamento de Reclusos (Regras de Mandela); CF/88 (Art. 5º, XLVII, XLIX); Giorgio Agamben.',
+    p: 'Adoção responsável de monitoração eletrônica para crimes sem violência, investimentos do Fundo Penitenciário Nacional em novas unidades e celeridade na revisão processual.'
+  },
+  {
+    e: 'pppe',
+    banca: 'CEBRASPE',
+    t: 'A valorização profissional e a preservação da saúde dos policiais penais no exercício de suas atribuições',
+    problema: 'Ambiente de alta periculosidade, estresse ocupacional crônico e sobrecarga de trabalho que afetam o policial penal.',
+    comando: 'Analise: 1) as especificidades e os riscos inerentes à função de policial penal; 2) o impacto do ambiente prisional na saúde física e mental do servidor; 3) políticas públicas de valorização, capacitação e apoio biopsicossocial.',
+    teses: [
+      'A eficiência da execução penal e a garantia dos direitos dos custodiados dependem diretamente da valorização e do suporte à saúde do policial penal.',
+      'O atendimento psicológico preventivo e o aparelhamento tático das equipes de custódia são medidas urgentes de valorização da categoria.'
+    ],
+    f: 'Saúde ocupacional, síndrome de burnout, capacitação contínua, equipamentos de proteção individual e modernização da carreira.',
+    r: 'EC nº 104/2019; Lei nº 13.675/2018 (SUSP - Valorização dos Profissionais de Segurança); Byung-Chul Han (Sociedade do Cansaço); Christophe Dejours.',
+    p: 'Criação de centros estaduais de atenção psicossocial dedicados aos servidores da segurança pública e planos de carreira estruturados com formação continuada.'
   },
 
   /* --- CBMPE / INSTITUTO AOCP --- */
