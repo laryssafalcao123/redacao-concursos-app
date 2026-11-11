@@ -1638,11 +1638,6 @@ html, body {
         <span id="creditosTexto">Créditos: <b>10/10</b> disponíveis</span>
       </div>
 
-      <!-- BOTÃO DE DESTAQUE B2B: VISÃO DO PROFESSOR (ACESSO RESTRITO POR SENHA) -->
-      <button type="button" class="btn btn-sm" id="btnNavProfessor" style="font-size:12px;font-weight:600;background:rgba(255,255,255,0.08);color:#cbd5e1;border:1px solid rgba(255,255,255,0.18);padding:4px 11px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px" title="Acesso restrito à Coordenação e Professores">
-        <span>🔐</span> <span>Área do Professor</span>
-      </button>
-
       <div id="googleAuthBox" style="display:inline-flex;align-items:center;gap:6px"></div>
       <select id="profileSelect" class="profile-select" aria-label="Selecionar perfil de aluno" style="display:none"></select>
       <span id="adminBadge" class="badge" style="display:none;background:#7c3aed;color:#fff;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:999px">🛠️ Admin Cursinho</span>
@@ -1658,7 +1653,6 @@ html, body {
       <button type="button" data-go="repertorio">Repertório</button>
       <button type="button" data-go="portugues">Português</button>
       <button type="button" data-go="evolucao">Evolução</button>
-      <button type="button" data-go="professor" class="nav-btn-professor" style="display:none;background:rgba(253,224,71,0.18);border:1px solid #fde047;color:#fde047;font-weight:700">👨‍🏫 Visão do Professor</button>
     </nav>
   </div>
 </header>
@@ -2192,45 +2186,6 @@ html, body {
           </button>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- ================= MODAL DE AUTENTICAÇÃO DO PROFESSOR (B2B SAAS) ================= -->
-<div class="modal-overlay" id="professorAuthModal">
-  <div class="modal-card" style="max-width:440px">
-    <div class="modal-header" style="background:linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #b45309 100%)">
-      <button type="button" class="modal-close-btn" id="btnCloseProfAuthModal" aria-label="Fechar">✕</button>
-      <h2 style="color:#fff;display:flex;align-items:center;gap:8px">
-        <span>🔐</span> <span>Área Restrita do Professor</span>
-      </h2>
-      <p style="color:#fde047;font-weight:600">Acesso Exclusivo à Coordenação Pedagógica & Docentes</p>
-    </div>
-    <div class="modal-body" style="padding:22px">
-      <div class="notice notice-blue" style="font-size:13px;margin-bottom:14px;line-height:1.5">
-        <b>🎓 Gestão de Turmas e Auditoria:</b><br>
-        Esta área contém métricas pedagógicas da turma, ranking e espelho das redações. Digite a senha do cursinho para acessar.
-      </div>
-      <form id="formProfAuth" onsubmit="return false;">
-        <div style="margin-bottom:14px">
-          <label for="inputProfPassword" style="display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;color:#0f172a">
-            Senha de Acesso do Professor:
-          </label>
-          <input type="password" id="inputProfPassword" class="field" placeholder="Digite a senha..." autocomplete="current-password" style="width:100%;font-size:14px;padding:10px 12px">
-          <div id="profAuthError" style="display:none;color:#b91c1c;font-size:12px;font-weight:600;margin-top:6px">
-            ⚠️ Senha incorreta. Tente novamente ou consulte a coordenação.
-          </div>
-          <small style="color:var(--muted);font-size:11.5px;display:block;margin-top:6px">
-            Senha padrão inicial: <b>prof2026</b> (personalizável no painel)
-          </small>
-        </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px">
-          <button type="button" class="btn btn-light btn-sm" id="btnCancelProfAuth">Voltar para o Aluno</button>
-          <button type="submit" class="btn btn-primary btn-sm" id="btnSubmitProfAuth" style="font-weight:800;background:linear-gradient(135deg, #d97706 0%, #b45309 100%);border:none;padding:8px 16px">
-            🔓 Desbloquear Painel
-          </button>
-        </div>
-      </form>
     </div>
   </div>
 </div>

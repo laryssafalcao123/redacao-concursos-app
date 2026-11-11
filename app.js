@@ -3319,8 +3319,7 @@ function go(id){
 
   // PROTEÇÃO DE ACESSO DO PROFESSOR (B2B SAAS CURSINHO)
   if(id === 'professor' && !isProfessorAutenticado()){
-    abrirModalAutenticacaoProfessor();
-    return;
+    id = 'inicio';
   }
 
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + id));
@@ -4054,7 +4053,12 @@ function inicializarApp(){
     setTimeout(() => $('#targetModal')?.classList.add('show'), 400);
   }
 
-  go(location.hash.slice(1) || 'inicio');
+  const searchParams = new URLSearchParams(window.location.search);
+  if(searchParams.get('professor') === 'true' || searchParams.get('prof') === '1' || searchParams.get('prof') === 'true'){
+    go('professor');
+  } else {
+    go(location.hash.slice(1) || 'inicio');
+  }
 }
 
 global.RedacaoApp = {
