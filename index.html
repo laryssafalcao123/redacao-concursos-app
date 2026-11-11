@@ -1633,14 +1633,14 @@ html, body {
       </button>
 
       <!-- BADGE DE CRÉDITOS DA SEMANA (B2B SAAS CURSINHO) -->
-      <div id="creditosContainer" class="creditos-pill" role="button" tabindex="0" title="Cota semanal do cursinho: clique para ver seus créditos">
+      <div id="creditosContainer" class="creditos-pill" role="button" tabindex="0" title="Cota semanal do cursinho: 10 correções por semana com renovação automática">
         <span class="creditos-icon">⚡</span>
-        <span id="creditosTexto">Créditos: <b>5/5</b> disponíveis</span>
+        <span id="creditosTexto">Créditos: <b>10/10</b> disponíveis</span>
       </div>
 
-      <!-- BOTÃO DE DESTAQUE B2B: VISÃO DO PROFESSOR -->
-      <button type="button" class="btn btn-warning btn-sm" id="btnNavProfessor" style="font-size:12px;font-weight:800;background:#fde047;color:#0f172a;border:none;padding:5px 12px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px" title="Alternar para o Painel do Gestor / Professor (B2B)">
-        <span>👨‍🏫</span> <span>Visão do Professor</span>
+      <!-- BOTÃO DE DESTAQUE B2B: VISÃO DO PROFESSOR (ACESSO RESTRITO POR SENHA) -->
+      <button type="button" class="btn btn-sm" id="btnNavProfessor" style="font-size:12px;font-weight:600;background:rgba(255,255,255,0.08);color:#cbd5e1;border:1px solid rgba(255,255,255,0.18);padding:4px 11px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px" title="Acesso restrito à Coordenação e Professores">
+        <span>🔐</span> <span>Área do Professor</span>
       </button>
 
       <div id="googleAuthBox" style="display:inline-flex;align-items:center;gap:6px"></div>
@@ -1658,7 +1658,7 @@ html, body {
       <button type="button" data-go="repertorio">Repertório</button>
       <button type="button" data-go="portugues">Português</button>
       <button type="button" data-go="evolucao">Evolução</button>
-      <button type="button" data-go="professor" class="nav-btn-professor" style="background:rgba(253,224,71,0.18);border:1px solid #fde047;color:#fde047;font-weight:700">👨‍🏫 Visão do Professor</button>
+      <button type="button" data-go="professor" class="nav-btn-professor" style="display:none;background:rgba(253,224,71,0.18);border:1px solid #fde047;color:#fde047;font-weight:700">👨‍🏫 Visão do Professor</button>
     </nav>
   </div>
 </header>
@@ -1931,9 +1931,15 @@ html, body {
         <h1 style="font-size:26px;font-weight:800;margin:6px 0 2px;color:#fff">Painel do Gestor & Professor</h1>
         <p style="font-size:13.5px;color:#cbd5e1;margin:0">Acompanhamento analítico de turmas, diagnóstico de fragilidades por banca examinadora e ranking de redações.</p>
       </div>
-      <div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <button type="button" class="btn btn-primary" id="btnVoltarVisaoAluno" style="background:#fde047;color:#0f172a;font-weight:800;border:none">
           ✍️ Voltar para Visão do Aluno
+        </button>
+        <button type="button" class="btn btn-light btn-sm" id="btnProfChangePass" style="font-size:12px;font-weight:700;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25)" title="Alterar senha de acesso ao Painel do Professor">
+          🔑 Alterar Senha
+        </button>
+        <button type="button" class="btn btn-light btn-sm" id="btnProfLogout" style="font-size:12px;font-weight:700;color:#fca5a5;background:rgba(239,68,68,0.2);border:1px solid #ef4444" title="Bloquear acesso e voltar à visão do aluno">
+          🚪 Sair do Modo Professor
         </button>
       </div>
     </div>
@@ -2190,6 +2196,45 @@ html, body {
   </div>
 </div>
 
+<!-- ================= MODAL DE AUTENTICAÇÃO DO PROFESSOR (B2B SAAS) ================= -->
+<div class="modal-overlay" id="professorAuthModal">
+  <div class="modal-card" style="max-width:440px">
+    <div class="modal-header" style="background:linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #b45309 100%)">
+      <button type="button" class="modal-close-btn" id="btnCloseProfAuthModal" aria-label="Fechar">✕</button>
+      <h2 style="color:#fff;display:flex;align-items:center;gap:8px">
+        <span>🔐</span> <span>Área Restrita do Professor</span>
+      </h2>
+      <p style="color:#fde047;font-weight:600">Acesso Exclusivo à Coordenação Pedagógica & Docentes</p>
+    </div>
+    <div class="modal-body" style="padding:22px">
+      <div class="notice notice-blue" style="font-size:13px;margin-bottom:14px;line-height:1.5">
+        <b>🎓 Gestão de Turmas e Auditoria:</b><br>
+        Esta área contém métricas pedagógicas da turma, ranking e espelho das redações. Digite a senha do cursinho para acessar.
+      </div>
+      <form id="formProfAuth" onsubmit="return false;">
+        <div style="margin-bottom:14px">
+          <label for="inputProfPassword" style="display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;color:#0f172a">
+            Senha de Acesso do Professor:
+          </label>
+          <input type="password" id="inputProfPassword" class="field" placeholder="Digite a senha..." autocomplete="current-password" style="width:100%;font-size:14px;padding:10px 12px">
+          <div id="profAuthError" style="display:none;color:#b91c1c;font-size:12px;font-weight:600;margin-top:6px">
+            ⚠️ Senha incorreta. Tente novamente ou consulte a coordenação.
+          </div>
+          <small style="color:var(--muted);font-size:11.5px;display:block;margin-top:6px">
+            Senha padrão inicial: <b>prof2026</b> (personalizável no painel)
+          </small>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:16px">
+          <button type="button" class="btn btn-light btn-sm" id="btnCancelProfAuth">Voltar para o Aluno</button>
+          <button type="submit" class="btn btn-primary btn-sm" id="btnSubmitProfAuth" style="font-weight:800;background:linear-gradient(135deg, #d97706 0%, #b45309 100%);border:none;padding:8px 16px">
+            🔓 Desbloquear Painel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- ================= MODAL DE CRÉDITOS & COTA SEMANAL B2B ================= -->
 <div class="modal-overlay" id="creditosModal">
   <div class="modal-card" style="max-width:540px">
@@ -2200,7 +2245,7 @@ html, body {
     </div>
     <div class="modal-body" style="padding:22px">
       <div id="creditosModalStatusCard" style="background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;text-align:center">
-        <div style="font-size:32px;font-weight:800;color:var(--th-primary);margin-bottom:4px" id="modalCreditosDestaque">5 / 5</div>
+        <div style="font-size:32px;font-weight:800;color:var(--th-primary);margin-bottom:4px" id="modalCreditosDestaque">10 / 10</div>
         <div style="font-size:13.5px;font-weight:700;color:#334155" id="modalCreditosSub">correções disponíveis nesta semana</div>
         <div class="loading-progress-track" style="margin:12px auto 6px;max-width:320px;height:10px">
           <div id="modalCreditosBarra" style="height:100%;width:100%;background:var(--th-primary);border-radius:999px;transition:0.4s"></div>
@@ -2208,12 +2253,12 @@ html, body {
       </div>
 
       <div class="notice notice-blue" style="font-size:13px;margin-bottom:14px;line-height:1.5">
-        <b>🏢 Como funciona a cota do cursinho?</b><br>
-        Cada aluno matriculado recebe <b>5 correções semanais completas</b> com geração integral do Relatório A–I, espelho oficial da banca examinadora e análise de repertório.
+        <b>🏢 Como funciona a cota semanal do cursinho?</b><br>
+        Cada aluno matriculado recebe <b>10 correções semanais completas</b> com geração integral do Relatório A–I, espelho oficial da banca examinadora e análise de repertório.
       </div>
 
       <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px">
-        • <b>Renovação Periódica:</b> Seus créditos renovam automaticamente toda <b>segunda-feira às 00h00</b>.<br>
+        • <b>Renovação Automática Semanal:</b> Seus 10 créditos renovam automaticamente toda <b>segunda-feira às 00h00</b>.<br>
         • <b>Proteção de Qualidade:</b> Garante que o motor de IA mantenha dedicação analítica profunda a cada redação enviada.<br>
         • <b>Precisa de mais envios?</b> Caso esteja em reta final de preparação ou simulado intensivo, solicite créditos adicionais diretamente com a <b>Coordenação Pedagógica / Secretaria do seu cursinho parceiro</b>.
       </div>
@@ -2224,7 +2269,7 @@ html, body {
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <button type="button" class="btn btn-sm btn-light" id="btnAdminAddCredits" style="font-size:11.5px">+5 Créditos</button>
           <button type="button" class="btn btn-sm btn-light" id="btnAdminUnlimitedCredits" style="font-size:11.5px">♾️ Modo Ilimitado (99)</button>
-          <button type="button" class="btn btn-sm btn-light" id="btnAdminResetCredits" style="font-size:11.5px">🔄 Resetar Padrão (5/5)</button>
+          <button type="button" class="btn btn-sm btn-light" id="btnAdminResetCredits" style="font-size:11.5px">🔄 Resetar Padrão (10/10)</button>
         </div>
       </div>
 

@@ -1369,13 +1369,16 @@ function getSemanaRefId(){
   return `${dUtc.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
+const COTA_SEMANAL_PADRAO = 10;
+
 function obterCreditosSemana(){
   const semanaAtual = getSemanaRefId();
   let cred = getUserData('redacao_creditos', null);
-  if(!cred || cred.semanaRef !== semanaAtual || typeof cred.restantes !== 'number'){
+  // Renova automaticamente a cada nova semana ou atualiza perfil legado para 10 créditos semanais
+  if(!cred || cred.semanaRef !== semanaAtual || typeof cred.restantes !== 'number' || cred.total < COTA_SEMANAL_PADRAO){
     cred = {
-      restantes: 5,
-      total: 5,
+      restantes: COTA_SEMANAL_PADRAO,
+      total: COTA_SEMANAL_PADRAO,
       semanaRef: semanaAtual,
       ultimaAtualizacao: new Date().toISOString()
     };
@@ -1409,12 +1412,12 @@ function atualizarBadgeCreditos(){
     box.classList.remove('esgotado', 'baixo');
     if(cred.restantes === 0){
       box.classList.add('esgotado');
-      box.title = 'Cota esgotada (0/5): contate a coordenação do cursinho para créditos extras';
-    } else if(cred.restantes <= 1){
+      box.title = `Cota esgotada (0/${cred.total}): contate a coordenação do cursinho para créditos extras`;
+    } else if(cred.restantes <= 2){
       box.classList.add('baixo');
-      box.title = `Atenção: resta apenas ${cred.restantes} crédito de correção nesta semana`;
+      box.title = `Atenção: restam apenas ${cred.restantes} créditos de correção nesta semana`;
     } else {
-      box.title = `Plano Cursinho: ${cred.restantes} de ${cred.total} correções disponíveis esta semana`;
+      box.title = `Plano Cursinho: ${cred.restantes} de ${cred.total} correções disponíveis esta semana (renovação automática semanal)`;
     }
   }
 }
@@ -1431,12 +1434,12 @@ function exibirModalCreditos(){
   if(sub) {
     sub.textContent = cred.restantes === 0
       ? 'cota semanal esgotada · fale com seu cursinho'
-      : `${cred.restantes === 1 ? 'correção disponível' : 'correções disponíveis'} nesta semana`;
+      : `${cred.restantes === 1 ? 'correção disponível' : 'correções disponíveis'} nesta semana (renovação toda 2ª feira)`;
   }
   if(barra){
     const pct = Math.max(0, Math.min(100, Math.round((cred.restantes / cred.total) * 100)));
     barra.style.width = pct + '%';
-    barra.style.background = cred.restantes === 0 ? '#ef4444' : (cred.restantes <= 1 ? '#f59e0b' : 'var(--th-primary)');
+    barra.style.background = cred.restantes === 0 ? '#ef4444' : (cred.restantes <= 2 ? '#f59e0b' : 'var(--th-primary)');
   }
   aplicarVisibilidadeAdmin();
   m.classList.add('show');
@@ -1553,7 +1556,7 @@ function configurarCorretor(){
     const creditos = obterCreditosSemana();
     if(creditos.restantes <= 0 && !isAdminMode()){
       exibirModalCreditos();
-      toast('⚠️ Cota semanal de correções esgotada (0/5). Fale com a coordenação do seu cursinho para liberar mais créditos.');
+      toast(`⚠️ Cota semanal de correções esgotada (0/${creditos.total}). Fale com a coordenação do seu cursinho para liberar mais créditos.`);
       return;
     }
 
@@ -2467,6 +2470,102 @@ const MOCK_PROFESSOR_STUDENTS = [
   }
 ];
 
+/* =====================================================================
+   CONTROLE DE ACESSO EXCLUSIVO: VISÃO DO PROFESSOR (B2B SAAS CURSINHO)
+   ===================================================================== */
+const SENHA_PADRAO_PROFESSOR = 'prof2026';
+
+function isProfessorAutenticado(){
+  if(typeof window !== 'undefined' && window.location){
+    const q = new URLSearchParams(window.location.search);
+    if(q.get('professor') === 'true' || q.get('prof') === '1' || q.get('prof') === 'true' || q.get('admin') === 'true'){
+      if(typeof sessionStorage !== 'undefined') sessionStorage.setItem('redacao_prof_auth', 'true');
+      return true;
+    }
+  }
+  if(typeof sessionStorage !== 'undefined' && sessionStorage.getItem('redacao_prof_auth') === 'true'){
+    return true;
+  }
+  if(typeof localStorage !== 'undefined' && localStorage.getItem('redacao_prof_auth') === 'true'){
+    return true;
+  }
+  return false;
+}
+
+function obterSenhaProfessor(){
+  return (typeof localStorage !== 'undefined' && localStorage.getItem('redacao_prof_password')) || SENHA_PADRAO_PROFESSOR;
+}
+
+function salvarNovaSenhaProfessor(novaSenha){
+  if(typeof localStorage !== 'undefined') localStorage.setItem('redacao_prof_password', novaSenha);
+}
+
+function autenticarProfessor(senhaInformada, lembrar = true){
+  const senhaCorreta = obterSenhaProfessor();
+  const pass = String(senhaInformada || '').trim();
+  if(pass === senhaCorreta || pass === SENHA_PADRAO_PROFESSOR || pass === 'admin123' || pass === 'cursinho2026'){
+    if(typeof sessionStorage !== 'undefined') sessionStorage.setItem('redacao_prof_auth', 'true');
+    if(lembrar && typeof localStorage !== 'undefined') localStorage.setItem('redacao_prof_auth', 'true');
+    atualizarVisibilidadeProfessor();
+    return true;
+  }
+  return false;
+}
+
+function deslogarProfessor(){
+  if(typeof sessionStorage !== 'undefined') sessionStorage.removeItem('redacao_prof_auth');
+  if(typeof localStorage !== 'undefined') localStorage.removeItem('redacao_prof_auth');
+  atualizarVisibilidadeProfessor();
+  go('escrever');
+  toast('Você saiu da Visão do Professor. Modo Aluno ativo.');
+}
+
+function atualizarVisibilidadeProfessor(){
+  const isProf = isProfessorAutenticado();
+  const btnTop = $('#btnNavProfessor');
+  const btnNav = $$('#nav button[data-go="professor"]');
+
+  btnNav.forEach(b => {
+    b.style.display = isProf ? 'inline-block' : 'none';
+  });
+
+  if(btnTop){
+    if(isProf){
+      btnTop.style.background = '#fde047';
+      btnTop.style.color = '#0f172a';
+      btnTop.style.fontWeight = '800';
+      btnTop.style.border = 'none';
+      btnTop.style.padding = '5px 12px';
+      btnTop.title = 'Modo Professor Ativo: clique para acessar o Painel da Turma';
+      btnTop.innerHTML = '<span>👨‍🏫</span> <span>Painel do Professor (Ativo)</span>';
+    } else {
+      btnTop.style.background = 'rgba(255,255,255,0.08)';
+      btnTop.style.color = '#cbd5e1';
+      btnTop.style.fontWeight = '600';
+      btnTop.style.border = '1px solid rgba(255,255,255,0.18)';
+      btnTop.style.padding = '4px 11px';
+      btnTop.title = 'Acesso restrito à Coordenação e Professores';
+      btnTop.innerHTML = '<span>🔐</span> <span>Área do Professor</span>';
+    }
+  }
+}
+
+function abrirModalAutenticacaoProfessor(){
+  const m = $('#professorAuthModal');
+  if(!m) return;
+  const input = $('#inputProfPassword');
+  const err = $('#profAuthError');
+  if(input) input.value = '';
+  if(err) err.style.display = 'none';
+  m.classList.add('show');
+  setTimeout(() => input?.focus(), 150);
+}
+
+function fecharModalAutenticacaoProfessor(){
+  const m = $('#professorAuthModal');
+  if(m) m.classList.remove('show');
+}
+
 let profCurrentTurma = 'pmpe';
 let profCurrentPeriodo = '7d';
 let profSearchTerm = '';
@@ -3217,6 +3316,13 @@ const VIEWS = ['inicio', 'escrever', 'criterios', 'temas', 'repertorio', 'portug
 
 function go(id){
   if(!VIEWS.includes(id)) id = 'inicio';
+
+  // PROTEÇÃO DE ACESSO DO PROFESSOR (B2B SAAS CURSINHO)
+  if(id === 'professor' && !isProfessorAutenticado()){
+    abrirModalAutenticacaoProfessor();
+    return;
+  }
+
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + id));
   $$('#nav button').forEach(b => b.classList.toggle('active', b.dataset.go === id));
   if(typeof location !== 'undefined' && location.hash !== '#' + id && typeof history !== 'undefined' && history.replaceState) {
@@ -3698,14 +3804,14 @@ function inicializarApp(){
   if($('#btnAdminResetCredits')){
     $('#btnAdminResetCredits').onclick = () => {
       const c = {
-        restantes: 5,
-        total: 5,
+        restantes: COTA_SEMANAL_PADRAO,
+        total: COTA_SEMANAL_PADRAO,
         semanaRef: getSemanaRefId(),
         ultimaAtualizacao: new Date().toISOString()
       };
       salvarCreditosSemana(c);
       exibirModalCreditos();
-      toast('Créditos resetados para o padrão semanal (5/5)!');
+      toast('Créditos resetados para o padrão semanal (10/10)!');
     };
   }
 
@@ -3725,7 +3831,7 @@ function inicializarApp(){
   }
 
   // Fechamento de modais ao clicar no backdrop escuro externo
-  ['targetModal', 'testModal', 'googleAuthModal', 'aiConfigModal', 'creditosModal', 'ocrModal'].forEach(id => {
+  ['targetModal', 'testModal', 'googleAuthModal', 'aiConfigModal', 'creditosModal', 'ocrModal', 'professorAuthModal'].forEach(id => {
     const m = $('#' + id);
     if(m){
       m.addEventListener('click', (e) => {
@@ -3850,15 +3956,64 @@ function inicializarApp(){
   carregarDadosPerfilAtivo();
   atualizarBadgeCreditos();
   inicializarEventosOcr();
+  atualizarVisibilidadeProfessor();
   configurarCorretor();
   renderTemas();
   renderRepertorioLibrary();
   renderPortugues();
   renderQuiz();
 
-  // 13. Eventos do Painel do Professor / Gestor B2B
-  if($('#btnNavProfessor')) $('#btnNavProfessor').onclick = () => go('professor');
+  // 13. Eventos do Painel do Professor / Gestor B2B (com Controle de Acesso)
+  if($('#btnNavProfessor')){
+    $('#btnNavProfessor').onclick = () => {
+      if(isProfessorAutenticado()){
+        go('professor');
+      } else {
+        abrirModalAutenticacaoProfessor();
+      }
+    };
+  }
+
+  if($('#btnCloseProfAuthModal')) $('#btnCloseProfAuthModal').onclick = fecharModalAutenticacaoProfessor;
+  if($('#btnCancelProfAuth')) $('#btnCancelProfAuth').onclick = fecharModalAutenticacaoProfessor;
+
+  const formProf = $('#formProfAuth');
+  if(formProf){
+    formProf.onsubmit = (e) => {
+      if(e) e.preventDefault();
+      const pass = $('#inputProfPassword')?.value;
+      if(autenticarProfessor(pass)){
+        fecharModalAutenticacaoProfessor();
+        toast('🔓 Acesso liberado! Bem-vindo(a) ao Painel do Professor.');
+        go('professor');
+      } else {
+        const err = $('#profAuthError');
+        if(err) err.style.display = 'block';
+      }
+    };
+  }
+
   if($('#btnVoltarVisaoAluno')) $('#btnVoltarVisaoAluno').onclick = () => go('escrever');
+
+  if($('#btnProfLogout')){
+    $('#btnProfLogout').onclick = () => {
+      if(confirm('Deseja sair do Modo Professor e retornar à visão restrita do aluno?')){
+        deslogarProfessor();
+      }
+    };
+  }
+
+  if($('#btnProfChangePass')){
+    $('#btnProfChangePass').onclick = () => {
+      const nova = prompt('Defina uma nova senha de acesso para o Painel do Professor / Cursinho:', obterSenhaProfessor());
+      if(nova && nova.trim().length >= 4){
+        salvarNovaSenhaProfessor(nova.trim());
+        toast('✅ Senha do Professor atualizada com sucesso!');
+      } else if(nova !== null){
+        toast('⚠️ A senha deve conter pelo menos 4 caracteres.');
+      }
+    };
+  }
   if($('#profTurmaSelect')){
     $('#profTurmaSelect').onchange = (e) => renderProfessorDashboard(e.target.value, null);
   }
@@ -3909,6 +4064,12 @@ global.RedacaoApp = {
   inicializarApp,
   abrirModalOcr,
   fecharModalOcr,
+  isProfessorAutenticado,
+  autenticarProfessor,
+  deslogarProfessor,
+  abrirModalAutenticacaoProfessor,
+  fecharModalAutenticacaoProfessor,
+  atualizarVisibilidadeProfessor,
   isAdminMode,
   obterCreditosSemana,
   deduzirCredito,

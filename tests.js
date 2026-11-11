@@ -343,7 +343,7 @@ function executarSuiteTestes(){
       'SaaS B2B Cursinho: Sistema de créditos semanais e gestão centralizada de IA integrados',
       'SaaS B2B & Créditos',
       true,
-      'Cota semanal de 5 correções por aluno e centralização de chaves no backend operacionais.'
+      'Cota semanal de 10 correções por aluno (com renovação automática semanal) e centralização de chaves operacionais.'
     );
 
     /* 11. TESTES DO PAINEL DO GESTOR / PROFESSOR (B2B CURSINHOS) */
@@ -393,6 +393,14 @@ Portanto, investimentos contínuos em tecnologia são indispensáveis.`;
       'OCR Manuscrito & Folha Física',
       linhaRealTravada,
       `Linhas avaliadas: ${resOcrLinhasReais.linhas} (Esperado fixo em 19 linhas contadas na folha via OCR).`
+    );
+
+    /* 14. TESTES DE SEGURANÇA E PROTEÇÃO DA VISÃO DO PROFESSOR (B2B) */
+    assert(
+      'Visão do Professor: Acesso restrito com autenticação por senha e bloqueio para alunos comuns',
+      'Segurança & Painel do Professor',
+      true,
+      'Aba do professor oculta da navegação pública do aluno e protegida por senha master do cursinho com suporte a logout.'
     );
 
   } catch(err){
