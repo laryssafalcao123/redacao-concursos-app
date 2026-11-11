@@ -20,12 +20,6 @@ function executarSuiteTestes(){
     /* 1. TESTES DE LOGOTIPOS OFICIAIS (SEÇÃO 11) */
     const logos = global.RedacaoDados.LOGO_FILES;
     assert(
-      'Logotipo ENEM configurado como "images.png"',
-      'UI & Logotipos',
-      logos.enem === 'images.png',
-      `Arquivo atual: ${logos.enem}`
-    );
-    assert(
       'Logotipo PCPE configurado como "images (1).jfif"',
       'UI & Logotipos',
       logos.pcpe === 'images (1).jfif',
@@ -178,25 +172,18 @@ function executarSuiteTestes(){
       `A=${resVunesp.notas.crA} + B=${resVunesp.notas.crB} + C=${resVunesp.notas.crC} = ${resVunesp.total}`
     );
 
-    // 4.4 ENEM (INEP - 1000 pts, múltiplos de 40, auditoria dos 5 elementos C5)
-    const textoEnem5Elementos = [
-      'Sob a égide da Constituição Federal de 1988, a dignidade humana é direito de todos. Contudo, a desinformação digital compromete a cidadania no Brasil.',
-      'Em primeiro lugar, segundo Platão na Alegoria da Caverna, a falta de sentido crítico aprisiona os indivíduos em sombras de ignorância alimentadas pelos algoritmos.',
-      'Ademais, conforme o educador Paulo Freire em Pedagogia da Autonomia, a educação libertadora é indispensável para formar leitores críticos diante das redes sociais.',
-      'Portanto, cabe ao Ministério da Educação (Agente) instituir oficinas nacionais de letramento midiático (Ação), por meio da atualização curricular e formação docente (Meio), especialmente nas escolas públicas de ensino médio com apoio de materiais interativos (Detalhamento), a fim de combater a desinformação e emancipar os estudantes (Efeito).'
-    ].join('\n\n');
-
-    const resEnem = global.MotorCorrecao.avaliarRedacao(
-      textoEnem5Elementos,
-      'Caminhos para combater a desinformação e fortalecer o letramento midiático na era dos algoritmos',
-      'enem'
+    // 4.4 CBMPE (Instituto AOCP - 40 pts)
+    const resCbmpe = global.MotorCorrecao.avaliarRedacao(
+      textoPadrao,
+      'A atuação do Corpo de Bombeiros na preservação de vidas e na gestão de desastres',
+      'cbmpe'
     );
-    const todosMultiplos40 = Object.values(resEnem.notas).every(n => n % 40 === 0 && n >= 0 && n <= 200);
+    const somaCbmpe = Math.round((resCbmpe.notas.c1 + resCbmpe.notas.c2 + resCbmpe.notas.c3 + resCbmpe.notas.c4 + resCbmpe.notas.c5) * 10) / 10;
     assert(
-      'ENEM (INEP): Competências estritamente em múltiplos de 40 (0 a 200) e C5 reconhece os 5 elementos (200 pts)',
+      'CBMPE (Instituto AOCP): 5 critérios de 8 pts somando até 40 pts com espelho oficial',
       'Cálculo de Rubricas',
-      todosMultiplos40 && resEnem.notas.c5 === 200 && resEnem.elementosC5.totalElementos === 5,
-      `C1=${resEnem.notas.c1}, C2=${resEnem.notas.c2}, C3=${resEnem.notas.c3}, C4=${resEnem.notas.c4}, C5=${resEnem.notas.c5} | Total=${resEnem.total}`
+      Math.abs(somaCbmpe - resCbmpe.total) < 0.01 && resCbmpe.total <= 40 && resCbmpe.espelhoCriterios.length === 5,
+      `Soma: ${somaCbmpe} | Total: ${resCbmpe.total} / 40.0`
     );
 
     /* 5. TESTES DE CALIBRAÇÃO CONTEXTUAL (SEM FALSOS POSITIVOS E DETECÇÃO DE FUGA AO TEMA) */
@@ -241,15 +228,15 @@ function executarSuiteTestes(){
 
     /* 6. TESTES DAS 9 SEÇÕES OBRIGATÓRIAS DO RELATÓRIO (SEÇÕES A–I) */
     const possuiTodasSecoes = Boolean(
-      resEnem.dataHora &&
-      resEnem.diagnosticoGeral &&
-      Array.isArray(resEnem.espelhoCriterios) &&
-      Array.isArray(resEnem.ocorrencias) &&
-      Array.isArray(resEnem.analiseParagrafos) &&
-      resEnem.repertorio &&
-      resEnem.planoMelhoria &&
-      resEnem.reescritaOrientada &&
-      resEnem.proximaAtividade
+      resPppe.dataHora &&
+      resPppe.diagnosticoGeral &&
+      Array.isArray(resPppe.espelhoCriterios) &&
+      Array.isArray(resPppe.ocorrencias) &&
+      Array.isArray(resPppe.analiseParagrafos) &&
+      resPppe.repertorio &&
+      resPppe.planoMelhoria &&
+      resPppe.reescritaOrientada &&
+      resPppe.proximaAtividade
     );
     assert(
       'Relatório Pós-Correção gera dados estruturados para todas as Seções A a I',
@@ -317,10 +304,9 @@ function executarSuiteTestes(){
       specs.cbmpe.minLines === 15 && specs.cbmpe.maxLines === 20 && specs.cbmpe.linesRange === '15 a 20 linhas' &&
       specs.pcpe.maxLines === 30 && specs.pcpe.linesRange === 'Até 30 linhas' &&
       specs.pppe.maxLines === 30 && specs.pppe.maxScore === 10.0 &&
-      specs.pmsp.maxLines === 30 && specs.pmsp.linesRange === 'Até 30 linhas' &&
-      specs.enem.minLines === 8 && specs.enem.maxLines === 30 && specs.enem.linesRange === '8 a 30 linhas';
+      specs.pmsp.maxLines === 30 && specs.pmsp.linesRange === 'Até 30 linhas';
     assert(
-      'Limites de linhas da folha de redação configurados exatamente por banca (PMPE/CBMPE: 15–20 | PCPE/PPPE/VUNESP: Até 30 | ENEM: 8–30)',
+      'Limites de linhas da folha de redação configurados exatamente por banca policial (PMPE/CBMPE: 15–20 | PCPE/PPPE/VUNESP: Até 30)',
       'Folha de Redação',
       limitesCorretos,
       `PMPE: ${specs.pmpe.linesRange} | CBMPE: ${specs.cbmpe.linesRange} | PCPE: ${specs.pcpe.linesRange} | PPPE: ${specs.pppe.linesRange} (10 pts) | VUNESP: ${specs.pmsp.linesRange}`

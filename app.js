@@ -293,10 +293,10 @@ function fallbackCopy(text, msg){
    3. GERENCIADOR DE OBJETIVO / BANCA E LOGOTIPOS OFICIAIS (SEÇÃO 11)
    ===================================================================== */
 let currentTarget = getUserData('redacao_target', 'pmpe');
-if(!BANCA_SPECS[currentTarget] || currentTarget === 'enem') currentTarget = 'pmpe';
+if(!BANCA_SPECS[currentTarget]) currentTarget = 'pmpe';
 
 function applyTarget(tId, save = true){
-  if(!BANCA_SPECS[tId] || tId === 'enem') tId = 'pmpe';
+  if(!BANCA_SPECS[tId]) tId = 'pmpe';
   currentTarget = tId;
   if(save) setUserData('redacao_target', tId);
 
@@ -630,7 +630,7 @@ function renderizarResultado(res, nome, tema, bancaKey){
   const box = $('#resultado');
   if(!box) return;
 
-  const casasDecimais = res.tipo === 'cebraspe' ? 2 : (res.tipo === 'enem' ? 0 : 1);
+  const casasDecimais = (res.tipo === 'cebraspe' || res.tipo === 'pcpe' || res.tipo === 'pppe') ? 2 : 1;
   const dataFormatada = new Date(res.dataHora || Date.now()).toLocaleString('pt-BR');
   const errosConfirmados = (res.ocorrencias || []).filter(o => o.severidade === 'erro_confirmado');
   const fragilidades = (res.ocorrencias || []).filter(o => o.severidade === 'fragilidade_argumentativa');
@@ -647,34 +647,19 @@ function renderizarResultado(res, nome, tema, bancaKey){
   const numOk = (res.analiseParagrafos && res.analiseParagrafos.length > 0 && !res.analiseParagrafos[0].relacaoTese?.includes('implícita')) ? 1 : 0;
   const totalGrifos = numErros + numCoesao + numRep + numOk;
 
-  // Bloco complementar da fórmula Cebraspe ou 5 elementos do ENEM na Seção C
+  // Bloco complementar da fórmula Cebraspe na Seção C
   let blocoEspecialBanca = '';
-  if(res.tipo === 'cebraspe'){
+  if(res.tipo === 'cebraspe' || res.tipo === 'pcpe' || res.tipo === 'pppe'){
     blocoEspecialBanca = `
       <div class="cebraspe-formula-box" style="margin-bottom:18px">
         <h4>📐 MEMÓRIA DE CÁLCULO — FÓRMULA LÍQUIDA DOCUMENTAL CEBRASPE</h4>
         <p style="font-size:15px;margin-bottom:8px"><strong>NPD = NC − (2 × NE ÷ TL)</strong></p>
         <div style="font-size:13px;line-height:1.75">
-          • <b>NC (Nota de Conteúdo / Soma da Macroestrutura):</b> ${res.nc.toFixed(2)} de ${spec.maxScore.toFixed(2)} pts<br>
-          • <b>NE (Número de Erros Gramaticais Confirmados na Microestrutura):</b> ${res.ne} erro(s)<br>
-          • <b>TL (Total de Linhas Efetivamente Escritas):</b> ${res.tl} linha(s)<br>
-          • <b>Desconto Proporcional (2 × ${res.ne} ÷ ${res.tl}):</b> −${res.penalidade.toFixed(2)} pts<br>
+          • <b>NC (Nota de Conteúdo / Soma da Macroestrutura):</b> ${(res.nc !== undefined ? res.nc : res.total).toFixed(2)} de ${spec.maxScore.toFixed(2)} pts<br>
+          • <b>NE (Número de Erros Gramaticais Confirmados na Microestrutura):</b> ${res.ne || 0} erro(s)<br>
+          • <b>TL (Total de Linhas Efetivamente Escritas):</b> ${res.tl || 25} linha(s)<br>
+          • <b>Desconto Proporcional:</b> −${(res.penalidade || 0).toFixed(2)} pts<br>
           • <b>Nota Final na Prova Discursiva (NPD):</b> <span style="color:#fde047;font-weight:800">${res.total.toFixed(2)} / ${spec.maxScore.toFixed(2)} pts</span>
-        </div>
-      </div>
-    `;
-  } else if(res.tipo === 'enem' && res.elementosC5){
-    const c5el = res.elementosC5;
-    blocoEspecialBanca = `
-      <div class="card" style="background:#eef2ff;border-left:5px solid #4f46e5;margin-bottom:18px">
-        <h4>🔎 Auditoria Detalhada dos 5 Elementos da Competência V (INEP/ENEM)</h4>
-        <p style="font-size:13.5px;margin:6px 0 10px">Cada elemento válido e conectado ao tema adiciona 40 pontos na Competência V (Total obtido: <b>${res.notas.c5} / 200 pts</b>):</p>
-        <div style="display:flex;flex-wrap:wrap;gap:8px">
-          <span class="pill ${c5el.temAgente ? 'ok' : 'bad'}">${c5el.temAgente ? '✅ 1. Agente Identificado' : '❌ 1. Falta Agente'}</span>
-          <span class="pill ${c5el.temAcao ? 'ok' : 'bad'}">${c5el.temAcao ? '✅ 2. Ação Interventiva' : '❌ 2. Falta Ação'}</span>
-          <span class="pill ${c5el.temMeio ? 'ok' : 'bad'}">${c5el.temMeio ? '✅ 3. Meio / Modo' : '❌ 3. Falta Meio/Modo'}</span>
-          <span class="pill ${c5el.temEfeito ? 'ok' : 'bad'}">${c5el.temEfeito ? '✅ 4. Efeito / Finalidade' : '❌ 4. Falta Finalidade'}</span>
-          <span class="pill ${c5el.temDetalhamento ? 'ok' : 'bad'}">${c5el.temDetalhamento ? '✅ 5. Detalhamento' : '❌ 5. Falta Detalhamento'}</span>
         </div>
       </div>
     `;
@@ -1609,7 +1594,7 @@ function renderPortugues(){
       'Repertório Produtivo: Conceito explicado e conectado diretamente à tese.',
       'Coesão: Conectivos interparágrafos na abertura do D1, D2 e Conclusão.',
       'Gramática: Revisão de crase, concordância (haver/fazer), regência e pontuação.',
-      'Extensão: Texto dentro do limite oficial da folha da banca (PMPE/CBMPE: 15 a 20 linhas | PCPE/VUNESP: Até 30 linhas | ENEM: 8 a 30 linhas).'
+      'Extensão: Texto dentro do limite oficial da folha da banca (PMPE/CBMPE: 15 a 20 linhas | PCPE/PPPE/VUNESP: Até 30 linhas).'
     ];
 
     checkBox.innerHTML = itensCheck.map((txt, i) => `
@@ -1752,7 +1737,7 @@ function renderEvolution(){
           <circle cx="${x(i)}" cy="${y(p.total)}" r="5.5" fill="#fff" stroke="var(--th-primary)" stroke-width="3">
             <title>${p.total.toFixed(1)} pts em ${new Date(p.d).toLocaleDateString('pt-BR')} — ${esc(p.tema)}</title>
           </circle>
-          <text x="${x(i)}" y="${y(p.total)-10}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#334155">${p.total.toFixed(spec.id==='enem'?0:1)}</text>
+          <text x="${x(i)}" y="${y(p.total)-10}" text-anchor="middle" font-size="10.5" font-weight="700" fill="#334155">${p.total.toFixed(1)}</text>
         `).join('')}
       </svg>
     `;
@@ -1823,7 +1808,7 @@ function renderEvolution(){
               <td style="padding:10px 14px;white-space:nowrap">${new Date(item.d).toLocaleDateString('pt-BR')} <small style="color:var(--muted)">${new Date(item.d).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</small></td>
               <td style="padding:10px 14px"><span class="badge" style="font-size:11px">${esc(item.banca)}</span></td>
               <td style="padding:10px 14px;max-width:300px">${esc(item.tema)}</td>
-              <td style="padding:10px 14px"><b>${item.total.toFixed(item.target==='enem'?0:1)} / ${(item.max || 40).toFixed(0)} pts</b></td>
+              <td style="padding:10px 14px"><b>${item.total.toFixed(item.target==='pcpe'||item.target==='pppe'?2:1)} / ${(item.max || 40).toFixed(0)} pts</b></td>
               <td style="padding:10px 14px;white-space:nowrap">
                 <button type="button" class="btn btn-primary btn-sm" data-open-hist="${esc(item.id || item.d)}">📄 Abrir Relatório</button>
               </td>
@@ -1965,7 +1950,7 @@ function inicializarApp(){
 
   function carregarDadosPerfilAtivo(){
     currentTarget = getUserData('redacao_target', 'pmpe');
-    if(!BANCA_SPECS[currentTarget] || currentTarget === 'enem') currentTarget = 'pmpe';
+    if(!BANCA_SPECS[currentTarget]) currentTarget = 'pmpe';
     applyTarget(currentTarget, false);
 
     if($('#inNome')) $('#inNome').value = getUserData('redacao_nome', '');

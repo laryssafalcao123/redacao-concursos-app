@@ -11,8 +11,7 @@ const LOGO_FILES = {
   cbmpe: 'logo_cbmpe.png',
   pcpe: 'images (1).jfif',
   pppe: 'logo_pppe.jpg',
-  pmsp: 'Logo_PMESP.jpg',
-  enem: 'images.png'
+  pmsp: 'Logo_PMESP.jpg'
 };
 
 function renderLogoImg(targetKey, customClass = 'inst-logo-img'){
@@ -22,11 +21,10 @@ function renderLogoImg(targetKey, customClass = 'inst-logo-img'){
     cbmpe: 'Brasão Corpo de Bombeiros Militar de Pernambuco (CBMPE)',
     pcpe: 'Brasão Polícia Civil de Pernambuco (PCPE)',
     pppe: 'Brasão Polícia Penal de Pernambuco (PPPE)',
-    pmsp: 'Brasão Polícia Militar do Estado de São Paulo (PMSP)',
-    enem: 'Logotipo Oficial ENEM'
+    pmsp: 'Brasão Polícia Militar do Estado de São Paulo (PMSP)'
   };
   const alt = altMap[targetKey] || 'Logotipo Institucional';
-  return `<img src="${file}" alt="${alt}" class="${customClass}" loading="eager" onerror="this.onerror=null;this.src='images.png';">`;
+  return `<img src="${file}" alt="${alt}" class="${customClass}" loading="eager" onerror="this.onerror=null;this.src='4060864b87ab4736e6efeda0032a7a40.jpg';">`;
 }
 
 /* 2. RUBRICAS INDEPENDENTES E VERSIONADAS POR BANCA (SEÇÃO 6) */
@@ -176,36 +174,6 @@ const BANCA_SPECS = {
       'Nota zero no Critério A (fuga total ao tema) anula toda a redação.',
       'Predominância de outro gênero textual (narração, carta, poema).',
       'Limite máximo da folha oficial: até 30 linhas.'
-    ]
-  },
-  enem: {
-    id: 'enem',
-    name: 'ENEM · Exame Nacional do Ensino Médio',
-    short: 'ENEM',
-    banca: 'INEP / ENEM',
-    rubricaVersion: 'INEP-Matriz-ENEM-v2024 (5 Competências · Níveis 0, 40, 80, 120, 160, 200 · Total 1000 pts)',
-    genero: 'Texto Dissertativo-Argumentativo em prosa com Proposta de Intervenção obrigatória',
-    maxScore: 1000.0,
-    minPass: 600.0,
-    minPassRule: 'O ENEM não possui nota de corte única (varia por curso/Sisu/Prouni), mas notas acima de 800 pontos representam alto desempenho competitivo.',
-    minLines: 8,
-    maxLines: 30,
-    zeroMinLines: 7,
-    requiresIntervention: true,
-    badgeClass: 'badge-blue',
-    linesRange: '8 a 30 linhas',
-    description: 'Matriz de Referência oficial do INEP com 5 Competências avaliadas em níveis estritos de 40 em 40 pontos (0 a 200 por competência), exigindo extensão de 8 a 30 linhas, repertório sociocultural produtivo e proposta de intervenção com 5 elementos.',
-    criteriaList: [
-      { id: 'comp1', title: 'Competência I: Domínio da modalidade escrita formal', pts: 200.0, desc: 'Avalia a construção sintática (períodos completos, sem truncamentos ou justaposições) e a ausência de desvios gramaticais e de convenções da escrita.' },
-      { id: 'comp2', title: 'Competência II: Compreensão do tema e repertório sociocultural', pts: 200.0, desc: 'Avalia a abordagem completa do tema dentro do gênero dissertativo-argumentativo e a presença de repertório legitimado, pertinente e com uso produtivo.' },
-      { id: 'comp3', title: 'Competência III: Projeto de texto e defesa de ponto de vista', pts: 200.0, desc: 'Avalia o planejamento estratégico do texto, o desenvolvimento consistente dos argumentos sem lacunas e a defesa da tese do início ao fim.' },
-      { id: 'comp4', title: 'Competência IV: Mecanismos linguísticos de coesão', pts: 200.0, desc: 'Avalia a presença de operadores argumentativos interparágrafos (em pelo menos 2 parágrafos) e intraparágrafos, com repertório diversificado e sem repetições.' },
-      { id: 'comp5', title: 'Competência V: Proposta de intervenção e direitos humanos', pts: 200.0, desc: 'Exige proposta concreta articulada à discussão com 5 elementos: Agente, Ação, Meio/Modo, Efeito/Finalidade e Detalhamento de pelo menos um elemento.' }
-    ],
-    regrasAnulacao: [
-      'Até 7 linhas escritas (texto insuficiente).',
-      'Fuga total ao tema ou não atendimento ao tipo dissertativo-argumentativo.',
-      'Desrespeito aos Direitos Humanos zera a Competência V.'
     ]
   }
 };
@@ -1898,7 +1866,7 @@ const EIXOS = {
   pcpe: { n: 'PCPE · Investigação & Justiça', c: '#ca8a04', banca: 'CESPE / CEBRASPE' },
   cbmpe: { n: 'CBMPE · Defesa Civil & Vida', c: '#b91c1c', banca: 'Instituto AOCP' },
   pmsp: { n: 'PMSP · Segurança Urbana & Ética', c: '#1e3a8a', banca: 'VUNESP' },
-  enem: { n: 'ENEM · Sociedade & Cidadania', c: '#6366f1', banca: 'INEP' },
+  pppe: { n: 'PPPE · Execução Penal & LEP', c: '#0f766e', banca: 'CEBRASPE' },
   tec: { n: 'Tecnologia, IA & Cibercrimes', c: '#0891b2', banca: 'Multi-Bancas' },
   amb: { n: 'Meio Ambiente, Clima & Saúde', c: '#059669', banca: 'Multi-Bancas' },
   edu: { n: 'Educação, Cultura & Trabalho', c: '#9333ea', banca: 'Multi-Bancas' }
@@ -2167,83 +2135,10 @@ const TEMAS = [
     p: 'Reforço das disciplinas de Direitos Humanos e Deontologia nos cursos de formação e fortalecimento da transparência institucional.'
   },
 
-  /* --- ENEM / INEP --- */
-  {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'Desafios para a valorização do trabalho de cuidado realizado pela mulher no Brasil',
-    problema: 'Invisibilidade histórica e econômica das atividades domésticas e de cuidado de crianças, idosos e pessoas com deficiência.',
-    comando: 'A partir da leitura dos textos motivadores, redija texto dissertativo-argumentativo em modalidade escrita formal sobre o tema, apresentando proposta de intervenção que respeite os direitos humanos.',
-    teses: [
-      'A invisibilidade do trabalho de cuidado no Brasil decorre tanto da persistência de uma cultura patriarcal quanto da insuficiência de equipamentos públicos de apoio às famílias.',
-      'A sobrecarga feminina com o cuidado não remunerado limita a inserção profissional das mulheres e perpetua desigualdades socioeconômicas.'
-    ],
-    f: 'Desigualdade de gênero, economia do cuidado, sobrecarga feminina e escassez de creches e centros-dia públicos.',
-    r: 'Simone de Beauvoir (O Segundo Sexo); CF/88 (Art. 5º, I e Art. 6º); Amartya Sen (Desenvolvimento como Liberdade).',
-    p: 'Ministério das Mulheres, em parceria com o MEC e municípios, amplia a rede de creches em tempo integral e centros de apoio a idosos, além de campanhas sobre corresponsabilidade familiar.'
-  },
-  {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'Caminhos para combater a desinformação e fortalecer o letramento midiático na era dos algoritmos',
-    problema: 'Disseminação acelerada de notícias falsas, câmaras de eco algorítmicas e prejuízos à saúde pública e ao debate democrático.',
-    comando: 'Redija texto dissertativo-argumentativo sobre os impactos da desinformação digital e apresente proposta de intervenção detalhada.',
-    teses: [
-      'A proliferação da desinformação no Brasil é alimentada pela combinação entre a arquitetura lucrativa dos algoritmos e a carência de educação midiática crítica.',
-      'Sem letramento informacional e transparência das plataformas digitais, o debate público democrático é substituído pela manipulação emocional.'
-    ],
-    f: 'Bolhas algorítmicas, verificação de fatos, educação midiática nas escolas e responsabilidade das plataformas.',
-    r: 'Platão (Alegoria da Caverna em A República); Paulo Freire (Pedagogia da Autonomia); Shoshana Zuboff (Capitalismo de Vigilância).',
-    p: 'MEC deve inserir oficinas obrigatórias de Educação Midiática e Checagem de Fatos na Educação Básica, mediante formação docente e material didático interdisciplinar.'
-  },
-  {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'A persistência do racismo estrutural e os desafios para a valorização da herança africana no Brasil',
-    problema: 'Apagamento histórico-cultural, intolerância religiosa e desigualdade de oportunidades enfrentados pela população negra.',
-    problemaCentral: 'Desigualdade socioeconômica e simbólica decorrente do passado escravocrata não reparado.',
-    comando: 'Aborde as raízes históricas do racismo no Brasil, a importância da educação antirracista (Lei 10.639/2003) e medidas de promoção da equidade.',
-    teses: [
-      'O enfrentamento ao racismo no Brasil exige a efetiva implementação da educação antirracista nas escolas e o fortalecimento de políticas públicas de equidade.',
-      'O apagamento da memória e da cultura afro-brasileira perpetua estereótipos discriminatórios que violam a dignidade humana.'
-    ],
-    f: 'Memória histórica, Lei nº 10.639/2003, igualdade de oportunidades e combate à discriminação.',
-    r: 'Silvio Almeida (Racismo Estrutural); Lei nº 10.639/2003 (História e Cultura Afro-Brasileira); CF/88 (Art. 3º, IV e Art. 5º, XLII).',
-    p: 'Ministério da Educação e secretarias estaduais devem fiscalizar e financiar a aplicação efetiva da Lei nº 10.639/2003 por meio de formação continuada de professores e projetos culturais.'
-  },
-  {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'Desafios para a inclusão social e produtiva das pessoas com deficiência no Brasil contemporâneo',
-    problema: 'Barreiras arquitetônicas, comunicacionais e atitudinais (capacitismo) que restringem a cidadania plena das pessoas com deficiência.',
-    comando: 'Discuta os obstáculos à acessibilidade e à inclusão escolar e laboral das pessoas com deficiência, propondo intervenção concreta.',
-    teses: [
-      'A exclusão das pessoas com deficiência no Brasil persiste devido à inefetividade na fiscalização das normas de acessibilidade e à permanência do preconceito capacitista.',
-      'Garantir autonomia às pessoas com deficiência requer adaptar o espaço urbano, o ensino e o mercado de trabalho às necessidades humanas diversas.'
-    ],
-    f: 'Combate ao capacitismo, acessibilidade arquitetônica e pedagógica, cumprimento da Lei Brasileira de Inclusão.',
-    r: 'Lei nº 13.146/2015 (Estatuto da Pessoa com Deficiência); Gilberto Dimenstein (O Cidadão de Papel); Amartya Sen.',
-    p: 'Ministério dos Direitos Humanos e da Cidadania, em conjunto com o Ministério do Trabalho, deve ampliar a fiscalização de acessibilidade e oferecer incentivos para adaptação das escolas e empresas.'
-  },
-  {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'O impacto do envelhecimento populacional e a garantia da qualidade de vida da pessoa idosa no Brasil',
-    problema: 'Transição demográfica acelerada acompanhada de despreparo previdenciário, urbano, familiar e de saúde para acolher os idosos.',
-    comando: 'Analise os desafios do envelhecimento da população brasileira, o combate ao etarismo e a garantia dos direitos previstos no Estatuto da Pessoa Idosa.',
-    teses: [
-      'O rápido envelhecimento demográfico brasileiro exige planejamento estatal imediato em saúde preventiva, acessibilidade urbana e combate ao etarismo.',
-      'A negligência familiar e estatal perante a pessoa idosa viola o princípio constitucional da dignidade humana e a proteção prioritária.'
-    ],
-    f: 'Transição demográfica, combate ao etarismo, inclusão digital do idoso e redes de saúde geriátrica.',
-    r: 'Lei nº 10.741/2003 (Estatuto da Pessoa Idosa); CF/88 (Art. 230); Simone de Beauvoir (A Velhice).',
-    p: 'Ministério da Saúde e prefeituras devem expandir centros-dia de atenção integral ao idoso e promover programas de inclusão digital e convivência intergeracional.'
-  },
-
   /* --- EIXO TECNOLOGIA, IA & CIBERCRIMES (MULTI-BANCAS) --- */
   {
     e: 'tec',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Os impactos éticos, educacionais e laborais da Inteligência Artificial generativa na sociedade contemporânea',
     problema: 'Transformação acelerada do mundo do trabalho, riscos de plágio e dependência cognitiva, uso de deepfakes e necessidade de regulação ética.',
     comando: 'Analise os benefícios e os riscos da Inteligência Artificial, abordando a qualificação profissional, a ética no uso de dados e o papel regulador do Estado.',
@@ -2257,7 +2152,7 @@ const TEMAS = [
   },
   {
     e: 'tec',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'O uso de reconhecimento facial na segurança pública: entre a eficiência investigativa e a proteção de direitos fundamentais',
     problema: 'Potencial tecnológico na localização de foragidos e desaparecidos contraposto aos riscos de viés algorítmico e falsos positivos.',
     comando: 'Pondere sobre os ganhos operacionais da biometria facial na segurança pública e as salvaguardas jurídicas necessárias para evitar erros judiciais.',
@@ -2271,7 +2166,7 @@ const TEMAS = [
   },
   {
     e: 'tec',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Dependência digital e os efeitos do uso excessivo de telas no desenvolvimento cognitivo e emocional de crianças e jovens',
     problema: 'Queda na atenção concentrada, isolamento social, cyberbullying e transtornos de ansiedade associados à hiperconexão precoce.',
     comando: 'Aborde as consequências pedagógicas e psíquicas da exposição excessiva às telas na infância e adolescência e o dever da família e da escola.',
@@ -2287,7 +2182,7 @@ const TEMAS = [
   /* --- EIXO MEIO AMBIENTE, CLIMA & SAÚDE PÚBLICA (MULTI-BANCAS) --- */
   {
     e: 'amb',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Saneamento básico e saúde pública: o desafio da universalização da água tratada e do esgotamento sanitário no Brasil',
     problema: 'Milhões de brasileiros ainda vivem sem coleta de esgoto e água potável regular, perpetuando doenças de veiculação hídrica e desigualdade.',
     comando: 'Analise a relação direta entre saneamento básico, dignidade humana, redução de gastos hospitalares no SUS e preservação hídrica.',
@@ -2301,7 +2196,7 @@ const TEMAS = [
   },
   {
     e: 'amb',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Insegurança alimentar e o paradoxo da fome em um dos maiores produtores agrícolas do mundo',
     problema: 'Coexistência entre recordes na produção de alimentos para exportação, desperdício na cadeia logística e famílias em vulnerabilidade nutricional.',
     comando: 'Discuta os fatores socioeconômicos e logísticos da insegurança alimentar no Brasil e caminhos para assegurar o direito humano à alimentação adequada.',
@@ -2315,7 +2210,7 @@ const TEMAS = [
   },
   {
     e: 'amb',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Queda nas taxas de cobertura vacinal e os riscos de reemergência de doenças erradicadas no Brasil',
     problema: 'Hesitação vacinal alimentada por desinformação e falsa sensação de segurança, ameaçando a imunidade coletiva.',
     comando: 'Analise a importância histórica do Programa Nacional de Imunizações (PNI), as causas da queda vacinal e estratégias de mobilização comunitária.',
@@ -2331,7 +2226,7 @@ const TEMAS = [
   /* --- EIXO EDUCAÇÃO, CULTURA & TRABALHO (MULTI-BANCAS) --- */
   {
     e: 'edu',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Evasão escolar no ensino médio brasileiro: entre a necessidade precoce de trabalho e a crise de sentido da escola',
     problema: 'Jovens de baixa renda abandonam os estudos para complementar a renda familiar ou por desmotivação com a infraestrutura escolar.',
     comando: 'Aborde os fatores socioeconômicos e pedagógicos da evasão escolar e o impacto dessa exclusão no desenvolvimento nacional.',
@@ -2345,7 +2240,7 @@ const TEMAS = [
   },
   {
     e: 'edu',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'A precarização do trabalho na era das plataformas digitais (uberização) e a proteção social do trabalhador',
     problema: 'Crescimento de trabalhadores por aplicativos submetidos a jornadas exaustivas sem garantias previdenciárias ou segurança ocupacional.',
     comando: 'Discuta o equilíbrio entre inovação tecnológica, geração de renda e preservação dos direitos sociais do trabalhador.',
@@ -2359,7 +2254,7 @@ const TEMAS = [
   },
   {
     e: 'edu',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'A importância da leitura e da democratização do acesso ao livro para a formação cidadã no Brasil',
     problema: 'Baixo índice de leitura crítica, escassez de bibliotecas comunitárias ativas e concentração de equipamentos culturais nos grandes centros.',
     comando: 'Analise como o hábito da leitura desenvolve o repertório vocabular, a empatia e o senso crítico indispensáveis à cidadania.',
@@ -2484,36 +2379,8 @@ const TEMAS = [
     p: 'Atuação conjunta de equipes de abordagem social, saúde (Consultório na Rua), habitação solidária e policiamento comunitário capacitado.'
   },
   {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'Desafios para o enfrentamento da automedicação e a promoção do uso racional de medicamentos no Brasil',
-    problema: 'Hábito cultural de consumir fármacos sem prescrição médica, impulsionado pela dificuldade de acesso rápido a consultas e pela publicidade.',
-    comando: 'Discorra sobre os riscos da automedicação para a saúde individual e coletiva (como a resistência bacteriana) e apresente proposta de intervenção.',
-    teses: [
-      'A prática generalizada da automedicação no Brasil resulta tanto de gargalos no acesso à atenção primária de saúde quanto da banalização publicitária de fármacos.',
-      'O consumo indiscriminado de medicamentos mascara sintomas graves, provoca intoxicações e agrava o problema global da resistência microbiana.'
-    ],
-    f: 'Saúde coletiva, atenção básica do SUS, educação sanitária e controle farmacêutico.',
-    r: 'CF/88 (Art. 196 - Direito à Saúde); OMS (Conceito de Saúde e Uso Racional de Medicamentos); Platão (Senso comum vs. conhecimento técnico).',
-    p: 'Ministério da Saúde e Anvisa devem promover campanhas educativas sobre os riscos da automedicação e ampliar o atendimento farmacêutico orientador nas Unidades Básicas de Saúde.'
-  },
-  {
-    e: 'enem',
-    banca: 'INEP / ENEM',
-    t: 'Caminhos para combater a intolerância religiosa e assegurar a liberdade de crença no Brasil',
-    problema: 'Ataques a templos, discriminação contra matrizes religiosas afro-brasileiras e incompreensão sobre o conceito de Estado laico.',
-    comando: 'Analise as raízes históricas da intolerância religiosa no Brasil, o significado da laicidade estatal e proponha medidas de respeito à diversidade.',
-    teses: [
-      'A persistência da intolerância religiosa no Brasil fere o princípio constitucional do Estado laico e decorre do preconceito histórico contra crenças de matriz africana.',
-      'A garantia da liberdade religiosa exige tanto a responsabilização penal dos atos discriminatórios quanto a promoção do diálogo inter-religioso na educação.'
-    ],
-    f: 'Estado laico, liberdade de consciência e crença, respeito às religiões de matriz africana e cultura de paz.',
-    r: 'CF/88 (Art. 5º, VI - Inviolabilidade da Liberdade de Crença e Art. 19, I - Estado Laico); Lei nº 14.532/2023; Hannah Arendt (Pluralidade humana).',
-    p: 'Ministério dos Direitos Humanos e secretarias de segurança devem fortalecer delegacias de combate a crimes raciais e de intolerância, enquanto o MEC promove projetos pedagógicos sobre diversidade cultural.'
-  },
-  {
     e: 'tec',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Exposição infantil nas redes sociais (sharenting) e a proteção dos direitos de personalidade de crianças e adolescentes',
     problema: 'Superexposição da rotina e da imagem de menores na internet, muitas vezes com fins comerciais, gerando riscos à segurança e ao desenvolvimento psíquico.',
     comando: 'Discuta os limites da autoridade parental diante da privacidade digital da criança, os riscos do trabalho infantil artístico digital e o dever de proteção.',
@@ -2527,7 +2394,7 @@ const TEMAS = [
   },
   {
     e: 'amb',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Gestão de resíduos sólidos e logística reversa: desafios para a erradicação dos lixões e o avanço da reciclagem no Brasil',
     problema: 'Baixo índice de coleta seletiva, persistência de descarte inadequado de lixo e subvalorização dos catadores de materiais recicláveis.',
     comando: 'Aborde os entraves para o cumprimento da Política Nacional de Resíduos Sólidos, a responsabilidade compartilhada e a inclusão socioeconômica de catadores.',
@@ -2541,7 +2408,7 @@ const TEMAS = [
   },
   {
     e: 'edu',
-    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp / ENEM)',
+    banca: 'Multi-Bancas (AOCP / Cebraspe / Vunesp)',
     t: 'Valorização do magistério e melhoria da infraestrutura escolar como alicerces do desenvolvimento nacional',
     problema: 'Desvalorização salarial e social da carreira docente, sobrecarga de trabalho e carência de laboratórios e recursos pedagógicos em escolas públicas.',
     comando: 'Redija texto dissertativo-argumentativo sobre a centralidade do professor e da estrutura escolar para a qualidade da educação pública brasileira.',
@@ -2560,7 +2427,7 @@ const QUIZ_BANCA = [
   {
     id: 'q1',
     categoria: 'Concordância Verbal',
-    q: 'Assinale a alternativa que respeita rigorosamente a concordância verbal exigida pelas bancas (AOCP, Cebraspe, Vunesp e INEP):',
+    q: 'Assinale a alternativa que respeita rigorosamente a concordância verbal exigida pelas bancas examinadoras (AOCP, Cebraspe e Vunesp):',
     o: [
       'Houveram diversos avanços tecnológicos na investigação criminal.',
       'Houve diversos avanços tecnológicos na investigação criminal.',

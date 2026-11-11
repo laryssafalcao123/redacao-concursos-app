@@ -1,7 +1,7 @@
 {
   "name": "redacao-concursos-app",
   "version": "2.0.0",
-  "description": "Plataforma profissional de treino e correção de redações para concursos públicos e ENEM com IA",
+  "description": "Plataforma de alta precisão para treino e correção de redações de Concursos Públicos Policiais e Militares (PMPE, CBMPE, PCPE, PPPE, PMSP) com IA",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -13,7 +13,10 @@
   "keywords": [
     "redacao",
     "concursos",
-    "enem",
+    "seguranca-publica",
+    "policia-militar",
+    "policia-civil",
+    "policia-penal",
     "inteligencia-artificial",
     "gemini"
   ],

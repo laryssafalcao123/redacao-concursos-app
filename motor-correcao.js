@@ -508,7 +508,7 @@ const REGRAS_CONTEXTUAIS = [
     diagnostico: 'Uso do pronome relativo "onde" retomando antecedente não espacial.',
     explicacao: 'Na norma-padrão, o pronome "onde" possui valor estritamente locativo (lugar físico). Quando o antecedente indica tempo, situação, contexto, sociedade ou ideia abstrata, deve-se empregar "em que" ou "no qual / na qual".',
     sugestao: (m) => m.replace(/onde$/i, 'em que (ou no qual / na qual)'),
-    justificativa: 'Desvio muito visado nas Competências I e IV do ENEM e nas bancas Cebraspe, AOCP e Vunesp.'
+    justificativa: 'Desvio penalizado com rigor em aspectos gramaticais e coesivos nas bancas Cebraspe, AOCP e Vunesp.'
   },
   {
     id: 'g-virgula-conectivo-inicial',
@@ -716,16 +716,14 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
     cbmpe: 'Critério 5: Modalidade gramatical (norma-padrão)',
     pcpe: 'Microestrutura (NE — Desconto na Fórmula Líquida)',
     pppe: 'Microestrutura (NE — Desconto na Fórmula Líquida)',
-    pmsp: 'Critério C: Expressão (Coesão e Modalidade)',
-    enem: 'Competência I: Domínio da modalidade escrita formal'
+    pmsp: 'Critério C: Expressão (Coesão e Modalidade)'
   };
   const criterioArgumentativoMap = {
     pmpe: 'Critério 4: Informatividade e argumentação',
     cbmpe: 'Critério 4: Informatividade e argumentação',
     pcpe: 'Macroestrutura (Conteúdo dos Tópicos — NC)',
     pppe: 'Macroestrutura (Domínio do Conteúdo — NC)',
-    pmsp: 'Critério B: Estrutura (Gênero e Coerência)',
-    enem: 'Competência III: Projeto de texto e defesa de ponto de vista'
+    pmsp: 'Critério B: Estrutura (Gênero e Coerência)'
   };
 
   paragrafos.forEach((par, pIdx) => {
@@ -758,7 +756,6 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
           let impactoNota = 'Sem desconto na nota (sugestão de refinamento estilístico)';
           if(isErro){
             if(bancaKey === 'pcpe' || bancaKey === 'pppe') impactoNota = 'Contabilizado como 1 erro de microestrutura (NE) na fórmula NPD = NC - (2 × NE / TL).';
-            else if(bancaKey === 'enem') impactoNota = 'Impacta a avaliação de desvios na Competência I.';
             else if(bancaKey === 'pmsp') impactoNota = 'Impacta a pontuação do Critério C (Expressão).';
             else impactoNota = 'Impacta a pontuação do Critério 5 (Modalidade gramatical).';
           } else if(isFrag){
@@ -947,14 +944,6 @@ function analisarParagrafosDetalhadamente(paragrafos, tema, bancaKey, repertorio
     if(idx === 0 && !temMarcadorTese) problemasPar.push('Falta explicitar a tese (posicionamento crítico) no fechamento da introdução.');
     if(idx > 0 && !iniciaComConectivo) problemasPar.push('Ausência de conectivo interparágrafo na abertura do bloco.');
     if(idx > 0 && idx < totalP - 1 && repNoPar.length === 0) problemasPar.push('Argumento sem fundamentação sociocultural/normativa explícita.');
-    if(idx === totalP - 1 && spec.requiresIntervention){
-      const temAgente = /\b(governo|ministerio|secretaria|estado|escolas|poder executivo|poder legislativo|policia|prefeituras|congresso|midia|sociedade)\b/.test(nPar);
-      const temMeio = /\b(por meio d[eao]s?|mediante|atraves d[eao]s?|com a criacao|por intermedio d[eao]s?)\b/.test(nPar);
-      const temFim = /\b(a fim de|para que|com o intuito|visando a|com o objetivo)\b/.test(nPar);
-      if(!temAgente || !temMeio || !temFim){
-        problemasPar.push('Proposta de intervenção incompleta para os 5 elementos exigidos na Competência V do ENEM.');
-      }
-    }
     errosNoPar.forEach(e => {
       if(e.severidade === 'erro_confirmado'){
         problemasPar.push(`${e.categoria}: "${e.trechoOriginal}" → ${e.sugestaoCorrecao}.`);
@@ -1411,99 +1400,6 @@ function calcularNotasPorRubrica(dadosAnalise){
     };
   }
 
-  /* -------------------------------------------------------------------
-     RUBRICA 4: INEP / ENEM — 1000 PONTOS (5 COMPETÊNCIAS DE 0 A 200 EM NÍVEIS DE 40)
-     ------------------------------------------------------------------- */
-  else if(bancaKey === 'enem'){
-    const nivelEnem = (val) => anulacao.anulada ? 0 : clamp(Math.round(val / 40) * 40, 0, 200);
-
-    // Competência 1: Norma-Padrão (0 a 200)
-    let rawC1 = 200 - (errosConfirmados.length * 30);
-    if(numPar === 1) rawC1 -= 40;
-    const c1 = nivelEnem(rawC1);
-
-    // Competência 2: Tema, Gênero e Repertório Produtivo (0 a 200)
-    let rawC2 = 120;
-    if(aderencia.status === 'tangenciamento'){
-      rawC2 = 40; // Tangenciamento no ENEM trava C2 em nível 1 (40 pts)
-    } else {
-      if(estruturaDissertativaCompleta) rawC2 += 40;
-      if(repertorio.temProdutivo) rawC2 += 40;
-      else if(!repertorio.temAlgum) rawC2 = Math.min(rawC2, 120); // Sem repertório externo fica em 120
-    }
-    const c2 = nivelEnem(rawC2);
-
-    // Competência 3: Projeto de Texto e Argumentação (0 a 200)
-    let rawC3 = 120;
-    if(temTeseClara && estruturaDissertativaCompleta) rawC3 += 40;
-    if(repertorio.temProdutivo && fragilidades.length === 0) rawC3 += 40;
-    if(fragilidades.length >= 2) rawC3 -= 40;
-    if(aderencia.status === 'tangenciamento') rawC3 = Math.min(rawC3, 80);
-    const c3 = nivelEnem(rawC3);
-
-    // Competência 4: Coesão Inter e Intraparágrafos (0 a 200)
-    let rawC4 = 80;
-    if(conectivosInter >= 2) rawC4 += 60;
-    else if(conectivosInter === 1) rawC4 += 40;
-    if(totalConectivosDistintos >= 5) rawC4 += 60;
-    else if(totalConectivosDistintos >= 3) rawC4 += 20;
-    const c4 = nivelEnem(rawC4);
-
-    // Competência 5: Proposta de Intervenção (5 elementos de 40 pts cada = 200 pts)
-    // CORREÇÃO DO BUG DA AUDITORIA: Todos os 5 elementos somam 40 pts cada (0 a 200)!
-    const ultParTxt = norm(paragrafos[paragrafos.length - 1] || '');
-    const textoTodoNorm = norm(dadosAnalise.texto);
-    const baseC5 = ultParTxt.length > 30 ? ultParTxt : textoTodoNorm;
-
-    const temAgente = /\b(governo federal|poder executivo|poder legislativo|poder judiciario|ministerio|secretaria|mec|estado|escolas|prefeituras|midia|imprensa|ong|ongs|sociedade civil|congresso nacional|anvisa|policia|defensoria)\b/.test(baseC5);
-    const temAcao = /\b(deve|devem|cabe|compete|precisa|criar|implementar|promover|ampliar|instituir|fiscalizar|investir|realizar|desenvolver|reformular|estabelecer|garantir)\b/.test(baseC5);
-    const temMeio = /\b(por meio d[eao]s?|mediante|atraves d[eao]s?|por intermedio d[eao]s?|com a criacao d[eao]s?|com o investimento|via|a partir da realizacao)\b/.test(baseC5);
-    const temEfeito = /\b(a fim de|para que|com o intuito d[eao]|com o objetivo d[eao]|visando a|de modo a|para garantir|com a finalidade d[eao])\b/.test(baseC5);
-    const temDetalhamento = /(,|—|\()\s*(especialmente|notadamente|como|a exemplo de|tais como|em parceria com|direcionado a|com foco em|que consiste em)/.test(baseC5) || (paragrafos[paragrafos.length - 1] || '').split(/\s+/).length >= 42;
-
-    let countC5 = 0;
-    if(temAgente) countC5++;
-    if(temAcao) countC5++;
-    if(temMeio) countC5++;
-    if(temEfeito) countC5++;
-    if(temDetalhamento) countC5++;
-
-    const c5 = anulacao.anulada ? 0 : countC5 * 40;
-    notaTotalCalculada = c1 + c2 + c3 + c4 + c5;
-
-    const arrEnem = [c1, c2, c3, c4, c5];
-    spec.criteriaList.forEach((cr, i) => {
-      const nota = arrEnem[i];
-      espelhoCriterios.push({
-        id: cr.id,
-        nome: cr.title,
-        max: 200,
-        nota,
-        justificativa: i === 0
-          ? `${errosConfirmados.length} desvio(s) gramatical(is) confirmado(s) na modalidade formal.`
-          : (i === 1 ? `${aderencia.diagnostico} ${repertorio.resumoGeral}`
-          : (i === 2 ? `Projeto de texto com ${numPar} parágrafo(s) e tese ${temTeseClara ? 'explícita' : 'pouco explícita'}.`
-          : (i === 3 ? `${conectivosInter} parágrafo(s) iniciado(s) com operador interparágrafo e ${totalConectivosDistintos} conectivo(s) distinto(s).`
-          : `Foram identificados ${countC5} de 5 elementos válidos na Proposta de Intervenção (${countC5 * 40} pts).`))),
-        evidencias: i === 4
-          ? `Agente: ${temAgente ? 'Sim' : 'Não'} | Ação: ${temAcao ? 'Sim' : 'Não'} | Meio/Modo: ${temMeio ? 'Sim' : 'Não'} | Efeito: ${temEfeito ? 'Sim' : 'Não'} | Detalhamento: ${temDetalhamento ? 'Sim' : 'Não'}.`
-          : (i === 1 ? (repertorio.temAlgum ? repertorio.lista.map(r => r.nome).join(', ') : 'Sem repertório legitimado externo.')
-          : `Avaliação contextual do texto (${palavras} palavras).`),
-        positivos: nota >= 160 ? 'Competência em nível elevado (160–200 pts).' : 'Competência parcialmente desenvolvida.',
-        problemas: nota < 160 ? 'Exige ajustes específicos para atingir o nível 200 da Matriz do INEP.' : 'Sem falhas graves.',
-        acaoRecomendada: i === 4
-          ? 'Garanta na conclusão os 5 elementos: Agente + Ação + Meio ("por meio de...") + Detalhamento (explicação entre vírgulas) + Efeito ("a fim de...").'
-          : 'Revise os requisitos específicos desta competência no guia da banca.'
-      });
-    });
-
-    detalhesEspecificos = {
-      tipo: 'enem',
-      notas: { c1, c2, c3, c4, c5 },
-      elementosC5: { temAgente, temAcao, temMeio, temEfeito, temDetalhamento, totalElementos: countC5 }
-    };
-  }
-
   return {
     anulacao,
     espelhoCriterios,
@@ -1523,10 +1419,6 @@ function validarNotasCorrecao(resultadoBruto, spec, ocorrencias){
   resultadoBruto.espelhoCriterios.forEach(c => {
     if(c.nota < 0 || c.nota > c.max){
       c.nota = clamp(c.nota, 0, c.max);
-      consistente = false;
-    }
-    if(spec.id === 'enem' && c.nota % 40 !== 0){
-      c.nota = clamp(Math.round(c.nota / 40) * 40, 0, 200);
       consistente = false;
     }
   });
@@ -1771,9 +1663,6 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
   if(resultadoCalculo.anulacao.anulada) planoMelhoria.alta.push(resultadoCalculo.anulacao.motivo);
   if(aderencia.status !== 'atendido') planoMelhoria.alta.push(`Garantir o emprego dos núcleos do tema (${aderencia.nucleosAusentes.slice(0, 4).join(', ')}) ao longo do texto.`);
   if(errosConfirmados.length > 0) planoMelhoria.alta.push(`Corrigir os ${errosConfirmados.length} desvio(s) de norma-padrão (${Array.from(new Set(errosConfirmados.map(e => e.categoria))).join(', ')}).`);
-  if(bancaKey === 'enem' && resultadoCalculo.detalhesEspecificos.elementosC5.totalElementos < 5){
-    planoMelhoria.alta.push('Completar os 5 elementos obrigatórios da Proposta de Intervenção na conclusão (Agente, Ação, Meio/Modo, Detalhamento e Efeito).');
-  }
   if(planoMelhoria.alta.length === 0) planoMelhoria.alta.push('Manter a regularidade estrutural e a atenção aos núcleos do comando da proposta.');
 
   if(!temTeseClara) planoMelhoria.media.push('Explicitar a tese no último período da introdução com verbos avaliativos ("evidencia-se que...", "decorre tanto de X quanto de Y").');
@@ -1803,7 +1692,7 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
   // Seção I: Próxima Atividade Recomendada
   const catErroPrincipal = errosConfirmados[0] ? errosConfirmados[0].categoria : 'Concordância e Regência Verbal';
   const temaCorrelato = global.RedacaoDados.TEMAS.find(t => t.e === bancaKey && t.t !== tema) || global.RedacaoDados.TEMAS[0];
-  const repSugerido = global.RedacaoDados.REPERTORIO_LIBRARY.find(r => r.categoria === (bancaKey === 'enem' ? 'sociologia' : 'seguranca')) || global.RedacaoDados.REPERTORIO_LIBRARY[0];
+  const repSugerido = global.RedacaoDados.REPERTORIO_LIBRARY.find(r => r.categoria === 'seguranca') || global.RedacaoDados.REPERTORIO_LIBRARY[0];
 
   const proximaAtividade = {
     exercicioGramatica: `Praticar no Quiz de Português questões focadas em "${catErroPrincipal}" e reescrever as sentenças apontadas na Seção D.`,
@@ -1882,14 +1771,6 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = ''){
 
 function gerarModeloIntegralEstudo(tema, bancaKey){
   const t = esc(tema);
-  if(bancaKey === 'enem'){
-    return [
-      `[Introdução] Sob a égide da Constituição Federal de 1988, a dignidade da pessoa humana e o pleno acesso aos direitos sociais constituem fundamentos inegociáveis da República. Entretanto, ao observar a questão de "${t}", constata-se um grave hiato entre a garantia formal da lei e a realidade vivenciada no Brasil contemporâneo — cenário que Gilberto Dimenstein definiu como "cidadania de papel". Dessa forma, torna-se imperativo analisar como a insuficiência de políticas públicas preventivas e a carência de debate crítico perpetuam esse desafio.`,
-      `[Desenvolvimento 1] Em primeiro lugar, cabe pontuar que a atuação estatal ainda se mostra fragmentada diante da complexidade do problema. Segundo o filósofo Thomas Hobbes, em "O Leviatã", o Estado surge do pacto social justamente para assegurar a proteção, a ordem e o bem-estar coletivo. Contudo, quando o Poder Público falha na fiscalização das leis e na oferta de infraestrutura adequada, fragiliza-se a proteção dos grupos mais vulneráveis e amplia-se a desigualdade social.`,
-      `[Desenvolvimento 2] Ademais, a falta de letramento crítico e de informação qualificada na sociedade agrava os impactos dessa problemática. Na "Alegoria da Caverna", de Platão, os indivíduos acorrentados tomam sombras como verdades por desconhecerem a realidade luminosa do conhecimento. Analogamente, a naturalização de preconceitos e a ausência de educação cidadã — defendida por Paulo Freire como prática emancipadora — impedem que a coletividade compreenda a gravidade do tema e atue de modo solidário.`,
-      `[Conclusão — 5 Elementos C5] Portanto, medidas urgentes são necessárias para reverter esse quadro. Para tanto, cabe ao Poder Executivo Federal, em ação articulada entre os Ministérios competentes e as secretarias estaduais (Agente), implementar um Programa Nacional de Enfrentamento e Conscientização acerca de ${t} (Ação), por meio da ampliação de verbas orçamentárias, da fiscalização rigorosa e de oficinas educativas nas escolas e comunidades (Meio/Modo) — especificamente com equipes multidisciplinares e canais acessíveis de atendimento ao cidadão (Detalhamento) —, a fim de efetivar os direitos previstos na Carta Magna e consolidar uma sociedade justa (Efeito).`
-    ].join('\n\n');
-  }
 
   if(bancaKey === 'pppe'){
     return [

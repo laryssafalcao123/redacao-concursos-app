@@ -224,17 +224,7 @@ function construirPromptBanca({ texto, tema, comando, bancaKey, spec }) {
 - Pontuação Máxima: 100,0 pontos divididos em 3 eixos oficiais da VUNESP:
   - Critério A: Tema (0 a 30,0 pontos) - Fuga total zera a redação; tangenciamento reduz drasticamente.
   - Critério B: Estrutura (Gênero e Coerência) (0 a 40,0 pontos) - Tese clara, progressão sem contradições e desfecho articulado.
-  - Critério C: Expressão (Coesão e Modalidade) (0 a 30,0 pontos) - Norma culta, conectivos diversificados e precisão vocabular.`,
-
-    enem: `BANCA ORGANIZADORA: INEP / ENEM (Exame Nacional do Ensino Médio)
-- Gênero: Texto Dissertativo-Argumentativo em prosa com Proposta de Intervenção obrigatória.
-- Extensão: 8 a 30 linhas (menos de 7 linhas = nota zero).
-- Pontuação Máxima: 1000 pontos divididos nas 5 Competências Oficiais (0 a 200 pontos cada, em saltos de 40 pontos: 0, 40, 80, 120, 160, 200):
-  - C1: Domínio da norma culta da língua escrita.
-  - C2: Compreensão da proposta e aplicação de repertório legitimado, pertinente e produtivo.
-  - C3: Projeto de texto, seleção, relação e organização dos argumentos em defesa do ponto de vista.
-  - C4: Mecanismos linguísticos de coesão inter e intraparágrafos.
-  - C5: Proposta de intervenção social com auditoria estrita dos 5 elementos obrigatórios: Agente, Ação, Meio/Modo, Detalhamento e Efeito/Finalidade (cada elemento válido vale 40 pontos).`
+  - Critério C: Expressão (Coesão e Modalidade) (0 a 30,0 pontos) - Norma culta, conectivos diversificados e precisão vocabular.`
   };
 
   const regraEspecifica = instrucoesBanca[bancaKey] || instrucoesBanca.pmpe;
@@ -358,15 +348,7 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
   "nc": number,
   "ne": number,
   "tl": number,
-  "penalidade": number` : ''}${bancaKey === 'enem' ? `,
-  "elementosC5": {
-    "temAgente": boolean,
-    "temAcao": boolean,
-    "temMeio": boolean,
-    "temDetalhamento": boolean,
-    "temEfeito": boolean,
-    "totalElementos": number
-  }` : ''}
+  "penalidade": number` : ''}
 }`;
 }
 
@@ -862,7 +844,7 @@ const server = http.createServer(async (req, res) => {
       if (!texto || String(texto).trim().length < 50) {
         return sendJson(res, 400, { error: 'A redação deve conter no mínimo 50 caracteres para avaliação.' });
       }
-      const BANCAS_PERMITIDAS = ['pmpe', 'pcpe', 'pppe', 'cbmpe', 'pmsp', 'enem'];
+      const BANCAS_PERMITIDAS = ['pmpe', 'pcpe', 'pppe', 'cbmpe', 'pmsp'];
       const targetKey = BANCAS_PERMITIDAS.includes(bancaKey) ? bancaKey : 'pmpe';
       const spec = global.RedacaoDados?.BANCA_SPECS?.[targetKey] || {
         banca: targetKey.toUpperCase(),
@@ -893,7 +875,7 @@ const server = http.createServer(async (req, res) => {
     } catch (err) {
       console.error('[API Evaluate Error]', err);
       // Se ocorrer qualquer erro inesperado, recorre ao motor local determinístico
-      const targetKey = ['pmpe', 'pcpe', 'cbmpe', 'pmsp', 'enem'].includes(req.body?.bancaKey) ? req.body.bancaKey : 'pmpe';
+      const targetKey = ['pmpe', 'pcpe', 'pppe', 'cbmpe', 'pmsp'].includes(req.body?.bancaKey) ? req.body.bancaKey : 'pmpe';
       const fallbackLocal = global.MotorCorrecao.avaliarRedacao(req.body?.texto || '', req.body?.tema || '', targetKey, req.body?.comando || '');
       fallbackLocal.modeloUtilizado = 'Motor Contextual Determinístico Local (Fallback Seguro)';
       return sendJson(res, 200, {
