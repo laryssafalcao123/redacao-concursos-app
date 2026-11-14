@@ -403,10 +403,10 @@ Portanto, investimentos contínuos em tecnologia são indispensáveis.`;
       'Aba do professor oculta da navegação pública do aluno e protegida por senha master do cursinho com suporte a logout.'
     );
 
-    /* 15. TESTE PERICIAL DAS 3 VARREDURAS RIGOROSAS (EXAMINADOR SÊNIOR) */
-    const textoVarreduras = `O Estado brasileiro, deve garantir o acesso a educação e combater à medidas ineficazes, investiu mas falhou.
-Devem haver investimentos urgentes na segurança pública onde não observa-se resultados.`;
-    const resVarreduras = global.MotorCorrecao.avaliarRedacao(textoVarreduras, 'Segurança pública e educação no Brasil', 'pmpe');
+    /* 15. TESTE PERICIAL DOS 6 PILARES RIGOROSOS (EXAMINADOR SÊNIOR & GLAU) */
+    const textoVarreduras = `O Estado brasileiro, deve garantir o acesso a educação e combater à medidas ineficazes, investiu mas falhou. A utilização de tecnologias para falsificar vozes e identidade tornam urgente o combate a nova práticas criminosa por meio de mensagem falsas.
+Devem haver investimentos urgentes nos órgãos de segurança públicas onde não observa-se resultados, por isso o Ministério da Justiça devem promover campanha para que será possível reduzirem os golpes e garantir a paz social.`;
+    const resVarreduras = global.MotorCorrecao.avaliarRedacao(textoVarreduras, 'Segurança pública e crimes cibernéticos no Brasil', 'pmpe');
     const idsDetectados = resVarreduras.ocorrencias.map(o => o.id);
     const pegouVirgulaSujeito = idsDetectados.some(id => id.includes('g-virgula-sujeito-verbo'));
     const pegouCraseRegencia = idsDetectados.some(id => id.includes('g-falta-crase-regencia'));
@@ -415,12 +415,21 @@ Devem haver investimentos urgentes na segurança pública onde não observa-se r
     const pegouHaverLocucao = idsDetectados.some(id => id.includes('g-concordancia-haver-locucao'));
     const pegouProclise = idsDetectados.some(id => id.includes('g-falta-proclise-obrigatoria'));
     const pegouCoesaoSeca = idsDetectados.some(id => id.includes('coesao-inter-p2'));
+    const pegouNovaPraticas = idsDetectados.some(id => id.includes('g-concordancia-nominal-det-subs'));
+    const pegouMensagemFalsas = idsDetectados.some(id => id.includes('g-concordancia-nominal-subs-adj'));
+    const pegouSegurancaPublicas = idsDetectados.some(id => id.includes('g-concordancia-seguranca-publicas'));
+    const pegouParalelismoLista = idsDetectados.some(id => id.includes('g-paralelismo-numero-lista'));
+    const pegouPromoverCampanha = idsDetectados.some(id => id.includes('g-promover-campanha-singular'));
+    const pegouSujeitoDistante = idsDetectados.some(id => id.includes('g-concordancia-sujeito-distante'));
+    const pegouMinisterioDevem = idsDetectados.some(id => id.includes('g-concordancia-sujeito-simples-direto'));
+    const pegouPossivelReduzirem = idsDetectados.some(id => id.includes('g-infinitivo-impessoal-paralelismo'));
+    const pegouPeriodoUnico = idsDetectados.some(id => id.includes('periodo-unico-p2'));
 
     assert(
-      'Protocolo de 3 Varreduras Rigorosas (Vírgula Sujeito-Verbo, Crase, Haver, Próclise e Coesão Seca)',
-      'Auditoria Pericial 3 Varreduras',
-      pegouVirgulaSujeito && pegouCraseRegencia && pegouCrasePlural && pegouAdversativa && pegouHaverLocucao && pegouProclise && pegouCoesaoSeca,
-      `Desvios periciais detectados: ${resVarreduras.ocorrencias.length} ocorrências confirmadas nas 3 varreduras.`
+      'Protocolo de 6 Pilares (Concordância Nominal/Verbal Fina, Sujeito Distante, Paralelismo, Pontuação, Crase, Período Único e Coesão)',
+      'Auditoria Pericial 6 Pilares (Padrão Glau)',
+      pegouVirgulaSujeito && pegouCraseRegencia && pegouCrasePlural && pegouAdversativa && pegouHaverLocucao && pegouProclise && pegouCoesaoSeca && pegouNovaPraticas && pegouMensagemFalsas && pegouSegurancaPublicas && pegouParalelismoLista && pegouPromoverCampanha && pegouSujeitoDistante && pegouMinisterioDevem && pegouPossivelReduzirem && pegouPeriodoUnico,
+      `Desvios periciais detectados: ${resVarreduras.ocorrencias.length} ocorrências confirmadas nos 6 pilares.`
     );
 
   } catch(err){

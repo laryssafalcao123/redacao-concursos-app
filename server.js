@@ -162,142 +162,108 @@ function extractJson(text) {
   return JSON.parse(cleaned);
 }
 
-// 2. CONSTRUTOR DE PROMPT CRITERIOSO ESPECIALIZADO POR BANCA
+// 2. CONSTRUTOR DE PROMPT CRITERIOSO ESPECIALIZADO POR BANCA (PADRÃO GLAU 6 PILARES)
 function construirPromptBanca({ texto, tema, comando, bancaKey, spec, linhasReais }) {
-  let instrucaoLinhas = '';
-  if (linhasReais && Number(linhasReais) > 0) {
-    instrucaoLinhas = `\n- CONTAGEM REAL DE LINHAS NA FOLHA MANUSCRITA (FOTO OCR FORENSE): O candidato escreveu exatamente ${Number(linhasReais)} linha(s) pautada(s) na folha física. Utilize OBRIGATORIAMENTE este valor real como TL (Total de Linhas) na fórmula Cebraspe e para verificar a conformidade de extensão com o edital.`;
-  }
+  const palavrasCount = String(texto || '').trim().split(/\s+/).filter(Boolean).length;
+  const paragrafosArr = String(texto || '').trim().split(/\n+/).map(p => p.trim()).filter(Boolean);
+  const linhasEst = (linhasReais && Number(linhasReais) > 0)
+    ? Math.round(Number(linhasReais))
+    : Math.max(1, paragrafosArr.reduce((acc, p) => {
+        const w = p.split(/\s+/).filter(Boolean).length;
+        return acc + Math.max(1, Math.round((Math.ceil(w / 11) + Math.ceil(p.length / 68)) / 2));
+      }, 0));
+
   const instrucoesBanca = {
     pmpe: `BANCA ORGANIZADORA: INSTITUTO AOCP (Polícia Militar de Pernambuco - PMPE)
 - Gênero: Texto Dissertativo-Argumentativo em prosa.
-- Extensão obrigatória: 15 a 20 linhas (inferior a 7 linhas = anulação/nota zero).
-- Pontuação Máxima: 40,0 pontos distribuídos em 5 critérios oficiais (0 a 8,0 pontos cada):
-  1. Aspectos Formais e Tipologia Textual (adequação ao gênero e tema sem tangenciamento) - Máx: 8,0 pts
-  2. Coerência e Progressão Temática (tese clara na introdução e argumentos encadeados) - Máx: 8,0 pts
-  3. Coesão Referencial e Sequencial (operadores argumentativos no início dos parágrafos e sem repetições) - Máx: 8,0 pts
-  4. Informatividade e Repertório Sociocultural (pertinência e produtividade do repertório) - Máx: 8,0 pts
-  5. Modalidade Gramatical (norma-padrão culta, concordância, regência, crase e pontuação) - Máx: 8,0 pts`,
+- Extensão obrigatória: 15 a 20 linhas (inferior a 7 linhas = anulação/nota zero). Linhas escritas pelo candidato: ${linhasEst}.
+- Pontuação Máxima: 40,0 pontos distribuídos nos 5 critérios oficiais (0 a 8,0 pontos cada):
+  1. Atendimento e desenvolvimento do tema (id: "c1") - Máx: 8,0 pts
+  2. Coesão referencial e sequencial (id: "c2") - Máx: 8,0 pts
+  3. Estrutura textual e coerência (id: "c3") - Máx: 8,0 pts
+  4. Informatividade e argumentação (id: "c4") - Máx: 8,0 pts
+  5. Modalidade gramatical / norma-padrão (id: "c5") - Máx: 8,0 pts (Desconte rigorosamente 0,8 pt por erro gramatical confirmado)`,
 
     cbmpe: `BANCA ORGANIZADORA: INSTITUTO AOCP (Corpo de Bombeiros Militar de PE - CBMPE)
-- Gênero: Texto Dissertativo-Argumentativo em prosa aplicado a temas de Defesa Social, Proteção à Vida e Cidadania.
-- Extensão obrigatória: 15 a 20 linhas (inferior a 7 linhas = anulação/nota zero).
-- Pontuação Máxima: 40,0 pontos distribuídos em 5 critérios oficiais (0 a 8,0 pontos cada):
-  1. Aspectos Formais e Tipologia Textual (adequação temática e gênero) - Máx: 8,0 pts
-  2. Coerência e Progressão Temática - Máx: 8,0 pts
-  3. Coesão Referencial e Sequencial - Máx: 8,0 pts
-  4. Informatividade e Repertório - Máx: 8,0 pts
-  5. Modalidade Gramatical - Máx: 8,0 pts`,
+- Gênero: Texto Dissertativo-Argumentativo em prosa.
+- Extensão obrigatória: 15 a 20 linhas (inferior a 7 linhas = nota zero). Linhas escritas: ${linhasEst}.
+- Pontuação Máxima: 40,0 pontos distribuídos nos 5 critérios oficiais (0 a 8,0 pontos cada):
+  1. Atendimento e desenvolvimento do tema (id: "c1") - Máx: 8,0 pts
+  2. Coesão referencial e sequencial (id: "c2") - Máx: 8,0 pts
+  3. Estrutura textual e coerência (id: "c3") - Máx: 8,0 pts
+  4. Informatividade e argumentação (id: "c4") - Máx: 8,0 pts
+  5. Modalidade gramatical / norma-padrão (id: "c5") - Máx: 8,0 pts`,
 
     pcpe: `BANCA ORGANIZADORA: CESPE / CEBRASPE (Polícia Civil de Pernambuco - PCPE)
-- Gênero: Texto Dissertativo em prosa com atendimento a tópicos determinantes do comando.
-- Extensão: Até 30 linhas (folha oficial Cebraspe).
+- Gênero: Texto Dissertativo em prosa. Extensão: Até 30 linhas. Total de Linhas Escritas (TL) = ${linhasEst}.
 - Pontuação Máxima: 30,00 pontos.
-- Aplicação rigorosa da FÓRMULA LÍQUIDA DOCUMENTAL CEBRASPE:
-  NPD = NC - (2 * NE / TL)
-  Onde:
-  - NC = Nota de Conteúdo (Macroestrutura, até 30,00 pontos):
-    * Apresentação, legibilidade e estrutura textual (Macro): até 1,50 pt
-    * Aspecto 1 (Contextualização e problematização temática): até 9,50 pts
-    * Aspecto 2 (Fundamentação normativa, técnica ou sociológica): até 9,50 pts
-    * Aspecto 3 (Mecanismos institucionais de enfrentamento e garantias): até 9,50 pts
-  - NE = Número de Erros gramaticais confirmados na Microestrutura (grafia, morfossintaxe, pontuação).
-  - TL = Total de Linhas efetivamente escritas.
-  - Penalidade proporcional: (2 * NE / TL).`,
+- FÓRMULA LÍQUIDA DOCUMENTAL CEBRASPE: NPD = NC - (2 * NE / TL)
+  * Apresentação, estrutura textual e legibilidade (id: "apres"): até 1,50 pt
+  * Aspecto 1: Contextualização e problematização temática (id: "topico1"): até 9,50 pts
+  * Aspecto 2: Fundamentação normativa, técnica ou sociológica (id: "topico2"): até 9,50 pts
+  * Aspecto 3: Mecanismos de enfrentamento e garantias institucionais (id: "topico3"): até 9,50 pts
+  * NE = Número exato de Erros gramaticais e de microestrutura confirmados.`,
 
     pppe: `BANCA ORGANIZADORA: CEBRASPE (Polícia Penal de Pernambuco - PPPE - Edital 2026)
-- Gênero: Texto Dissertativo em prosa com atendimento a aspectos temáticos do comando.
-- Extensão Oficial: Até 30 linhas (folha oficial Cebraspe). Menos de 7 linhas = anulação sumária.
-- Pontuação Máxima: 10,00 pontos.
-- Nota Mínima para Aprovação: 5,00 pontos (NPD < 5,00 = reprovação).
-- FÓRMULA OFICIAL DO EDITAL PPPE 2026:
-  NPD = NC - (2 * NE / TL)
-  Onde:
-  - NC = Domínio do Conteúdo (Macroestrutura, até 10,00 pontos):
-    * 1. Apresentação, estrutura textual e legibilidade: até 1,00 pt (respeito às margens, paragrafação, ausência de rasuras)
-    * 2. Desenvolvimento do tema e conhecimento do assunto: até 3,00 pts (domínio sobre segurança pública, sistema penitenciário e execução penal)
-    * 3. Qualidade e consistência dos argumentos: até 3,00 pts (fundamentação na Lei de Execução Penal - LEP nº 7.210/84, CF/88, dados e doutrina)
-    * 4. Progressão temática e propostas de encaminhamento: até 3,00 pts (respeito aos direitos humanos, atuação técnica da Polícia Penal e integração ao SUSP)
-  - NE = Número de Erros gramaticais confirmados na Microestrutura (grafia, acentuação, morfossintaxe, pontuação, propriedade vocabular).
-  - TL = Total de Linhas efetivamente escritas.
-  - Penalidade proporcional da banca: (2 * NE / TL).`,
+- Gênero: Texto Dissertativo em prosa. Extensão: 20 a 30 linhas. TL = ${linhasEst}.
+- Pontuação Máxima: 10,00 pontos (Corte mínimo: 5,00 pts).
+- FÓRMULA OFICIAL: NPD = NC - (2 * NE / TL)
+  * 1. Apresentação, estrutura textual e legibilidade (id: "apres"): até 1,00 pt
+  * 2. Desenvolvimento do tema e conhecimento do assunto (id: "topico1"): até 3,00 pts
+  * 3. Qualidade e consistência dos argumentos (id: "topico2"): até 3,00 pts
+  * 4. Progressão temática e propostas de encaminhamento (id: "topico3"): até 3,00 pts`,
 
     pmsp: `BANCA ORGANIZADORA: FUNDAÇÃO VUNESP (Polícia Militar de São Paulo - PMSP)
-- Gênero: Texto Dissertativo-Argumentativo em prosa.
-- Extensão: Até 30 linhas (folha oficial Vunesp).
-- Pontuação Máxima: 100,0 pontos divididos em 3 eixos oficiais da VUNESP:
-  - Critério A: Tema (0 a 30,0 pontos) - Fuga total zera a redação; tangenciamento reduz drasticamente.
-  - Critério B: Estrutura (Gênero e Coerência) (0 a 40,0 pontos) - Tese clara, progressão sem contradições e desfecho articulado.
-  - Critério C: Expressão (Coesão e Modalidade) (0 a 30,0 pontos) - Norma culta, conectivos diversificados e precisão vocabular.`
+- Gênero: Texto Dissertativo-Argumentativo em prosa. Extensão: Até 30 linhas. Linhas escritas: ${linhasEst}.
+- Pontuação Máxima: 100,0 pontos divididos em 3 eixos oficiais:
+  * Critério A: Tema (id: "critA") - 0 a 30,0 pts
+  * Critério B: Estrutura - Gênero e Coerência (id: "critB") - 0 a 40,0 pts
+  * Critério C: Expressão - Coesão e Modalidade Gramatical (id: "critC") - 0 a 30,0 pts`
   };
 
   const regraEspecifica = instrucoesBanca[bancaKey] || instrucoesBanca.pmpe;
 
-  return `Você é um Examinador Sênior de Bancas de Concursos Públicos (Cebraspe, Instituto AOCP e Fundação Vunesp). Sua missão é realizar uma auditoria pericial, implacável e 100% detalhada da redação do candidato, sem deixar passar nenhum desvio básico ou avançado.
+  return `Você é um Examinador Sênior da banca oficial e Auditor Linguístico padrão GLAU. Sua missão é realizar uma auditoria pericial, implacável e 100% detalhada da redação abaixo. É proibido ser permissivo ou deixar passar desvios básicos.
 
 ${regraEspecifica}
-${instrucaoLinhas}
 
 DADOS DA PROPOSTA:
 - Tema: "${tema}"
-- Comando específico / Recorte: "${comando || 'Dissertação sobre o tema com problematização crítica e fundamentação.'}"
+- Comando / Recorte: "${comando || 'Dissertação argumentativa sobre o tema com problematização crítica e fundamentação.'}"
+- Métricas Físicas: ${palavrasCount} palavras | ${paragrafosArr.length} parágrafo(s) | TL = ${linhasEst} linha(s).
 
-REDAÇÃO DO CANDIDATO PARA AVALIAÇÃO:
+REDAÇÃO DO CANDIDATO (INSPECIONE PALAVRA POR PALAVRA):
 """
 ${texto}
 """
 
-Execute obrigatoriamente a correção em 3 VARREDURAS RIGOROSAS:
+EXECUTE OBRIGATORIAMENTE OS 6 PILARES DE AUDITORIA ANTES DE GERAR O JSON:
 
-=====================================================================
-VARREDURA 1: GRAMÁTICA NORMATIVA E MICROESTRUTURA (CRITÉRIO DE PENALIZAÇÃO DIRETA)
-=====================================================================
-Analise o texto período por período e aponte TODOS os erros nos seguintes pontos:
-1. PONTUAÇÃO E VÍRGULAS (ERRO CRÍTICO):
-   - Proibição Sintática Absoluta: Verifique se há vírgula separando o SUJEITO do VERBO (predicado) ou o VERBO de seus COMPLEMENTOS (objeto direto/indireto). Se houver, marque como "erro_confirmado" e explique claramente: "Na ordem direta da oração (Sujeito + Verbo + Complemento), é proibido usar vírgula entre o sujeito e o verbo ou entre o verbo e o objeto, mesmo que o sujeito seja longo."
-   - Falta de Vírgula Obrigatória: Aponte ausência de vírgula em adjuntos adverbiais deslocados (ex: "No Brasil contemporâneo, ..."), após conectivos iniciais ("Portanto,", "Ademais,", "Nesse sentido,"), antes de conjunções adversativas (", mas", ", contudo", ", porém") e em orações subordinadas antepostas ou explicativas.
-2. CRASE:
-   - Falta de Crase: Identifique ausência do acento grave em locuções femininas ("à medida que", "à luz de", "às vezes") e na fusão de preposição "a" + artigo "a/as" exigida pela regência (ex: "visar à proteção", "obedecer às normas", "acesso à educação").
-   - Crase Proibida: Puna o uso de crase antes de verbos no infinitivo ("a partir", "a combater"), palavras masculinas ("a curto prazo", "a respeito"), pronomes indefinidos/pessoais/demonstrativos ("a todos", "a toda", "a ela", "a essa") e "a" no singular antes de palavra no plural.
-3. CONCORDÂNCIA VERBAL E NOMINAL:
-   - Verbos Impessoais: Puna a pluralização indevida de "haver" no sentido de existir/ocorrer ("Houveram crimes" -> "Houve crimes"; "Devem haver" -> "Deve haver") e "fazer" indicando tempo decorrido ("Fazem dez anos" -> "Faz dez anos").
-   - Voz Passiva Sintética e Sujeito Distante: Verifique se o verbo concorda com o sujeito paciente plural (ex: "Observa-se problemas" -> "Observam-se problemas") e se há discordância de gênero/número entre substantivos, adjetivos e particípios.
-4. REGÊNCIA VERBAL E NOMINAL:
-   - Audite verbos clássicos de prova: "visar" (no sentido de objetivar exige preposição "a": "visar ao bem"), "obedecer/desobedecer" (exige "a"), "assistir" (no sentido de ver exige "a"), "implicar" e "acarretar" (no sentido de causar são transitivos diretos: proibido usar "implicar em" ou "acarretar em"), "chegar/ir" (exigem preposição "a" e não "em").
-   - Uso de "ONDE" vs. "EM QUE": Puna o uso de "onde" quando não se referir a lugar físico (ex: "sociedade onde", "momento onde", "situação onde" -> corrigir para "em que" ou "no qual/na qual").
-5. ORTOGRAFIA, ACENTUAÇÃO E COLOCAÇÃO PRONOMINAL:
-   - Aponte falta de acentos gráficos, erros de grafia, confusão entre parônimos/homônimos ("a fim de" vs "afim", "acerca de" vs "a cerca de", "ao encontro de" vs "de encontro a", "haja vista" vs "haja visto").
-   - Puna início de frase com pronome oblíquo átono ("Se observa..." -> "Observa-se...") e falta de próclise obrigatória após palavras negativas ("não", "nunca"), advérbios sem vírgula, pronomes relativos ("que") e conjunções subordinativas ("quando", "embora", "conforme").
+1. PILAR 1 — ADEQUAÇÃO AO TEMA E TIPOLOGIA: Verifique se todos os núcleos do tema foram atendidos ou se houve tangenciamento/fuga. Puna marcas de 1ª pessoa e oralidade.
+2. PILAR 2 — ESTRUTURA E PROPORCIONALIDADE: Avalie Introdução (com tese), D1, D2 e Conclusão. Puna parágrafos de período único (1 frase longa sem ponto interno), períodos > 45 palavras e desvios no limite de linhas.
+3. PILAR 3 — COESÃO SEQUENCIAL E REFERENCIAL: Exija conectivos interparágrafos no início do D1, D2 e Conclusão e conectivos intraparágrafos entre períodos. Puna conectivos com sentido inadequado, repetições viciosas da mesma palavra (eco vocabular), uso de "o mesmo" como pronome pessoal e uso de "onde" para ideias abstratas/tempo (exigir "em que / no qual").
+4. PILAR 4 — COERÊNCIA E ARGUMENTAÇÃO: Aponte contradições, circularidade argumentativa, generalizações absolutas ("todo mundo", "ninguém faz nada") e clichês ("nos dias de hoje", "cada um fazer sua parte").
+5. PILAR 5 — REPERTÓRIO SOCIOCULTURAL: Avalie legitimidade, pertinência e produtividade (se o repertório foi explicado e conectado ao argumento com uma ponte explícita).
+6. PILAR 6 — MICROESTRUTURA E NORMA-PADRÃO CULTA (CAÇA IMPLACÁVEL A TODOS OS ERROS):
+   - CONCORDÂNCIA NOMINAL: Verifique cada par de determinante/substantivo/adjetivo. Aponte imediatamente desvios como "nova práticas criminosa" (-> "novas práticas criminosas"), "mensagem falsas" (-> "mensagens falsas"), "órgãos de segurança públicas" (-> "órgãos de segurança pública", pois o adjetivo concorda com "segurança"), e quebra de paralelismo de número ("falsificar vozes e identidade" -> "vozes e identidades").
+   - CONCORDÂNCIA VERBAL: Identifique o NÚCLEO real do sujeito (mesmo quando distante do verbo). Puna verbos pluralizados por atração de termos intercalados (ex: "A utilização de tecnologias para falsificar vozes e identidade tornam" -> o núcleo é "A utilização", logo o correto é "torna"). Puna discordâncias diretas ("o Ministério da Justiça devem" -> "deve"), flexão indevida de infinitivo após expressão impessoal ("será possível reduzirem" -> "será possível reduzir"), verbos impessoais no plural ("houveram", "devem haver", "fazem X anos") e passiva sintética ("observa-se problemas" -> "observam-se problemas").
+   - PONTUAÇÃO SINTÁTICA (VÍRGULAS): Puna qualquer vírgula proibida separando SUJEITO e VERBO ou VERBO e COMPLEMENTO, explicando a regra sintática da ordem direta. Puna toda falta de vírgula após adjuntos adverbiais deslocados, conectivos iniciais/intercalados e antes de conjunções adversativas/conclusivas (", mas", ", porém", ", contudo", ", portanto").
+   - CRASE: Puna falta de crase obrigatória ("à medida que", "à luz de", "acesso à", "combate à", "proteção à", "visar à", "obedecer às") e crase proibida (antes de verbo, palavra masculina, pronome indefinido ou singular antes de plural).
+   - REGÊNCIA, ORTOGRAFIA, ACENTUAÇÃO E PRONOMES: Puna desvios em "visar a", "obedecer a", "implicar" (sem "em"), "acarretar" (sem "em"), "chegar a" (sem "em"), falta de acentos gráficos, acento diferencial ("tem/têm", "vem/vêm"), confusão entre "a fim de / afim", "haja vista / haja visto", "mas / mais", "mal / mau", próclise inicial e falta de próclise após palavras atrativas.
 
-=====================================================================
-VARREDURA 2: COESÃO TEXTUAL (REFERENCIAL E SEQUENCIAL)
-=====================================================================
-1. COESÃO INTERPARÁGRAFOS: Verifique se os parágrafos de Desenvolvimento (D1 e D2) e de Conclusão iniciam com operadores argumentativos adequados (ex: "Em primeiro lugar,", "Ademais,", "Outrossim,", "Portanto,"). Se o parágrafo começar "seco" (sem conectivo), aponte o erro de coesão sequencial.
-2. COESÃO INTRAPARÁGRAFOS: Verifique se os períodos dentro do mesmo parágrafo estão ligados por conectivos ou se são apenas frases soltas/justapostas.
-3. ADEQUAÇÃO SEMÂNTICA DO CONECTIVO: Aponte se o candidato usou um conectivo com sentido errado (ex: usar "Portanto" sem haver conclusão lógica, ou "Contudo" quando as ideias não se opõem).
-4. COESÃO REFERENCIAL E ECO VOCABULAR: Aponte repetições viciosas da mesma palavra em linhas próximas, uso ambíguo de pronomes possessivos ("seu/sua") e mau uso de demonstrativos ("este" vs "esse").
-
-=====================================================================
-VARREDURA 3: COERÊNCIA E CONSISTÊNCIA ARGUMENTATIVA (MACROESTRUTURA)
-=====================================================================
-1. CONTRADIÇÃO INTERNA E EXTERNA: Aponte qualquer contradição entre a tese da introdução e os argumentos do desenvolvimento, ou afirmações que violem a Constituição Federal e os Direitos Humanos.
-2. PROGRESSÃO TEMÁTICA VS. CIRCULARIDADE: Verifique se o texto avança nas ideias ou se apenas repete a mesma frase com palavras diferentes (argumentação circular / "encher linguiça").
-3. FRAGMENTAÇÃO E TRUNCAMENTO SINTÁTICO: Aponte períodos incompletos (subordinadas sem oração principal) ou períodos excessivamente longos (mais de 45 palavras sem ponto final) que comprometem a coerência e a clareza.
-4. GENERALIZAÇÕES E SENSO COMUM: Aponte expressões absolutas ou coloquiais ("ninguém faz nada", "todo mundo sabe", "nos dias de hoje", "cada um fazer sua parte") e exija modalização dissertativa formal.
-
-INSTRUÇÕES ADICIONAIS DE MAPEAMENTO PARA O RELATÓRIO E RAIO-X INTERATIVO:
-1. Avalie estritamente segundo os critérios da banca especificada. Seja cirúrgico, implacável e pedagógico.
-2. Todos os desvios detectados nas Varreduras 1, 2 e 3 devem constar obrigatoriamente tanto em "ocorrencias" quanto em "marcacoes_inline" (com fragmentos literais de 1 a 12 palavras, parágrafo 1, 2, 3..., categoria entre "gramatica", "coesao", "repeticao", "argumentacao", "acerto", regra/critério, explicação pedagógica direta e sugestão de substituição precisa).
-3. Analise cada parágrafo individualmente (função, relação com a tese, qualidade e versão revisada).
-4. Avalie o repertório sociocultural: se é legitimado, se é pertinente ao tema e se foi usado de forma produtiva (com explicação e ponte com o argumento).
-5. Gere o plano de melhoria em 3 níveis (alta, média e complementar), uma reescrita orientada do parágrafo mais frágil e um modelo integral de estudo nota máxima.
-
-Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora do JSON) com a seguinte estrutura exata:
+Retorne EXCLUSIVAMENTE um objeto JSON válido (sem markdown \`\`\`json) seguindo EXATAMENTE esta estrutura:
 {
-  "total": number (nota final obtida),
-  "max": number (nota máxima da banca),
-  "percentual": number (percentual de aproveitamento, ex: 85.5),
+  "total": number,
+  "max": ${spec.maxScore},
+  "percentual": number,
   "aprovado": boolean,
+  "palavras": ${palavrasCount},
+  "linhas": ${linhasEst},
+  "numParagrafos": ${paragrafosArr.length},
+  "nc": number,
+  "ne": number,
+  "tl": ${linhasEst},
+  "penalidade": number,
   "anulacao": {
     "anulada": boolean,
     "motivo": string or null
@@ -316,10 +282,6 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
       "acaoRecomendada": string
     }
   ],
-  "nc": number,
-  "ne": number,
-  "tl": number,
-  "penalidade": number,
   "diagnosticoGeral": {
     "pontosFortes": [string],
     "principaisProblemas": [string],
@@ -332,39 +294,55 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
   },
   "ocorrencias": [
     {
-      "trechoOriginal": string,
-      "linhaAprox": number,
+      "id": string,
       "severidade": "erro_confirmado" | "fragilidade_argumentativa" | "sugestao_estilistica",
       "categoria": string,
+      "trechoOriginal": string,
+      "contextoSentenca": string,
+      "paragrafo": number,
+      "sentenca": number,
+      "localizacao": string,
+      "diagnostico": string,
       "explicacaoRegra": string,
       "sugestaoCorrecao": string,
-      "localizacao": string
+      "justificativaCorrecao": string,
+      "criterioAfetado": string,
+      "impactoNota": string
     }
   ],
   "analiseParagrafos": [
     {
       "numero": number,
-      "tipoBloco": string,
-      "textoOriginal": string,
       "funcao": string,
+      "palavras": number,
+      "sentencas": number,
+      "ideiaCentral": string,
+      "clareza": string,
       "relacaoTese": string,
-      "avaliacaoQualidade": string,
+      "qualidadeFundamentacao": string,
+      "coesaoInterna": string,
       "problemas": [string],
+      "comoMelhorar": string,
+      "textoOriginal": string,
       "versaoRevisada": string
     }
   ],
   "repertorio": {
-    "identificados": [
+    "lista": [
       {
-        "termo": string,
+        "nome": string,
         "tipo": string,
-        "legitimado": boolean,
+        "paragrafo": number,
         "pertinente": boolean,
+        "correcaoFactual": string,
+        "explicado": boolean,
+        "integrado": boolean,
         "produtivo": boolean,
-        "analise": string
+        "avaliacao": string
       }
     ],
-    "temLegitimo": boolean,
+    "quantidade": number,
+    "temAlgum": boolean,
     "temProdutivo": boolean,
     "resumoGeral": string
   },
@@ -389,30 +367,24 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora 
   },
   "marcacoes_inline": [
     {
-      "trecho_exato": string (cópia idêntica literal de 1 a 12 palavras do texto do aluno),
-      "paragrafo": number (número do parágrafo 1, 2, 3...),
+      "id": string,
+      "trecho_exato": string,
+      "paragrafo": number,
       "categoria": "gramatica" | "coesao" | "repeticao" | "argumentacao" | "acerto",
-      "regra_ou_criterio": string (nome curto do desvio ou mérito),
-      "explicacao": string (explicação pedagógica direta do porquê está errado ou como melhorar),
-      "sugestao_substituicao": string (como reescrever apenas aquele trecho corretamente)
+      "regra_ou_criterio": string,
+      "explicacao": string,
+      "sugestao_substituicao": string
     }
-  ]${bancaKey === 'cebraspe' ? `,
-  "nc": number,
-  "ne": number,
-  "tl": number,
-  "penalidade": number` : ''}
+  ]
 }`;
 }
 
-// 3. CASCATA COMPLETA DE MODELOS DE INTELIGÊNCIA ARTIFICIAL (CENTRALIZADA NO BACKEND)
+// 3. CASCATA COMPLETA DE MODELOS DE IA + FUSÃO HÍBRIDA BLINDADA COM MOTOR LOCAL
 async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasReais, customKeys = {} }) {
   const failedAttempts = [];
   const promptCompleto = construirPromptBanca({ texto, tema, comando, bancaKey, spec, linhasReais });
 
-  // Lista sequencial de modelos com suporte a fallback automático
   const cascadeQueue = [];
-
-  // Leitura exclusiva das variáveis de ambiente do servidor (process.env no .env ou Render)
   const geminiKey = (process.env.GEMINI_API_KEY || customKeys.geminiKey || '').trim();
   if (geminiKey) {
     cascadeQueue.push(
@@ -449,7 +421,6 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
 
   console.log(`[IA Cascade] Iniciando avaliação com ${cascadeQueue.length} modelo(s) configurados na fila.`);
 
-  // Tentativa sequencial de cada modelo da cascata
   for (const item of cascadeQueue) {
     try {
       console.log(`[IA Cascade] Tentando modelo: ${item.label}...`);
@@ -460,7 +431,7 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
           contents: [{ parts: [{ text: promptCompleto }] }],
           generationConfig: {
             responseMimeType: 'application/json',
-            temperature: 0.2
+            temperature: 0.15
           }
         });
 
@@ -491,11 +462,11 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
         const postData = JSON.stringify({
           model: item.model,
           messages: [
-            { role: 'system', content: 'Você é um avaliador de redação sênior. Responda exclusivamente em JSON válido.' },
+            { role: 'system', content: 'Você é um examinador sênior de bancas de concursos. Responda exclusivamente em JSON válido.' },
             { role: 'user', content: promptCompleto }
           ],
           response_format: { type: 'json_object' },
-          temperature: 0.2
+          temperature: 0.15
         });
 
         const resp = await makeHttpsRequest({
@@ -549,12 +520,12 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
       }
 
       if (jsonResult && (jsonResult.total !== undefined || jsonResult.espelhoCriterios)) {
-        console.log(`[IA Cascade] Sucesso com modelo: ${item.label}! Mesclando com Motor Local...`);
+        console.log(`[IA Cascade] Sucesso com modelo: ${item.label}! Executando Fusão Híbrida Blindada...`);
 
-        // 1. Executa SEMPRE o motor determinístico local para garantir 100% das regras fixas
+        // 1. Executa SEMPRE o Motor Determinístico Local para garantir 100% das regras morfossintáticas e de pontuação
         const baseLocal = global.MotorCorrecao.avaliarRedacao(texto, tema, bancaKey, comando, { linhasReais });
 
-        // 2. Mescla as ocorrências (Seção D): une o que a IA achou com o que o motor local cravou
+        // 2. Normaliza e mescla ocorrências (IA + Motor Local)
         const ocorrenciasIA = Array.isArray(jsonResult.ocorrencias) ? jsonResult.ocorrencias : [];
         ocorrenciasIA.forEach((o, idx) => {
           o.id = o.id || `ia_occ_${idx}`;
@@ -566,28 +537,45 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
         });
 
         baseLocal.ocorrencias.forEach(ocLocal => {
-          const jaExiste = ocorrenciasIA.some(o =>
-            String(o.trechoOriginal || '').toLowerCase().trim() === String(ocLocal.trechoOriginal || '').toLowerCase().trim()
-          );
+          const tLocal = String(ocLocal.trechoOriginal || '').toLowerCase().trim();
+          const jaExiste = ocorrenciasIA.some(o => {
+            const tIA = String(o.trechoOriginal || '').toLowerCase().trim();
+            return tIA === tLocal || (tIA.length > 4 && tLocal.includes(tIA)) || (tLocal.length > 4 && tIA.includes(tLocal));
+          });
           if (!jaExiste) {
             ocorrenciasIA.push(ocLocal);
           }
         });
 
-        // 3. Mescla os grifos clicáveis do Raio-X Interativo (Padrão Glau)
+        // 3. Mescla grifos clicáveis do Raio-X Glau
         const marksIA = Array.isArray(jsonResult.marcacoes_inline) ? jsonResult.marcacoes_inline : [];
-        (baseLocal.marcacoes_inline || []).forEach(mLocal => {
-          const jaExiste = marksIA.some(m =>
-            String(m.trecho_exato || '').toLowerCase().trim() === String(mLocal.trecho_exato || '').toLowerCase().trim()
-          );
+        baseLocal.marcacoes_inline.forEach(mLocal => {
+          const tLocal = String(mLocal.trecho_exato || '').toLowerCase().trim();
+          const jaExiste = marksIA.some(m => {
+            const tIA = String(m.trecho_exato || '').toLowerCase().trim();
+            return tIA === tLocal || (tIA.length > 4 && tLocal.includes(tIA)) || (tLocal.length > 4 && tIA.includes(tLocal));
+          });
           if (!jaExiste) {
             marksIA.push(mLocal);
           }
         });
 
-        const repListaUnificada = jsonResult.repertorio?.lista || jsonResult.repertorio?.identificados || baseLocal.repertorio.lista;
+        const repListaUnificada = Array.isArray(jsonResult.repertorio?.lista)
+          ? jsonResult.repertorio.lista
+          : (Array.isArray(jsonResult.repertorio?.identificados)
+              ? jsonResult.repertorio.identificados.map((r, i) => ({
+                  nome: r.nome || r.termo || `Referência ${i + 1}`,
+                  tipo: r.tipo || 'Referência Sociocultural',
+                  paragrafo: r.paragrafo || 1,
+                  pertinente: Boolean(r.pertinente ?? true),
+                  correcaoFactual: r.correcaoFactual || 'Referência válida.',
+                  explicado: Boolean(r.explicado ?? r.produtivo),
+                  integrado: Boolean(r.integrado ?? r.produtivo),
+                  produtivo: Boolean(r.produtivo),
+                  avaliacao: r.avaliacao || r.analise || 'Repertório analisado.'
+                }))
+              : baseLocal.repertorio.lista);
 
-        // 4. Garante compatibilidade total de propriedades com o renderizador do app.js
         const relatorioHibrido = {
           ...baseLocal,
           ...jsonResult,
@@ -606,19 +594,25 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
           numParagrafos: baseLocal.numParagrafos,
           ocorrencias: ocorrenciasIA,
           marcacoes_inline: marksIA,
+          analiseParagrafos: Array.isArray(jsonResult.analiseParagrafos) && jsonResult.analiseParagrafos.length > 0
+            ? jsonResult.analiseParagrafos.map((p, i) => ({
+                ...(baseLocal.analiseParagrafos[i] || {}),
+                ...p,
+                problemas: Array.isArray(p.problemas) ? p.problemas : (baseLocal.analiseParagrafos[i]?.problemas || ['Sem falhas graves.'])
+              }))
+            : baseLocal.analiseParagrafos,
           repertorio: {
             lista: repListaUnificada,
             quantidade: repListaUnificada.length,
-            temAlgum: Boolean(jsonResult.repertorio?.temAlgum ?? jsonResult.repertorio?.temLegitimo ?? baseLocal.repertorio.temAlgum),
+            temAlgum: repListaUnificada.length > 0,
             temProdutivo: Boolean(jsonResult.repertorio?.temProdutivo ?? baseLocal.repertorio.temProdutivo),
             resumoGeral: jsonResult.repertorio?.resumoGeral || baseLocal.repertorio.resumoGeral
           },
-          modeloUtilizado: `${item.label} + Motor Determinístico da Banca`,
+          modeloUtilizado: `${item.label} + Motor Morfossintático da Banca`,
           tentativasFalhadas: failedAttempts,
           origem: 'hibrido_blindado'
         };
 
-        // 5. Recalcula a penalidade de erros confirmados (NE) no Cebraspe para manter precisão matemática
         const errosConfirmadosTotal = ocorrenciasIA.filter(o => o.severidade === 'erro_confirmado');
         relatorioHibrido.desvios = errosConfirmadosTotal.map(e => ({
           termo: e.trechoOriginal,
@@ -641,7 +635,6 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
           relatorioHibrido.percentual = Math.round((relatorioHibrido.total / spec.maxScore) * 1000) / 10;
         }
 
-        // 6. Gera o HTML interativo de grifos com a lista unificada
         relatorioHibrido.textoAnotadoGlau = global.MotorCorrecao.gerarTextoAnotadoGlau(
           texto,
           relatorioHibrido.ocorrencias,
@@ -664,7 +657,7 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
   }
 
   // 4. FALLBACK ABSOLUTO: MOTOR CONTEXTUAL DETERMINÍSTICO ESPECIALIZADO
-  console.log('[IA Cascade] Todas as chamadas de IA externas falharam ou nenhuma chave estava configurada. Acionando Motor Contextual Especializado Determinístico.');
+  console.log('[IA Cascade] Acionando Motor Contextual Especializado Determinístico Local.');
   const fallbackResult = global.MotorCorrecao.avaliarRedacao(texto, tema, bancaKey, comando, { linhasReais });
   fallbackResult.modeloUtilizado = 'Motor Contextual Especializado da Banca (Modo Contingência)';
   fallbackResult.tentativasFalhadas = failedAttempts;

@@ -686,82 +686,179 @@ const REGRAS_CONTEXTUAIS = [
     justificativa: 'Elimina clichês e oralidades expressamente combatidos por examinadores de bancas.'
   },
 
-  /* --- SUGESTÕES ESTILÍSTICAS (SEM DESCONTO NA NOTA GRAMATICAL — REGRA 4.2) --- */
+  {
+    id: 's-hoje-em-dia',
+    severidade: 'sugestao_estilistica',
+    categoria: 'Refinamento Estilístico',
+    re: /\bhoje em dia\b/gi,
+    diagnostico: 'Locução temporal desgastada pelo uso cotidiano.',
+    explicacao: 'A expressão "hoje em dia" é correta, mas pode ser substituída por marcadores temporais mais elegantes na prosa acadêmica e de concursos.',
+    sugestao: () => 'na contemporaneidade / no cenário hodierno / na atualidade',
+    justificativa: 'Sugestão estilística (não gera desconto na nota).'
+  },
+
+  /* --- NOVAS REGRAS DETERMINÍSTICAS DE PONTUAÇÃO, CRASE, CONCORDÂNCIA E ACENTUAÇÃO --- */
   {
     id: 'g-virgula-sujeito-verbo',
     severidade: 'erro_confirmado',
-    categoria: 'Pontuação & Sintaxe (Vírgula Sujeito-Verbo)',
-    re: /(?:^|[.!?]\s+)((?:O|A|Os|As|Um|Uma|Esse|Essa|Este|Esta|Tal|Todo|Toda)\s+[a-záàâãéêíóôõúç]+(?:\s+(?:de|da|do|das|dos|brasileir[oa]s?|públic[oa]s?|sociais?|federais?|estaduais?|atuais?|contemporâne[oa]s?|civis|militares|penais|humanos|policiais|estatais|governamentais))*),\s+(é|são|foi|foram|será|serão|deve|devem|precisa|precisam|pode|podem|tem|têm|exige|exigem|mostra|mostram|revela|revelam|evidencia|evidenciam|afeta|afetam|causa|causam|gera|geram|representa|representam|constitui|constituem|enfrenta|enfrentam|sofre|sofrem|carece|carecem|necessita|necessitam|atua|atuam|busca|buscam|garante|garantem|promove|promovem|impõe|impõem)\b/gi,
-    diagnostico: 'Erro sintático grave: vírgula separando o sujeito do verbo (predicado).',
-    explicacao: 'Na ordem direta da oração (Sujeito + Verbo + Complemento), é proibido usar vírgula entre o sujeito e o verbo ou entre o verbo e o objeto, mesmo que o sujeito seja longo.',
-    sugestao: (m) => m.replace(/,\s+/, ' '),
-    justificativa: 'Penalização direta e severa nas bancas Cebraspe, Instituto AOCP e Vunesp.'
+    categoria: 'Pontuação Sintática (Vírgula Proibida)',
+    re: /(?:^|[.!?]\s+)((?:O|A|Os|As|Um|Uma)\s+(?:[a-záàâãéêíóôõúç]+\s+){1,6}[a-záàâãéêíóôõúç]+),\s+(é|são|foi|foram|está|estão|deve|devem|pode|podem|precisa|precisam|garante|garantem|promove|promovem|representa|representam|configura|configuram|exige|exigem|mostra|mostram|revela|revelam|causa|causam|gera|geram|afeta|afetam|compromete|comprometem|atua|atuam|tem|têm|possui|possuem)\b/gi,
+    validarContexto: (match) => {
+      const sujeito = norm(match[1]);
+      if (match[1].includes(',')) return false;
+      if (/^(no|na|nos|nas|em|sob|diante|segundo|conforme|para|com|apesar|embora|quando|enquanto)\b/.test(sujeito)) return false;
+      return true;
+    },
+    diagnostico: 'Uso proibido de vírgula separando o Sujeito do Verbo (Predicado).',
+    explicacao: 'Na ordem direta da oração (Sujeito + Verbo + Complemento), é terminantemente proibido colocar vírgula entre o sujeito e o seu verbo, mesmo quando o sujeito é longo.',
+    sugestao: (m) => m.replace(/,\s+([a-záàâãéêíóôõúç]+)$/i, ' $1'),
+    justificativa: 'Separar sujeito e predicado com vírgula é erro grave de estrutura sintática em todas as bancas.'
+  },
+  {
+    id: 'g-virgula-apos-conjuncao-que',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação Sintática (Vírgula Proibida)',
+    re: /\b(observa-se|constata-se|verifica-se|nota-se|percebe-se|sabe-se|evidencia-se|conclui-se|infere-se|afirma|defende|sustenta|mostra|demonstra|garante|exige|implica|certo|claro|evidente|necess[aá]rio|fundamental|importante)\s+que,\s+(?!(?:em|no|na|nos|nas|sob|diante|apesar|embora|quando|se|como|segundo|conforme|al[eé]m|por|para|durante|ap[oó]s|antes|sem)\b)/gi,
+    diagnostico: 'Vírgula indevida logo após a conjunção integrante "que".',
+    explicacao: 'Não se coloca vírgula após a conjunção integrante "que" quando não há um termo adverbial intercalado entre duas vírgulas.',
+    sugestao: (m) => m.replace(/que,\s+/i, 'que '),
+    justificativa: 'Elimina truncamento sintático entre a oração principal e a subordinada.'
   },
   {
     id: 'g-virgula-verbo-complemento',
     severidade: 'erro_confirmado',
-    categoria: 'Pontuação & Sintaxe (Vírgula Verbo-Complemento)',
-    re: /\b(garantir|promover|assegurar|combater|proteger|reduzir|ampliar|criar|buscar|efetivar|implementar|exigir|garante|garantem|promove|promovem|combate|combatem|protege|protegem|afeta|afetam|gera|geram|causa|causam|provoca|provocam|impede|impedem),\s+(o|a|os|as|um|uma|ao|à|aos|às)\s+([a-záàâãéêíóôõúç]+)\b/gi,
-    validarContexto: (match, frase) => {
-      const resto = frase.slice(match.index + match[0].length);
-      if(/^\s*[a-záàâãéêíóôõúç]*\s*,/.test(resto)) return false;
-      return true;
-    },
-    diagnostico: 'Erro sintático grave: vírgula separando o verbo de seu complemento (objeto direto/indireto).',
-    explicacao: 'Na ordem direta da oração (Sujeito + Verbo + Complemento), é proibido usar vírgula entre o sujeito e o verbo ou entre o verbo e o objeto, mesmo que o sujeito seja longo.',
+    categoria: 'Pontuação Sintática (Vírgula Proibida)',
+    re: /\b(garante|garantem|promove|promovem|exige|exigem|combate|combatem|protege|protegem|assegura|asseguram|viola|violam|compromete|comprometem|reduz|reduzem|aumenta|aumentam|causa|causam|gera|geram|enfrenta|enfrentam),\s+(o|a|os|as|um|uma)\s+([a-záàâãéêíóôõúç]+)\b/gi,
+    diagnostico: 'Uso proibido de vírgula separando o Verbo Transitivo de seu Complemento (Objeto Direto).',
+    explicacao: 'Jamais se deve separar o verbo de seu objeto direto ou indireto por vírgula.',
     sugestao: (m) => m.replace(/,\s+/, ' '),
-    justificativa: 'Ruptura sintática entre verbo transitivo e complemento verbal.'
+    justificativa: 'Restaura a ligação direta entre o verbo e seu complemento.'
   },
   {
-    id: 'g-falta-virgula-adversativa',
+    id: 'g-falta-virgula-adversativa-conclusiva',
     severidade: 'erro_confirmado',
-    categoria: 'Pontuação (Conjunção Adversativa)',
-    re: /\b([a-záàâãéêíóôõúç]{2,})\s+(mas|porém|contudo|todavia|entretanto)\s+([a-záàâãéêíóôõúç]{2,})\b/gi,
-    validarContexto: (match) => {
-      const p = match[0].split(/\s+/);
-      const ant = norm(p[0].toLowerCase());
-      const seg = norm(p[2].toLowerCase());
-      if(ant === 'nao' || ant === 'apenas' || seg === 'tambem') return false;
-      return true;
+    categoria: 'Pontuação Sintática (Falta de Vírgula)',
+    re: /\b([a-záàâãéêíóôõúç]{3,})\s+(mas|por[eé]m|contudo|todavia|entretanto|no entanto|portanto|logo|pois)\s+([a-záàâãéêíóôõúç]{2,})\b/gi,
+    validarContexto: (match) => !/^(que|se|como|ou|e|nem|nao|apenas)$/.test(norm(match[1])),
+    diagnostico: 'Ausência de vírgula obrigatória antes de conjunção adversativa, conclusiva ou explicativa.',
+    explicacao: 'Conjunções adversativas ("mas", "porém", "contudo", "todavia", "entretanto"), conclusivas ("portanto", "logo") e explicativas ("pois") exigem vírgula obrigatória antes delas.',
+    sugestao: (m) => m.replace(/\s+(mas|por[eé]m|contudo|todavia|entretanto|no entanto|portanto|logo|pois)\s+/i, ', $1 '),
+    justificativa: 'Regra obrigatória de pontuação entre orações coordenadas.'
+  },
+  {
+    id: 'g-falta-virgula-adjunto-inicial',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação Sintática (Falta de Vírgula)',
+    re: /(?:^|[.!?]\s+)(No Brasil(?: contempor[aâ]neo| atual| hodierno)?|Na sociedade(?: brasileira| atual| contempor[aâ]nea)?|Diante desse cen[aá]rio|Diante desse contexto|Diante do exposto|Sob essa perspectiva|Sob esse prisma|Em Pernambuco|No contexto atual|Nos dias atuais|Na atualidade|Para que isso ocorra|Com o advento d[ao]|De acordo com a Constitui[cç][aã]o|Segundo a Constitui[cç][aã]o)\s+(?![,])([a-záàâãéêíóôõúç]+)/g,
+    diagnostico: 'Ausência de vírgula obrigatória após adjunto adverbial deslocado no início do período.',
+    explicacao: 'Adjuntos adverbiais deslocados para o início da frase devem ser obrigatoriamente isolados por vírgula.',
+    sugestao: (m) => {
+      const partes = m.trim().split(/\s+/);
+      const ultima = partes.pop();
+      return `${partes.join(' ')}, ${ultima}`;
     },
-    diagnostico: 'Ausência de vírgula obrigatória antes de conjunção adversativa.',
-    explicacao: 'Orações coordenadas sindéticas adversativas introduzidas por "mas", "porém", "contudo", "todavia" ou "entretanto" exigem vírgula obrigatória antes da conjunção.',
-    sugestao: (m) => m.replace(/\s+(mas|porém|contudo|todavia|entretanto)\s+/i, ', $1 '),
-    justificativa: 'Pontuação obrigatória no período composto por coordenação.'
+    justificativa: 'Isola corretamente o termo adverbial anteposto à oração principal.'
   },
   {
-    id: 'g-falta-virgula-adjunto',
+    id: 'g-falta-crase-regencia-feminina',
     severidade: 'erro_confirmado',
-    categoria: 'Pontuação (Adjunto Adverbial Deslocado)',
-    re: /(?:^|[.!?]\s+)(No Brasil\s+(?:contemporâneo|atual|hodierno)|Na sociedade\s+(?:atual|brasileira|contemporânea|hodierna)|Atualmente|Hodiernamente|Infelizmente|Historicamente|Consequentemente|Primeiramente|Diante\s+d(?:isso|esse\s+cenário|esse\s+contexto|essa\s+realidade)|Nesse\s+(?:contexto|cenário|sentido|viés|prisma|panorama)|Sob\s+ess[ea]\s+(?:ótica|viés|prisma|perspectiva|aspecto)|Em\s+(?:suma|síntese|primeiro\s+lugar|segundo\s+lugar|virtude\s+disso|decorrência\s+disso))\s+(?![,])/gi,
-    diagnostico: 'Ausência de vírgula obrigatória em adjunto adverbial ou operador deslocado no início do período.',
-    explicacao: 'Adjuntos adverbiais deslocados para a cabeça do período e conectivos interparágrafos/intraparágrafos devem ser obrigatoriamente seguidos de vírgula.',
-    sugestao: (m) => m.trim() + ',',
-    justificativa: 'Regra de isolamento de adjuntos adverbiais antepostos.'
-  },
-  {
-    id: 'g-falta-crase-regencia',
-    severidade: 'erro_confirmado',
-    categoria: 'Crase (Regência Nominal e Verbal)',
-    re: /\b(acesso|combate|respeito|desrespeito|incentivo|estímulo|apoio|assistência|proteção|ameaça|ofensa|violação|frente|devido|referente|quanto|em relação|no tocante|no que tange|no que se refere)\s+a\s+(educação|saúde|segurança|vida|justiça|cidadania|sociedade|lei|legislação|constituição|norma|ordem|população|violência|criminalidade|impunidade|mulher|família|dignidade|liberdade|igualdade|integridade|cultura|informação|tecnologia|proteção|prevenção|repressão)\b/gi,
-    validarContexto: (match, frase) => {
-      const trecho = frase.slice(match.index, match.index + match[0].length);
-      return /\s+a\s+/i.test(trecho) && !/\s+[àÀ]\s+/.test(trecho);
-    },
-    diagnostico: 'Ausência de crase obrigatória exigida pela regência diante de substantivo feminino.',
-    explicacao: 'A regência do termo anterior exige a preposição "a", e o substantivo feminino seguinte admite o artigo "a", tornando obrigatório o acento grave indicativo de crase ("acesso à educação", "combate à criminalidade", "respeito à Constituição").',
+    categoria: 'Crase Obrigatória',
+    re: /\b(acesso|combate|prote[cç][aã]o|respeito|direito|incentivo|apoio|assist[eê]ncia|frente|devido|gra[cç]as|referente|inerente|quanto|relativo|submetid[oa]s?|associad[oa]s?|integrado|integra[cç][aã]o|atendimento|obedi[eê]ncia|amea[cç]a|ofensa|agress[aã]o)\s+a\s+(educa[cç][aã]o|sa[uú]de|seguran[cç]a|viol[eê]ncia|criminalidade|impunidade|corrup[cç][aã]o|mulher|vida|inf[aâ]ncia|cidadania|dignidade|constitui[cç][aã]o|lei|norma|ordem|sociedade|popula[cç][aã]o|comunidade|justi[cç]a|fam[ií]lia|v[ií]tima|pessoa|liberdade|igualdade)\b/gi,
+    validarContexto: (match, frase) => !/\s+[àÀ]\s+/.test(frase.slice(match.index, match.index + match[0].length)),
+    diagnostico: 'Ausência de crase obrigatória na fusão da preposição "a" com o artigo definido feminino "a".',
+    explicacao: 'O termo regente exige a preposição "a" e o substantivo seguinte é feminino determinado pelo artigo "a", tornando obrigatório o acento grave indicativo de crase ("à").',
     sugestao: (m) => m.replace(/\s+a\s+/i, ' à '),
-    justificativa: 'Penalização direta de microestrutura em regência e crase.'
+    justificativa: 'Omissão de crase obrigatória em regência nominal.'
   },
   {
     id: 'g-crase-singular-plural',
     severidade: 'erro_confirmado',
-    categoria: 'Crase Proibida (Singular antes de Plural)',
-    re: /(?:^|\s)[àÀ]\s+([a-záàâãéêíóôõúç]{3,}s)\b/gi,
-    diagnostico: 'Crase proibida: uso de "à" no singular diante de palavra no plural.',
-    explicacao: 'Nunca ocorre crase quando o "a" está no singular e a palavra seguinte está no plural, pois há apenas preposição sem artigo ("a medidas") ou deveria haver flexão plural com artigo ("às medidas").',
-    sugestao: (m) => m.trim().replace(/^[àÀ]\s+/i, 'às ') + ' (ou "' + m.trim().replace(/^[àÀ]\s+/i, 'a ') + '")',
-    justificativa: 'Regra clássica de proibição de crase cobrada em todas as bancas.'
+    categoria: 'Crase Proibida',
+    re: /(?:^|\s)à\s+([a-záàâãéêíóôõúç]{3,}s)\b/gi,
+    validarContexto: (match) => !/^(atras|pais|simples|tenis|lapis|onibus|virus|caos|deus|mais|menos)$/.test(norm(match[1])),
+    diagnostico: 'Uso proibido de crase no singular ("à") diante de palavra no plural.',
+    explicacao: 'Nunca ocorre crase quando o "a" está no singular e a palavra seguinte está no plural. Caso haja artigo definido, deve-se empregar "às".',
+    sugestao: (m) => m.trim().replace(/^à\s+/i, 'às '),
+    justificativa: 'Corrige discordância de número no emprego do acento grave.'
+  },
+  {
+    id: 'g-tem-vem-plural',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância Verbal / Acentuação Diferencial',
+    re: /\b(os\s+[a-záàâãéêíóôõúç]+s|as\s+[a-záàâãéêíóôõúç]+s|muitos\s+[a-záàâãéêíóôõúç]+s|diversos\s+[a-záàâãéêíóôõúç]+s|v[aá]rios\s+[a-záàâãéêíóôõúç]+s|policiais|cidad[aã]os|governos|estados|munic[ií]pios|pres[ií]dios|fac[cç][oõ]es|mulheres|jovens|crian[cç]as|pessoas|indiv[ií]duos|agentes|institui[cç][oõ]es|corpora[cç][oõ]es|leis|medidas|pol[ií]ticas|problemas|crimes)\s+(?:n[aã]o\s+|j[aá]\s+|ainda\s+|tamb[eé]m\s+)?(tem|vem)\b/gi,
+    validarContexto: (match, frase) => !/\b(têm|vêm)\b/i.test(frase.slice(match.index, match.index + match[0].length)),
+    diagnostico: 'Falta de acento circunflexo diferencial de plural nos verbos "ter" ou "vir" ("têm" / "vêm") com sujeito plural.',
+    explicacao: 'Na 3ª pessoa do plural, os verbos "ter" e "vir" recebem obrigatoriamente acento circunflexo ("eles têm", "eles vêm") para diferenciar do singular ("ele tem", "ele vem").',
+    sugestao: (m) => m.replace(/\btem$/i, 'têm').replace(/\bvem$/i, 'vêm'),
+    justificativa: 'Erro clássico de concordância/acentuação diferencial.'
+  },
+  {
+    id: 'g-falta-acento-grafico',
+    severidade: 'erro_confirmado',
+    categoria: 'Acentuação Gráfica Oficial',
+    re: /\b(policia|publica|publico|publicos|publicas|seguranca|constituicao|tambem|alem|atraves|necessario|necessaria|violencia|cidadao|cidadaos|individuo|individuos|epoca|porem|sera|serao|pais|paises|indice|indices|numero|numeros|unico|unica|etico|etica|pratica|praticas|politica|politicas|economico|economica|historico|historica|psicologico|psicologica|juizo|saude|educacao|populacao|informacao|corrupcao|acao|acoes|situacao|solucao|prevencao|repressao|instrucao|execucao|protecao|funcoes|condicoes|instituicoes|organizacoes|faccoes|presidios|penitenciario|penitenciaria|familia|familias|vitima|vitimas|inumeros|inumeras)\b/gi,
+    validarContexto: (match, frase) => {
+      const original = frase.slice(match.index, match.index + match[0].length).toLowerCase();
+      if (original === 'pais') {
+        const ant = frase.slice(Math.max(0, match.index - 12), match.index).toLowerCase();
+        return /\b(o|no|do|ao|este|esse|nosso|um)\s+$/.test(ant);
+      }
+      if (original === 'pratica' || original === 'politica' || original === 'publica') {
+        const ant = frase.slice(Math.max(0, match.index - 18), match.index).toLowerCase();
+        if (/\b(ele|ela|quem|que\s+se|n[aã]o)\s+$/.test(ant)) return false;
+      }
+      const mapaExato = {
+        policia: 'polícia', publica: 'pública', publico: 'público', publicos: 'públicos', publicas: 'públicas',
+        seguranca: 'segurança', constituicao: 'constituição', tambem: 'também', alem: 'além', atraves: 'através',
+        necessario: 'necessário', necessaria: 'necessária', violencia: 'violência', cidadao: 'cidadão', cidadaos: 'cidadãos',
+        individuo: 'indivíduo', individuos: 'indivíduos', epoca: 'época', porem: 'porém', sera: 'será', serao: 'serão',
+        pais: 'país', paises: 'países', indice: 'índice', indices: 'índices', numero: 'número', numeros: 'números',
+        unico: 'único', unica: 'única', etico: 'ético', etica: 'ética', pratica: 'prática', praticas: 'práticas',
+        politica: 'política', politicas: 'políticas', economico: 'econômico', economica: 'econômica',
+        historico: 'histórico', historica: 'histórica', psicologico: 'psicológico', psicologica: 'psicológica',
+        juizo: 'juízo', saude: 'saúde', educacao: 'educação', populacao: 'população', informacao: 'informação',
+        corrupcao: 'corrupção', acao: 'ação', acoes: 'ações', situacao: 'situação', solucao: 'solução',
+        prevencao: 'prevenção', repressao: 'repressão', instrucao: 'instrução', execucao: 'execução',
+        protecao: 'proteção', funcoes: 'funções', condicoes: 'condições', instituicoes: 'instituições',
+        organizacoes: 'organizações', faccoes: 'facções', presidios: 'presídios', penitenciario: 'penitenciário',
+        penitenciaria: 'penitenciária', familia: 'família', familias: 'famílias', vitima: 'vítima', vitimas: 'vítimas',
+        inumeros: 'inúmeros', inumeras: 'inúmeras'
+      };
+      return Boolean(mapaExato[original]);
+    },
+    diagnostico: 'Ausência de acentuação gráfica ou til obrigatório na palavra.',
+    explicacao: 'A omissão de acento gráfico ou til viola as regras ortográficas oficiais (oxítonas, paroxítonas terminadas em ditongo, proparoxítonas e hiatos).',
+    sugestao: (m) => {
+      const mapa = {
+        policia: 'polícia', publica: 'pública', publico: 'público', publicos: 'públicos', publicas: 'públicas',
+        seguranca: 'segurança', constituicao: 'constituição', tambem: 'também', alem: 'além', atraves: 'através',
+        necessario: 'necessário', necessaria: 'necessária', violencia: 'violência', cidadao: 'cidadão', cidadaos: 'cidadãos',
+        individuo: 'indivíduo', individuos: 'indivíduos', epoca: 'época', porem: 'porém', sera: 'será', serao: 'serão',
+        pais: 'país', paises: 'países', indice: 'índice', indices: 'índices', numero: 'número', numeros: 'números',
+        unico: 'único', unica: 'única', etico: 'ético', etica: 'ética', pratica: 'prática', praticas: 'práticas',
+        politica: 'política', politicas: 'políticas', economico: 'econômico', economica: 'econômica',
+        historico: 'histórico', historica: 'histórica', psicologico: 'psicológico', psicologica: 'psicológica',
+        juizo: 'juízo', saude: 'saúde', educacao: 'educação', populacao: 'população', informacao: 'informação',
+        corrupcao: 'corrupção', acao: 'ação', acoes: 'ações', situacao: 'situação', solucao: 'solução',
+        prevencao: 'prevenção', repressao: 'repressão', instrucao: 'instrução', execucao: 'execução',
+        protecao: 'proteção', funcoes: 'funções', condicoes: 'condições', instituicoes: 'instituições',
+        organizacoes: 'organizações', faccoes: 'facções', presidios: 'presídios', penitenciario: 'penitenciário',
+        penitenciaria: 'penitenciária', familia: 'família', familias: 'famílias', vitima: 'vítima', vitimas: 'vítimas',
+        inumeros: 'inúmeros', inumeras: 'inúmeras'
+      };
+      return mapa[m.toLowerCase()] || m;
+    },
+    justificativa: 'Penalização direta em ortografia e microestrutura.'
+  },
+  {
+    id: 'f-mesmo-pronome-pessoal',
+    severidade: 'erro_confirmado',
+    categoria: 'Coesão Referencial (Uso de "O mesmo")',
+    re: /\b(o\s+mesmo|a\s+mesma|os\s+mesmos|as\s+mesmas)\s+(deve|devem|pode|podem|foi|foram|est[aá]|est[aã]o|precisa|precisam|sofre|sofrem|atua|atuam|realiza|realizam|garante|garantem|tem|t[eê]m)\b/gi,
+    diagnostico: 'Uso indevido da expressão "o mesmo / a mesma" funcionando como pronome pessoal sujeito.',
+    explicacao: 'A gramática normativa condena o uso de "o mesmo" para substituir pronomes pessoais ("ele", "ela") ou demonstrativos ("este", "esse").',
+    sugestao: (m) => m.replace(/^(o\s+mesmo|a\s+mesma|os\s+mesmos|as\s+mesmas)/i, 'ele / este'),
+    justificativa: 'Vício de coesão referencial penalizado pelas bancas.'
   },
   {
     id: 'g-concordancia-haver-locucao',
@@ -787,14 +884,37 @@ const REGRAS_CONTEXTUAIS = [
     justificativa: 'Violação de regra obrigatória de colocação pronominal.'
   },
   {
-    id: 'g-paronimos-acerca',
+    id: 'g-concordancia-seguranca-publicas',
     severidade: 'erro_confirmado',
-    categoria: 'Ortografia & Parônimos',
-    re: /\b(debater|discutir|tratar|falar|refletir|discorrer|pensar|conhecimento|discussão|debate|reflexão)\s+a\s+cerca\s+d[eao]s?\b/gi,
-    diagnostico: 'Confusão entre os parônimos "a cerca de" e "acerca de".',
-    explicacao: 'Quando equivale a "sobre" ou "a respeito de", a grafia correta é "acerca de" (uma só palavra). "A cerca de" indica distância aproximada ou tempo aproximado.',
-    sugestao: (m) => m.replace(/a\s+cerca\s+d/i, 'acerca d'),
-    justificativa: 'Precisão ortográfica exigida na norma culta.'
+    categoria: 'Concordância Nominal (Locução Especificativa)',
+    re: /(?:^|\s)([oó]rg[aã]os|for[cç]as|agentes|secretarias|pol[ií]ticas|sistemas|institui[cç][oõ]es|redes|mecanismos|planos|a[cç][oõ]es|setores)\s+de\s+(seguran[cç]a|sa[uú]de|educa[cç][aã]o|ordem|defesa|justi[cç]a|administra[cç][aã]o|gest[aã]o|prote[cç][aã]o|assist[eê]ncia)\s+(p[uú]blicas|p[uú]blicos|sociais)\b/gi,
+    diagnostico: 'Erro de concordância nominal: o adjetivo qualifica o núcleo preposicionado no singular ("segurança pública"), e não o termo regente plural.',
+    explicacao: 'Em expressões técnicas como "órgãos de segurança pública" ou "agentes de segurança pública", o adjetivo "pública" especifica o substantivo "segurança" (singular feminino), devendo permanecer no singular.',
+    sugestao: (m) => m.replace(/p[uú]blicas$/i, 'pública').replace(/p[uú]blicos$/i, 'pública').replace(/sociais$/i, 'social'),
+    justificativa: 'Precisão morfossintática e concordância nominal.'
+  },
+  {
+    id: 'g-paralelismo-numero-lista',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância Nominal & Paralelismo de Número',
+    re: /\b(falsificar|criar|aprovar|aplicar|combater|proteger|garantir|promover|desenvolver|implementar|adotar|utilizar|usar|gerar|causar|evitar|reduzir|ampliar|fortalecer)\s+([a-záàâãéêíóôõúç]{3,}s)\s+e\s+(identidade|voz|imagem|dado|informa[cç][aã]o|norma|lei|regra|medida|puni[cç][aã]o|san[cç][aã]o|fraude|golpe|crime|direito|dever|garantia|campanha|pol[ií]tica|a[cç][aã]o)\b/gi,
+    diagnostico: 'Quebra de paralelismo de número em termos coordenados (plural seguido de singular sem determinante).',
+    explicacao: 'Em enumerações de complementos verbais coordenados pela conjunção "e" com sentido genérico plural, deve-se manter a simetria de número (plural + plural), como em "falsificar vozes e identidades".',
+    sugestao: (m) => {
+      const s = m.replace(/m$/i, 'ns').replace(/ão$/i, 'ões');
+      return (s === m) ? m + 's' : s;
+    },
+    justificativa: 'Garante paralelismo morfossintático e precisão nominal.'
+  },
+  {
+    id: 'g-promover-campanha-singular',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância & Determinação Nominal',
+    re: /\b(promover|realizar|veicular|impulsionar)\s+(campanha|palestra|debate)\b(?:\s+(educativas|informativas|preventivas|sociais|nacionais|p[uú]blicas))?/gi,
+    diagnostico: 'Falta de flexão plural ou de artigo determinante no complemento verbal ("promover campanhas").',
+    explicacao: 'Substantivos contáveis empregados em sentido genérico plural como objeto direto de verbos de intervenção ("promover campanhas", "realizar palestras") exigem flexão no plural ou determinação por artigo ("promover uma campanha").',
+    sugestao: (m) => m.replace(/\bcampanha\b/i, 'campanhas').replace(/\bpalestra\b/i, 'palestras').replace(/\bdebate\b/i, 'debates'),
+    justificativa: 'Adequa a sintaxe nominal da proposta de intervenção.'
   },
   {
     id: 's-vocabulario-vago',
@@ -805,18 +925,235 @@ const REGRAS_CONTEXTUAIS = [
     explicacao: 'Embora gramaticalmente aceitável, o substantivo "coisa" ou "algo" possui baixa especificidade semântica. Substituí-lo por termos precisos enriquece a informatividade.',
     sugestao: () => 'fator / aspecto / fenômeno / conjuntura / entrave / diretriz',
     justificativa: 'Refinamento estilístico opcional: melhora a precisão vocabular sem configurar erro gramatical.'
-  },
-  {
-    id: 's-hoje-em-dia',
-    severidade: 'sugestao_estilistica',
-    categoria: 'Refinamento Estilístico',
-    re: /\bhoje em dia\b/gi,
-    diagnostico: 'Locução temporal desgastada pelo uso cotidiano.',
-    explicacao: 'A expressão "hoje em dia" é correta, mas pode ser substituída por marcadores temporais mais elegantes na prosa acadêmica e de concursos.',
-    sugestao: () => 'na contemporaneidade / no cenário hodierno / na atualidade',
-    justificativa: 'Sugestão estilística (não gera desconto na nota).'
   }
 ];
+
+/* =====================================================================
+   3.1 MOTOR MORFOSSINTÁTICO ALGORÍTMICO DE CONCORDÂNCIA NOMINAL E VERBAL
+   ===================================================================== */
+const PALAVRAS_INVARIAVEIS_S = new Set([
+  'mais','menos','apenas','simples','lapis','onibus','virus','pais','atras',
+  'depois','antes','sempre','jamais','ademais','outrossim','pois','mas','tres',
+  'dois','seis','vezes','atraves','alias','caos','deus','mes','reves','vies'
+]);
+
+const VERBOS_PLURAL_COMUNS = new Set([
+  'sao','estao','foram','eram','serao','tem','vem','devem','podem','precisam',
+  'tornam','fazem','geram','causam','mostram','revelam','exigem','comprometem',
+  'dificultam','representam','contribuem','impedem','garantem','promovem',
+  'afetam','atuam','possuem','ocorrem','existem','acabam','levam','deixam',
+  'ajudam','buscam','enfrentam','sofrem','crescem','aumentam','reduzem',
+  'conseguem','aproveitam','trabalham','cooperam','fortalecem','dependem'
+]);
+
+const VERBOS_SINGULAR_OU_INFINITIVO = new Set([
+  'ser','estar','ter','haver','fazer','ir','vir','poder','dever','precisar',
+  'tornar','gerar','causar','mostrar','revelar','exigir','comprometer',
+  'dificultar','representar','contribuir','impedir','garantir','promover',
+  'afetar','atuar','possuir','ocorrer','existir','acabar','levar','deixar',
+  'ajudar','buscar','enfrentar','sofrer','crescer','aumentar','reduzir',
+  'conseguir','aproveitar','trabalhar','cooperar','fortalecer','depender',
+  'assegurar','prevenir','ampliar','consolidar','fundamentar','demonstrar',
+  'transformar','favorecer','identificar','obter','realizar','falsificar',
+  'combater','investir','proteger','punir','inibir','mapear','permitir',
+  'exige','garante','promove','reduz','amplia','contribui','dificulta',
+  'representa','fortalece','depende','cabe','compete','ocorre','existe'
+]);
+
+const MAPA_PLURAL_PARA_SINGULAR_VERBO = {
+  'são': 'é', 'estão': 'está', 'foram': 'foi', 'eram': 'era', 'serão': 'será',
+  'têm': 'tem', 'vêm': 'vem', 'devem': 'deve', 'podem': 'pode', 'precisam': 'precisa',
+  'tornam': 'torna', 'fazem': 'faz', 'geram': 'gera', 'causam': 'causa',
+  'mostram': 'mostra', 'revelam': 'revela', 'exigem': 'exige', 'comprometem': 'compromete',
+  'dificultam': 'dificulta', 'representam': 'representa', 'contribuem': 'contribui',
+  'impedem': 'impede', 'garantem': 'garante', 'promovem': 'promove', 'afetam': 'afeta',
+  'atuam': 'atua', 'possuem': 'possui', 'ocorrem': 'ocorre', 'existem': 'existe',
+  'acabam': 'acaba', 'levam': 'leva', 'deixam': 'deixa', 'ajudam': 'ajuda',
+  'buscam': 'busca', 'enfrentam': 'enfrenta', 'sofrem': 'sofre', 'crescem': 'cresce',
+  'aumentam': 'aumenta', 'reduzem': 'reduz'
+};
+
+function isVerboOuGerundio(wRaw) {
+  const w = norm(wRaw);
+  if (VERBOS_SINGULAR_OU_INFINITIVO.has(w) || VERBOS_PLURAL_COMUNS.has(w)) return true;
+  return /(ando|endo|indo|ondo|aram|eram|iram|ou|eu|iu|ava|avam|ia|iam|ara|era|ira|r|os-se|a-se|e-se|am-se|em-se)$/.test(w);
+}
+
+function isPalavraPluralNominal(wRaw) {
+  const w = norm(wRaw);
+  if (w.length < 4 || PALAVRAS_INVARIAVEIS_S.has(w) || STOPWORDS_PT.has(w) || isVerboOuGerundio(wRaw)) return false;
+  return /(oes|aes|ais|eis|ois|uis|ns|as|os|es|is)$/.test(w) && w.endsWith('s');
+}
+
+function isSubstantivoSingularConfirmado(wRaw) {
+  const w = norm(wRaw);
+  if (w.length < 4 || PALAVRAS_INVARIAVEIS_S.has(w) || STOPWORDS_PT.has(w) || isVerboOuGerundio(wRaw)) return false;
+  if (w.endsWith('s') || w.endswith?.('m') || w.endsWith('m') || w.endsWith('r') || w.endsWith('z')) {
+    return /(gem|cao|sao|xao)$/.test(w);
+  }
+  return /(a|o|e|dade|tude|ncia|ica|ico|mento|ismo|ista)$/.test(w);
+}
+
+function isAdjetivoQualificativoProvavel(wRaw) {
+  const w = norm(wRaw);
+  if (PALAVRAS_INVARIAVEIS_S.has(w) || STOPWORDS_PT.has(w) || isVerboOuGerundio(wRaw)) return false;
+  return /(os[oa]s?|iv[oa]s?|ic[oa]s?|ad[oa]s?|id[oa]s?|ais|eis|vel|veis|al|ar|ares|ente|entes|ante|antes|falsa|falsas|falso|falsos|nova|novas|novo|novos|publica|publicas|publico|publicos|privada|privadas|humana|humanas|humano|humanos|urbana|urbanas|atual|atuais|mundial|mundiais|nacional|nacionais|estadual|estaduais|federal|federais|grave|graves|forte|fortes|livre|livres|comum|comuns|eficaz|eficazes|capaz|capazes|moderna|modernas|moderno|modernos|complexa|complexas|complexo|complexos|conjunta|conjuntas|conjunto|conjuntos|indevida|indevidas)$/.test(w);
+}
+
+function analisarConcordanciaMorfossintaticaAvancada(sent, pIdx, sIdx, criterioGramatical) {
+  const achados = [];
+
+  const registrar = (idSufixo, categoria, trecho, diag, regra, sugestao, just) => {
+    const tLow = trecho.toLowerCase().trim();
+    if (achados.some(a => a.trechoOriginal.toLowerCase().includes(tLow) || tLow.includes(a.trechoOriginal.toLowerCase()))) {
+      return;
+    }
+    achados.push({
+      id: `morf-${idSufixo}-p${pIdx+1}-s${sIdx+1}-${achados.length}`,
+      severidade: 'erro_confirmado',
+      tipoGlau: 'erro',
+      categoria,
+      trechoOriginal: trecho,
+      contextoSentenca: sent,
+      paragrafo: pIdx + 1,
+      sentenca: sIdx + 1,
+      localizacao: `Parágrafo ${pIdx + 1}, Sentença ${sIdx + 1}`,
+      diagnostico: diag,
+      explicacaoRegra: regra,
+      sugestaoCorrecao: sugestao,
+      justificativaCorrecao: just,
+      criterioAfetado: criterioGramatical,
+      impactoNota: 'Contabilizado como erro confirmado de Concordância na norma-padrão.'
+    });
+  };
+
+  // 1. Determinante/Adjetivo Singular + Substantivo Plural (+ Adjetivo Singular opcional)
+  const regexDetSingSubPlur = /\b(nova|novo|essa|esse|esta|este|aquela|aquele|muita|muito|pouca|pouco|toda|todo|alguma|algum|nenhuma|nenhum|outra|outro|certa|certo|determinada|determinado|v[aá]ria|diversa)\s+([a-záàâãéêíóôõúç]{4,}s)(?:\s+([a-záàâãéêíóôõúç]{4,}))?\b/gi;
+  let m;
+  while ((m = regexDetSingSubPlur.exec(sent)) !== null) {
+    const det = m[1];
+    const sub = m[2];
+    const adjPos = m[3] || '';
+    if (!isPalavraPluralNominal(sub)) continue;
+
+    if (adjPos && isSubstantivoSingularConfirmado(adjPos) && isAdjetivoQualificativoProvavel(adjPos)) {
+      registrar(
+        'det-sub-adj',
+        'Concordância Nominal',
+        `${det} ${sub} ${adjPos}`,
+        `Dupla discordância nominal: os termos "${det}" e "${adjPos}" estão no singular, mas acompanham o substantivo plural "${sub}".`,
+        'Pela regra de concordância nominal, todos os determinantes e adjetivos devem concordar obrigatoriamente em gênero e número com o substantivo núcleo a que se referem.',
+        `${det}s ${sub} ${adjPos}s`,
+        'Alinha todo o sintagma nominal no plural conforme exige a norma culta.'
+      );
+    } else {
+      registrar(
+        'det-sing-sub-plur',
+        'Concordância Nominal',
+        `${det} ${sub}`,
+        `Discordância nominal de número entre "${det}" (singular) e "${sub}" (plural).`,
+        'Adjetivos e pronomes determinantes antepostos devem concordar em número com o substantivo a que se referem.',
+        `${det}s ${sub}`,
+        'Corrige a flexão de número do termo determinante/adjetivo.'
+      );
+    }
+  }
+
+  // 2. Par Substantivo Singular + Adjetivo Plural OU Substantivo Plural + Adjetivo Singular
+  const segmentos = sent.split(/[,.;:!?()]+/);
+  segmentos.forEach(seg => {
+    const palavras = seg.trim().split(/\s+/).filter(Boolean);
+    for (let i = 0; i < palavras.length - 1; i++) {
+      const w1 = palavras[i].replace(/[^a-záàâãéêíóôõúçA-ZÁÀÂÃÉÊÍÓÔÕÚÇ-]/g, '');
+      const w2 = palavras[i + 1].replace(/[^a-záàâãéêíóôõúçA-ZÁÀÂÃÉÊÍÓÔÕÚÇ-]/g, '');
+      if (!w1 || !w2) continue;
+
+      if (isSubstantivoSingularConfirmado(w1) && isPalavraPluralNominal(w2) && isAdjetivoQualificativoProvavel(w2)) {
+        const w2Sing = w2.replace(/ns$/i, 'm').replace(/ais$/i, 'al').replace(/eis$/i, 'el').replace(/s$/i, '');
+        const w1Plur = w1.replace(/m$/i, 'ns').replace(/ão$/i, 'ões') + (/(m|ão)$/i.test(w1) ? '' : 's');
+        registrar(
+          'sub-sing-adj-plur',
+          'Concordância Nominal',
+          `${w1} ${w2}`,
+          `Discordância nominal entre o substantivo no singular ("${w1}") e o adjetivo no plural ("${w2}").`,
+          'O adjetivo qualificativo deve concordar obrigatoriamente em gênero e número com o substantivo imediatamente modificado por ele.',
+          `${w1} ${w2Sing} (ou "${w1Plur} ${w2}")`,
+          'Elimina erro grave de concordância nominal penalizado pelas bancas.'
+        );
+      }
+
+      if (isPalavraPluralNominal(w1) && isSubstantivoSingularConfirmado(w2) && isAdjetivoQualificativoProvavel(w2)) {
+        const w2Plur = w2.replace(/al$/i, 'ais').replace(/el$/i, 'eis').replace(/m$/i, 'ns') + (/(al|el|m)$/i.test(w2) ? '' : 's');
+        registrar(
+          'sub-plur-adj-sing',
+          'Concordância Nominal',
+          `${w1} ${w2}`,
+          `Discordância nominal entre o substantivo no plural ("${w1}") e o adjetivo no singular ("${w2}").`,
+          'Quando o substantivo está no plural, o adjetivo que o restringe ou qualifica deve obrigatoriamente receber a desinência de plural.',
+          `${w1} ${w2Plur}`,
+          'Garante a concordância de número no sintagma nominal.'
+        );
+      }
+    }
+  });
+
+  // 3. Sujeito Simples Singular (direto ou com núcleo distante) + Verbo no Plural
+  const oracoes = sent.split(/[,;:]|\b(?:enquanto|porque|pois|embora|quando|como|se|caso|para que|a fim de que)\b/i);
+  oracoes.forEach(oracaoRaw => {
+    const oracao = oracaoRaw.trim();
+    if (!oracao) return;
+
+    const matchSujVerbo = oracao.match(/(?:^|\b(?:por isso|logo|portanto|entretanto|contudo|todavia|ademais|outrossim|assim|dessa maneira|desse modo|nesse contexto|para isso|além disso)\s+)(O|A|Um|Uma|Esse|Essa|Este|Esta|Aquele|Aquela)\s+([a-záàâãéêíóôõúçA-ZÁÀÂÃÉÊÍÓÔÕÚÇ]{3,})(\s+(?:d[aeo]s?|em|n[ao]s?|para|com|por|sobre|contra|entre|P[uú]blico|Federal|Estadual|Municipal|Militar|Civil|Penal)\s+[^.!?]+?)?\s+(são|estão|foram|eram|serão|têm|vêm|devem|podem|precisam|tornam|fazem|geram|causam|mostram|revelam|exigem|comprometem|dificultam|representam|contribuem|impedem|garantem|promovem|afetam|atuam|possuem|ocorrem|existem|levam|deixam|ajudam|buscam|enfrentam|sofrem|crescem|aumentam|reduzem)\b/i);
+
+    if (matchSujVerbo) {
+      const art = matchSujVerbo[1];
+      const nucleo = matchSujVerbo[2];
+      const modificadores = matchSujVerbo[3] || '';
+      const verboPlural = matchSujVerbo[4];
+      const nucleoNorm = norm(nucleo);
+      const isPartitivo = /^(maioria|parte|minoria|metade|porcentagem|parcela|resto|conjunto|serie|totalidade)$/.test(nucleoNorm);
+      const temSujeitoCompostoReal = /\s+e\s+(?:o|a|os|as|um|uma)\s+[a-záàâãéêíóôõúç]+/i.test(modificadores);
+      const temRelativo = /\b(que|os quais|as quais)\s*$/i.test(modificadores.trim());
+
+      if (!nucleoNorm.endsWith('s') && !isPartitivo && !temSujeitoCompostoReal && !temRelativo) {
+        const verboCorreto = MAPA_PLURAL_PARA_SINGULAR_VERBO[verboPlural.toLowerCase()] || verboPlural.replace(/m$/i, '');
+        const trechoCompleto = `${art} ${nucleo}${modificadores} ${verboPlural}`;
+        const distanciaLonga = modificadores.trim().split(/\s+/).length >= 4;
+
+        registrar(
+          'suj-sing-verbo-plur',
+          'Concordância Verbal (Núcleo do Sujeito)',
+          trechoCompleto,
+          distanciaLonga
+            ? `Discordância verbal por atração: o verbo "${verboPlural}" foi flexionado no plural por influência dos termos intercalados, mas o núcleo do sujeito é singular ("${art} ${nucleo}").`
+            : `Discordância verbal direta: o sujeito "${art} ${nucleo}${modificadores}" está na 3ª pessoa do singular, mas o verbo "${verboPlural}" foi conjugado no plural.`,
+          'O verbo deve concordar em número e pessoa com o NÚCLEO do sujeito, e não com os termos preposicionados intercalados entre o sujeito e o verbo.',
+          `${art} ${nucleo}${modificadores} ${verboCorreto}`,
+          'Erro clássico de concordância verbal fortemente penalizado pelas bancas.'
+        );
+      }
+    }
+  });
+
+  // 4. Infinitivo flexionado indevido após expressão impessoal ("será possível reduzirem")
+  const regexInfinitivoImpessoal = /\b([eé]\s+poss[ií]vel|ser[aá]\s+poss[ií]vel|[eé]\s+necess[aá]rio|ser[aá]\s+necess[aá]rio|[eé]\s+preciso|[eé]\s+fundamental|[eé]\s+urgente|[eé]\s+importante)\s+([a-záàâãéêíóôõúç]+rem)\b/gi;
+  while ((m = regexInfinitivoImpessoal.exec(sent)) !== null) {
+    const expr = m[1];
+    const infPlural = m[2];
+    const infSingular = infPlural.replace(/em$/i, '');
+    registrar(
+      'infinitivo-impessoal',
+      'Concordância Verbal & Paralelismo (Infinitivo)',
+      `${expr} ${infPlural}`,
+      `Flexão indevida do infinitivo ("${infPlural}") após expressão impessoal ("${expr}").`,
+      'Após expressões impessoais como "será possível" e "é necessário" sem sujeito explícito, o infinitivo deve permanecer na forma impessoal (não flexionada).',
+      `${expr} ${infSingular}`,
+      'Restaura a concordância e o paralelismo sintático.'
+    );
+  }
+
+  return achados;
+}
 
 function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
   const ocorrencias = [];
@@ -836,7 +1173,6 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
   };
 
   paragrafos.forEach((par, pIdx) => {
-    // Dividir em sentenças preservando pontuação final
     const sentencas = par.match(/[^.!?]+[.!?]*/g) || [par];
 
     sentencas.forEach((sentRaw, sIdx) => {
@@ -891,30 +1227,61 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
         }
       });
 
-      // Verificar período excessivamente longo (> 45 palavras em uma única sentença sem ponto final - Varredura 3.3)
+      // Aciona o Motor Morfossintático Algorítmico de Concordância Nominal e Verbal
+      const desviosMorf = analisarConcordanciaMorfossintaticaAvancada(sent, pIdx, sIdx, criterioGramaticalMap[bancaKey]);
+      desviosMorf.forEach(dm => {
+        const tLow = dm.trechoOriginal.toLowerCase().trim();
+        const jaTem = ocorrencias.some(o => o.paragrafo === dm.paragrafo && o.sentenca === dm.sentenca && (o.trechoOriginal.toLowerCase().includes(tLow) || tLow.includes(o.trechoOriginal.toLowerCase())));
+        if(!jaTem) ocorrencias.push(dm);
+      });
+
+      // Verificar período excessivamente longo (> 62 palavras)
       const numPalavrasSent = sent.split(/\s+/).filter(Boolean).length;
-      if(numPalavrasSent > 45){
+      if(numPalavrasSent > 62){
         ocorrencias.push({
           id: `sintaxe-longa-p${pIdx+1}-s${sIdx+1}`,
           severidade: 'fragilidade_argumentativa',
           tipoGlau: 'coesao',
-          categoria: 'Construção Sintática & Truncamento (Varredura 3)',
-          trechoOriginal: sent.split(/\s+/).slice(0, 8).join(' '),
+          categoria: 'Construção Sintática & Clareza',
+          trechoOriginal: sent.slice(0, 85) + '...',
           contextoSentenca: sent,
           paragrafo: pIdx + 1,
           sentenca: sIdx + 1,
           localizacao: `Parágrafo ${pIdx + 1}, Sentença ${sIdx + 1}`,
-          diagnostico: `Período excessivamente longo (${numPalavrasSent} palavras sem ponto final), comprometendo a coerência e a clareza sintática.`,
-          explicacaoRegra: 'Períodos com mais de 45 palavras sem ponto final geram truncamento sintático e perda de clareza. Parágrafos dissertativos de alto nível organizam-se em 2 a 4 períodos de extensão equilibrada.',
-          sugestaoCorrecao: 'Dividir o período em duas orações utilizando ponto final seguido de conectivo ("Nesse sentido,", "Ademais,", "Consequentemente,").',
-          justificativaCorrecao: 'Evita truncamentos sintáticos e melhora a progressão temática.',
+          diagnostico: `Período excessivamente longo (${numPalavrasSent} palavras em uma única frase), prejudicando a fluidez e a clareza sintática.`,
+          explicacaoRegra: 'Parágrafos dissertativos de alto nível costumam organizar-se em 2 a 4 períodos de extensão equilibrada.',
+          sugestaoCorrecao: 'Dividir o período em duas frases utilizando ponto final seguido de conectivo ("Nesse sentido,", "Ademais,").',
+          justificativaCorrecao: 'Evita truncamentos sintáticos e melhora a clareza da argumentação.',
           criterioAfetado: criterioArgumentativoMap[bancaKey],
-          impactoNota: 'Impacto na coesão sequencial e coerência.'
+          impactoNota: 'Impacto qualitativo na clareza e coesão sequencial.'
         });
       }
     });
 
-    // Varredura 2.1: Coesão Interparágrafos (verificar se D1, D2 e Conclusão iniciam "secos" sem conectivo)
+    // Pilar 2.2: Parágrafo em Período Único (uma única frase longa sem ponto final interno)
+    const qtdPalavrasPar = par.trim().split(/\s+/).filter(Boolean).length;
+    if(sentencas.length === 1 && qtdPalavrasPar >= 22){
+      const inicioTrecho = par.trim().split(/\s+/).slice(0, 6).join(' ') + '...';
+      ocorrencias.push({
+        id: `periodo-unico-p${pIdx+1}`,
+        severidade: 'fragilidade_argumentativa',
+        tipoGlau: 'estrutura',
+        categoria: 'Estrutura Textual: Período Único (Pilar 2)',
+        trechoOriginal: inicioTrecho,
+        contextoSentenca: par,
+        paragrafo: pIdx + 1,
+        sentenca: 1,
+        localizacao: `Parágrafo ${pIdx + 1} (Integral)`,
+        diagnostico: `Parágrafo redigido em PERÍODO ÚNICO (${qtdPalavrasPar} palavras em uma única frase sem ponto final interno).`,
+        explicacaoRegra: 'Segundo a anatomia paragráfica das bancas (Cebraspe, AOCP e Vunesp), um parágrafo dissertativo deve conter no mínimo 2 a 3 períodos articulados (Tópico Frasal + Fundamentação/Desenvolvimento + Fechamento). Escrever o parágrafo inteiro em uma única frase longa compromete a estrutura sintática e a progressão.',
+        sugestaoCorrecao: 'Dividir o parágrafo em pelo menos 2 ou 3 períodos usando ponto final (.) e iniciando o novo período com conectivo intraparágrafo ("Nesse sentido,", "Isso ocorre porque", "Dessa forma,").',
+        justificativaCorrecao: 'Elimina o período único e organiza a anatomia interna do parágrafo.',
+        criterioAfetado: criterioArgumentativoMap[bancaKey],
+        impactoNota: 'Penalização em Estrutura Textual e Coesão Intraparágrafos.'
+      });
+    }
+
+    // Pilar 3.1: Coesão Interparágrafos (verificar se D1, D2 e Conclusão iniciam "secos" sem conectivo)
     if(pIdx >= 1){
       const inicioNorm = norm(par.slice(0, 45)).replace(/^[^a-z]+/, '');
       const operadoresIniciais = [
@@ -932,7 +1299,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
           id: `coesao-inter-p${pIdx+1}`,
           severidade: 'fragilidade_argumentativa',
           tipoGlau: 'coesao',
-          categoria: 'Coesão Interparágrafos (Varredura 2)',
+          categoria: 'Coesão Interparágrafos (Pilar 3)',
           trechoOriginal: primeirasPalavras,
           contextoSentenca: sentencas[0] || par,
           paragrafo: pIdx + 1,
@@ -952,7 +1319,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
       }
     }
 
-    // Verificar repetição vocabular excessiva dentro do mesmo parágrafo (palavras não-stopwords >= 6 letras repetidas >= 4 vezes no mesmo parágrafo)
+    // Verificar repetição vocabular excessiva dentro do mesmo parágrafo
     const palavrasPar = norm(par).replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(w => w.length >= 6 && !STOPWORDS_PT.has(w));
     const freq = {};
     palavrasPar.forEach(w => { freq[w] = (freq[w] || 0) + 1; });
@@ -969,8 +1336,8 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
           sentenca: 1,
           localizacao: `Parágrafo ${pIdx + 1}`,
           diagnostico: `Repetição frequente do vocábulo "${palavra}" (${cont} ocorrências no mesmo parágrafo).`,
-          explicacaoRegra: 'A coesão referencial valoriza a substituição lexical por sinônimos, hiperônimos ou pronomes demonstrativos/relativos para evitar eco vocabular.',
-          sugestaoCorrecao: `Alternar "${palavra}" com sinônimos contextuais, pronomes ("esse fenômeno", "tal questão") ou elipses.`,
+          explicacaoRegra: 'A coesão referencial valoriza a substituição lexical por sinônimos, hiperônimos ou pronomes.',
+          sugestaoCorrecao: `Alternar "${palavra}" com sinônimos contextuais ou pronomes ("esse fenômeno", "tal questão").`,
           justificativaCorrecao: 'Enriquece a fluidez coesiva (Coesão Referencial).',
           criterioAfetado: 'Coesão Referencial (Refinamento)',
           impactoNota: 'Sugestão de aprimoramento coesivo.'
