@@ -1005,7 +1005,7 @@ function analisarConcordanciaMorfossintaticaAvancada(sent, pIdx, sIdx, criterioG
 
   const registrar = (idSufixo, categoria, trecho, diag, regra, sugestao, just) => {
     const tLow = trecho.toLowerCase().trim();
-    if (achados.some(a => a.trechoOriginal.toLowerCase().includes(tLow) || tLow.includes(a.trechoOriginal.toLowerCase()))) {
+    if (achados.some(a => a.trechoOriginal.toLowerCase().trim() === tLow)) {
       return;
     }
     achados.push({
@@ -1231,7 +1231,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
       const desviosMorf = analisarConcordanciaMorfossintaticaAvancada(sent, pIdx, sIdx, criterioGramaticalMap[bancaKey]);
       desviosMorf.forEach(dm => {
         const tLow = dm.trechoOriginal.toLowerCase().trim();
-        const jaTem = ocorrencias.some(o => o.paragrafo === dm.paragrafo && o.sentenca === dm.sentenca && (o.trechoOriginal.toLowerCase().includes(tLow) || tLow.includes(o.trechoOriginal.toLowerCase())));
+        const jaTem = ocorrencias.some(o => o.paragrafo === dm.paragrafo && o.sentenca === dm.sentenca && o.trechoOriginal.toLowerCase().trim() === tLow);
         if(!jaTem) ocorrencias.push(dm);
       });
 

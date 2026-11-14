@@ -415,20 +415,19 @@ Devem haver investimentos urgentes nos órgãos de segurança públicas onde nã
     const pegouHaverLocucao = idsDetectados.some(id => id.includes('g-concordancia-haver-locucao'));
     const pegouProclise = idsDetectados.some(id => id.includes('g-falta-proclise-obrigatoria'));
     const pegouCoesaoSeca = idsDetectados.some(id => id.includes('coesao-inter-p2'));
-    const pegouNovaPraticas = idsDetectados.some(id => id.includes('g-concordancia-nominal-det-subs'));
-    const pegouMensagemFalsas = idsDetectados.some(id => id.includes('g-concordancia-nominal-subs-adj'));
+    const pegouNovaPraticas = idsDetectados.some(id => id.includes('morf-det-sub-adj'));
+    const pegouMensagemFalsas = idsDetectados.some(id => id.includes('morf-sub-sing-adj-plur'));
     const pegouSegurancaPublicas = idsDetectados.some(id => id.includes('g-concordancia-seguranca-publicas'));
     const pegouParalelismoLista = idsDetectados.some(id => id.includes('g-paralelismo-numero-lista'));
     const pegouPromoverCampanha = idsDetectados.some(id => id.includes('g-promover-campanha-singular'));
-    const pegouSujeitoDistante = idsDetectados.some(id => id.includes('g-concordancia-sujeito-distante'));
-    const pegouMinisterioDevem = idsDetectados.some(id => id.includes('g-concordancia-sujeito-simples-direto'));
-    const pegouPossivelReduzirem = idsDetectados.some(id => id.includes('g-infinitivo-impessoal-paralelismo'));
+    const pegouSujeitoVerboPlural = idsDetectados.filter(id => id.includes('morf-suj-sing-verbo-plur')).length >= 2;
+    const pegouPossivelReduzirem = idsDetectados.some(id => id.includes('morf-infinitivo-impessoal'));
     const pegouPeriodoUnico = idsDetectados.some(id => id.includes('periodo-unico-p2'));
 
     assert(
       'Protocolo de 6 Pilares (Concordância Nominal/Verbal Fina, Sujeito Distante, Paralelismo, Pontuação, Crase, Período Único e Coesão)',
       'Auditoria Pericial 6 Pilares (Padrão Glau)',
-      pegouVirgulaSujeito && pegouCraseRegencia && pegouCrasePlural && pegouAdversativa && pegouHaverLocucao && pegouProclise && pegouCoesaoSeca && pegouNovaPraticas && pegouMensagemFalsas && pegouSegurancaPublicas && pegouParalelismoLista && pegouPromoverCampanha && pegouSujeitoDistante && pegouMinisterioDevem && pegouPossivelReduzirem && pegouPeriodoUnico,
+      pegouVirgulaSujeito && pegouCraseRegencia && pegouCrasePlural && pegouAdversativa && pegouHaverLocucao && pegouProclise && pegouCoesaoSeca && pegouNovaPraticas && pegouMensagemFalsas && pegouSegurancaPublicas && pegouParalelismoLista && pegouPromoverCampanha && pegouSujeitoVerboPlural && pegouPossivelReduzirem && pegouPeriodoUnico,
       `Desvios periciais detectados: ${resVarreduras.ocorrencias.length} ocorrências confirmadas nos 6 pilares.`
     );
 
