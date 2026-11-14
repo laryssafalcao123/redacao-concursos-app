@@ -403,6 +403,26 @@ Portanto, investimentos contínuos em tecnologia são indispensáveis.`;
       'Aba do professor oculta da navegação pública do aluno e protegida por senha master do cursinho com suporte a logout.'
     );
 
+    /* 15. TESTE PERICIAL DAS 3 VARREDURAS RIGOROSAS (EXAMINADOR SÊNIOR) */
+    const textoVarreduras = `O Estado brasileiro, deve garantir o acesso a educação e combater à medidas ineficazes, investiu mas falhou.
+Devem haver investimentos urgentes na segurança pública onde não observa-se resultados.`;
+    const resVarreduras = global.MotorCorrecao.avaliarRedacao(textoVarreduras, 'Segurança pública e educação no Brasil', 'pmpe');
+    const idsDetectados = resVarreduras.ocorrencias.map(o => o.id);
+    const pegouVirgulaSujeito = idsDetectados.some(id => id.includes('g-virgula-sujeito-verbo'));
+    const pegouCraseRegencia = idsDetectados.some(id => id.includes('g-falta-crase-regencia'));
+    const pegouCrasePlural = idsDetectados.some(id => id.includes('g-crase-singular-plural'));
+    const pegouAdversativa = idsDetectados.some(id => id.includes('g-falta-virgula-adversativa'));
+    const pegouHaverLocucao = idsDetectados.some(id => id.includes('g-concordancia-haver-locucao'));
+    const pegouProclise = idsDetectados.some(id => id.includes('g-falta-proclise-obrigatoria'));
+    const pegouCoesaoSeca = idsDetectados.some(id => id.includes('coesao-inter-p2'));
+
+    assert(
+      'Protocolo de 3 Varreduras Rigorosas (Vírgula Sujeito-Verbo, Crase, Haver, Próclise e Coesão Seca)',
+      'Auditoria Pericial 3 Varreduras',
+      pegouVirgulaSujeito && pegouCraseRegencia && pegouCrasePlural && pegouAdversativa && pegouHaverLocucao && pegouProclise && pegouCoesaoSeca,
+      `Desvios periciais detectados: ${resVarreduras.ocorrencias.length} ocorrências confirmadas nas 3 varreduras.`
+    );
+
   } catch(err){
     assert('Execução sem exceções da suíte de testes', 'Sistema', false, err.message);
   }

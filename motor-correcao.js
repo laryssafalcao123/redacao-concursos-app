@@ -328,7 +328,7 @@ const REGRAS_CONTEXTUAIS = [
     id: 'g-afim-finalidade',
     severidade: 'erro_confirmado',
     categoria: 'Ortografia & Homônimos',
-    re: /\b[aà]fim\s+de\b/gi,
+    re: /(?:^|\s)[aà]fim\s+de\b/gi,
     diagnostico: 'Grafia incorreta da locução prepositiva de finalidade "a fim de".',
     explicacao: 'Para indicar finalidade ou objetivo (= para), escreve-se separado e sem acento grave: "a fim de". A forma junta "afim" é um adjetivo que significa "semelhante".',
     sugestao: () => 'a fim de',
@@ -349,20 +349,20 @@ const REGRAS_CONTEXTUAIS = [
     id: 'g-crase-verbo',
     severidade: 'erro_confirmado',
     categoria: 'Crase',
-    re: /\bà\s+(partir|fazer|garantir|promover|combater|reduzir|assegurar|criar|buscar|evitar|proteger|desenvolver|investir|construir|impedir|concluir|analisar|compreender|resolver|tratar|agir|propor|ampliar|fortalecer)\b/gi,
+    re: /(?:^|\s)[àÀ]\s+(partir|fazer|garantir|promover|combater|reduzir|assegurar|criar|buscar|evitar|proteger|desenvolver|investir|construir|impedir|concluir|analisar|compreender|resolver|tratar|agir|propor|ampliar|fortalecer)\b/gi,
     diagnostico: 'Uso indevido do acento grave (crase) diante de verbo no infinitivo.',
     explicacao: 'A crase é a fusão da preposição "a" com o artigo feminino "a". Como verbos não admitem artigo feminino anteposto, nunca ocorre crase antes de verbo.',
-    sugestao: (m) => m.replace(/^à/i, 'a'),
+    sugestao: (m) => m.trim().replace(/^[àÀ]/i, 'a'),
     justificativa: 'Desvio de crase antes de verbo é fortemente penalizado por Cebraspe, AOCP, Vunesp e INEP.'
   },
   {
     id: 'g-crase-pronomes-masc',
     severidade: 'erro_confirmado',
     categoria: 'Crase',
-    re: /\bà\s+(todos|todo|cada|qualquer|ningu[eé]m|algu[eé]m|ela|elas|ele|eles|isso|isto|aquilo|esse|este|respeito|n[ií]vel|curto|longo|m[eé]dio|prazo|fim|um|dois|tr[eê]s)\b/gi,
+    re: /(?:^|\s)[àÀ]\s+(todos|toda|todas|todo|cada|qualquer|ningu[eé]m|algu[eé]m|ela|elas|ele|eles|isso|isto|aquilo|esse|essa|este|esta|respeito|n[ií]vel|curto|longo|m[eé]dio|prazo|fim|um|uma|dois|tr[eê]s)\b/gi,
     diagnostico: 'Emprego indevido de crase antes de palavra masculina ou pronome que rejeita artigo.',
-    explicacao: 'Não ocorre crase diante de vocábulos masculinos ("a respeito", "a curto prazo") nem antes de pronomes pessoais, demonstrativos iniciados por "e/i" ou indefinidos ("a todos", "a qualquer", "a essa").',
-    sugestao: (m) => m.replace(/^[àÀ]/, 'a'),
+    explicacao: 'Não ocorre crase diante de vocábulos masculinos ("a respeito", "a curto prazo") nem antes de pronomes pessoais, demonstrativos ou indefinidos ("a todos", "a toda", "a ela", "a essa").',
+    sugestao: (m) => m.trim().replace(/^[àÀ]/, 'a'),
     justificativa: 'Corrige emprego proibido do acento grave.'
   },
   {
@@ -688,6 +688,115 @@ const REGRAS_CONTEXTUAIS = [
 
   /* --- SUGESTÕES ESTILÍSTICAS (SEM DESCONTO NA NOTA GRAMATICAL — REGRA 4.2) --- */
   {
+    id: 'g-virgula-sujeito-verbo',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação & Sintaxe (Vírgula Sujeito-Verbo)',
+    re: /(?:^|[.!?]\s+)((?:O|A|Os|As|Um|Uma|Esse|Essa|Este|Esta|Tal|Todo|Toda)\s+[a-záàâãéêíóôõúç]+(?:\s+(?:de|da|do|das|dos|brasileir[oa]s?|públic[oa]s?|sociais?|federais?|estaduais?|atuais?|contemporâne[oa]s?|civis|militares|penais|humanos|policiais|estatais|governamentais))*),\s+(é|são|foi|foram|será|serão|deve|devem|precisa|precisam|pode|podem|tem|têm|exige|exigem|mostra|mostram|revela|revelam|evidencia|evidenciam|afeta|afetam|causa|causam|gera|geram|representa|representam|constitui|constituem|enfrenta|enfrentam|sofre|sofrem|carece|carecem|necessita|necessitam|atua|atuam|busca|buscam|garante|garantem|promove|promovem|impõe|impõem)\b/gi,
+    diagnostico: 'Erro sintático grave: vírgula separando o sujeito do verbo (predicado).',
+    explicacao: 'Na ordem direta da oração (Sujeito + Verbo + Complemento), é proibido usar vírgula entre o sujeito e o verbo ou entre o verbo e o objeto, mesmo que o sujeito seja longo.',
+    sugestao: (m) => m.replace(/,\s+/, ' '),
+    justificativa: 'Penalização direta e severa nas bancas Cebraspe, Instituto AOCP e Vunesp.'
+  },
+  {
+    id: 'g-virgula-verbo-complemento',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação & Sintaxe (Vírgula Verbo-Complemento)',
+    re: /\b(garantir|promover|assegurar|combater|proteger|reduzir|ampliar|criar|buscar|efetivar|implementar|exigir|garante|garantem|promove|promovem|combate|combatem|protege|protegem|afeta|afetam|gera|geram|causa|causam|provoca|provocam|impede|impedem),\s+(o|a|os|as|um|uma|ao|à|aos|às)\s+([a-záàâãéêíóôõúç]+)\b/gi,
+    validarContexto: (match, frase) => {
+      const resto = frase.slice(match.index + match[0].length);
+      if(/^\s*[a-záàâãéêíóôõúç]*\s*,/.test(resto)) return false;
+      return true;
+    },
+    diagnostico: 'Erro sintático grave: vírgula separando o verbo de seu complemento (objeto direto/indireto).',
+    explicacao: 'Na ordem direta da oração (Sujeito + Verbo + Complemento), é proibido usar vírgula entre o sujeito e o verbo ou entre o verbo e o objeto, mesmo que o sujeito seja longo.',
+    sugestao: (m) => m.replace(/,\s+/, ' '),
+    justificativa: 'Ruptura sintática entre verbo transitivo e complemento verbal.'
+  },
+  {
+    id: 'g-falta-virgula-adversativa',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação (Conjunção Adversativa)',
+    re: /\b([a-záàâãéêíóôõúç]{2,})\s+(mas|porém|contudo|todavia|entretanto)\s+([a-záàâãéêíóôõúç]{2,})\b/gi,
+    validarContexto: (match) => {
+      const p = match[0].split(/\s+/);
+      const ant = norm(p[0].toLowerCase());
+      const seg = norm(p[2].toLowerCase());
+      if(ant === 'nao' || ant === 'apenas' || seg === 'tambem') return false;
+      return true;
+    },
+    diagnostico: 'Ausência de vírgula obrigatória antes de conjunção adversativa.',
+    explicacao: 'Orações coordenadas sindéticas adversativas introduzidas por "mas", "porém", "contudo", "todavia" ou "entretanto" exigem vírgula obrigatória antes da conjunção.',
+    sugestao: (m) => m.replace(/\s+(mas|porém|contudo|todavia|entretanto)\s+/i, ', $1 '),
+    justificativa: 'Pontuação obrigatória no período composto por coordenação.'
+  },
+  {
+    id: 'g-falta-virgula-adjunto',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação (Adjunto Adverbial Deslocado)',
+    re: /(?:^|[.!?]\s+)(No Brasil\s+(?:contemporâneo|atual|hodierno)|Na sociedade\s+(?:atual|brasileira|contemporânea|hodierna)|Atualmente|Hodiernamente|Infelizmente|Historicamente|Consequentemente|Primeiramente|Diante\s+d(?:isso|esse\s+cenário|esse\s+contexto|essa\s+realidade)|Nesse\s+(?:contexto|cenário|sentido|viés|prisma|panorama)|Sob\s+ess[ea]\s+(?:ótica|viés|prisma|perspectiva|aspecto)|Em\s+(?:suma|síntese|primeiro\s+lugar|segundo\s+lugar|virtude\s+disso|decorrência\s+disso))\s+(?![,])/gi,
+    diagnostico: 'Ausência de vírgula obrigatória em adjunto adverbial ou operador deslocado no início do período.',
+    explicacao: 'Adjuntos adverbiais deslocados para a cabeça do período e conectivos interparágrafos/intraparágrafos devem ser obrigatoriamente seguidos de vírgula.',
+    sugestao: (m) => m.trim() + ',',
+    justificativa: 'Regra de isolamento de adjuntos adverbiais antepostos.'
+  },
+  {
+    id: 'g-falta-crase-regencia',
+    severidade: 'erro_confirmado',
+    categoria: 'Crase (Regência Nominal e Verbal)',
+    re: /\b(acesso|combate|respeito|desrespeito|incentivo|estímulo|apoio|assistência|proteção|ameaça|ofensa|violação|frente|devido|referente|quanto|em relação|no tocante|no que tange|no que se refere)\s+a\s+(educação|saúde|segurança|vida|justiça|cidadania|sociedade|lei|legislação|constituição|norma|ordem|população|violência|criminalidade|impunidade|mulher|família|dignidade|liberdade|igualdade|integridade|cultura|informação|tecnologia|proteção|prevenção|repressão)\b/gi,
+    validarContexto: (match, frase) => {
+      const trecho = frase.slice(match.index, match.index + match[0].length);
+      return /\s+a\s+/i.test(trecho) && !/\s+[àÀ]\s+/.test(trecho);
+    },
+    diagnostico: 'Ausência de crase obrigatória exigida pela regência diante de substantivo feminino.',
+    explicacao: 'A regência do termo anterior exige a preposição "a", e o substantivo feminino seguinte admite o artigo "a", tornando obrigatório o acento grave indicativo de crase ("acesso à educação", "combate à criminalidade", "respeito à Constituição").',
+    sugestao: (m) => m.replace(/\s+a\s+/i, ' à '),
+    justificativa: 'Penalização direta de microestrutura em regência e crase.'
+  },
+  {
+    id: 'g-crase-singular-plural',
+    severidade: 'erro_confirmado',
+    categoria: 'Crase Proibida (Singular antes de Plural)',
+    re: /(?:^|\s)[àÀ]\s+([a-záàâãéêíóôõúç]{3,}s)\b/gi,
+    diagnostico: 'Crase proibida: uso de "à" no singular diante de palavra no plural.',
+    explicacao: 'Nunca ocorre crase quando o "a" está no singular e a palavra seguinte está no plural, pois há apenas preposição sem artigo ("a medidas") ou deveria haver flexão plural com artigo ("às medidas").',
+    sugestao: (m) => m.trim().replace(/^[àÀ]\s+/i, 'às ') + ' (ou "' + m.trim().replace(/^[àÀ]\s+/i, 'a ') + '")',
+    justificativa: 'Regra clássica de proibição de crase cobrada em todas as bancas.'
+  },
+  {
+    id: 'g-concordancia-haver-locucao',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância Verbal (Verbo Impessoal)',
+    re: /\b(devem|podem|deveriam|poderiam|costumam|v[aã]o|ir[aã]o)\s+haver\b/gi,
+    diagnostico: 'Pluralização indevida de locução verbal com o verbo impessoal "haver".',
+    explicacao: 'O verbo "haver" no sentido de existir ou ocorrer é impessoal e transmite sua impessoalidade ao verbo auxiliar, que deve permanecer obrigatoriamente no singular ("deve haver", "pode haver").',
+    sugestao: (m) => m.replace(/^devem/i, 'deve').replace(/^podem/i, 'pode').replace(/^deveriam/i, 'deveria').replace(/^poderiam/i, 'poderia').replace(/^costumam/i, 'costuma').replace(/^v[aã]o/i, 'vai').replace(/^ir[aã]o/i, 'irá'),
+    justificativa: 'Desvio de concordância verbal severamente penalizado.'
+  },
+  {
+    id: 'g-falta-proclise-obrigatoria',
+    severidade: 'erro_confirmado',
+    categoria: 'Colocação Pronominal (Próclise Obrigatória)',
+    re: /\b(n[aã]o|nunca|jamais|ningu[eé]m|nada|que|quando|embora|conforme|porque|caso|como)\s+([a-záàâãéêíóôõúç]{2,})-(me|te|se|lhe|lhes|nos)\b/gi,
+    diagnostico: 'Uso indevido de ênclise após palavra atrativa (falta de próclise obrigatória).',
+    explicacao: 'Palavras negativas ("não", "nunca"), pronomes relativos ("que") e conjunções subordinativas ("quando", "embora", "conforme") atraem obrigatoriamente o pronome oblíquo átono para antes do verbo (próclise).',
+    sugestao: (m) => {
+      const p = m.match(/\b(n[aã]o|nunca|jamais|ningu[eé]m|nada|que|quando|embora|conforme|porque|caso|como)\s+([a-záàâãéêíóôõúç]{2,})-(me|te|se|lhe|lhes|nos)\b/i);
+      return p ? `${p[1]} ${p[3]} ${p[2]}` : m;
+    },
+    justificativa: 'Violação de regra obrigatória de colocação pronominal.'
+  },
+  {
+    id: 'g-paronimos-acerca',
+    severidade: 'erro_confirmado',
+    categoria: 'Ortografia & Parônimos',
+    re: /\b(debater|discutir|tratar|falar|refletir|discorrer|pensar|conhecimento|discussão|debate|reflexão)\s+a\s+cerca\s+d[eao]s?\b/gi,
+    diagnostico: 'Confusão entre os parônimos "a cerca de" e "acerca de".',
+    explicacao: 'Quando equivale a "sobre" ou "a respeito de", a grafia correta é "acerca de" (uma só palavra). "A cerca de" indica distância aproximada ou tempo aproximado.',
+    sugestao: (m) => m.replace(/a\s+cerca\s+d/i, 'acerca d'),
+    justificativa: 'Precisão ortográfica exigida na norma culta.'
+  },
+  {
     id: 's-vocabulario-vago',
     severidade: 'sugestao_estilistica',
     categoria: 'Precisão Lexical (Refinamento)',
@@ -782,28 +891,66 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
         }
       });
 
-      // Verificar período excessivamente longo (> 62 palavras em uma única sentença sem ponto final)
+      // Verificar período excessivamente longo (> 45 palavras em uma única sentença sem ponto final - Varredura 3.3)
       const numPalavrasSent = sent.split(/\s+/).filter(Boolean).length;
-      if(numPalavrasSent > 62){
+      if(numPalavrasSent > 45){
         ocorrencias.push({
           id: `sintaxe-longa-p${pIdx+1}-s${sIdx+1}`,
           severidade: 'fragilidade_argumentativa',
           tipoGlau: 'coesao',
-          categoria: 'Construção Sintática & Clareza',
-          trechoOriginal: sent.slice(0, 85) + '...',
+          categoria: 'Construção Sintática & Truncamento (Varredura 3)',
+          trechoOriginal: sent.split(/\s+/).slice(0, 8).join(' '),
           contextoSentenca: sent,
           paragrafo: pIdx + 1,
           sentenca: sIdx + 1,
           localizacao: `Parágrafo ${pIdx + 1}, Sentença ${sIdx + 1}`,
-          diagnostico: `Período excessivamente longo (${numPalavrasSent} palavras em uma única frase), prejudicando a fluidez e a clareza sintática.`,
-          explicacaoRegra: 'Parágrafos dissertativos de alto nível costumam organizar-se em 2 a 4 períodos de extensão equilibrada (entre 20 e 45 palavras por período), facilitando a leitura das relações de causa e consequência.',
-          sugestaoCorrecao: 'Dividir o período em duas frases utilizando ponto final seguido de conectivo ("Nesse sentido,", "Ademais,", "Consequentemente,").',
-          justificativaCorrecao: 'Evita truncamentos sintáticos e melhora a clareza da argumentação.',
+          diagnostico: `Período excessivamente longo (${numPalavrasSent} palavras sem ponto final), comprometendo a coerência e a clareza sintática.`,
+          explicacaoRegra: 'Períodos com mais de 45 palavras sem ponto final geram truncamento sintático e perda de clareza. Parágrafos dissertativos de alto nível organizam-se em 2 a 4 períodos de extensão equilibrada.',
+          sugestaoCorrecao: 'Dividir o período em duas orações utilizando ponto final seguido de conectivo ("Nesse sentido,", "Ademais,", "Consequentemente,").',
+          justificativaCorrecao: 'Evita truncamentos sintáticos e melhora a progressão temática.',
           criterioAfetado: criterioArgumentativoMap[bancaKey],
-          impactoNota: 'Impacto qualitativo na clareza e coesão sequencial.'
+          impactoNota: 'Impacto na coesão sequencial e coerência.'
         });
       }
     });
+
+    // Varredura 2.1: Coesão Interparágrafos (verificar se D1, D2 e Conclusão iniciam "secos" sem conectivo)
+    if(pIdx >= 1){
+      const inicioNorm = norm(par.slice(0, 45)).replace(/^[^a-z]+/, '');
+      const operadoresIniciais = [
+        'em primeiro lugar','primeiramente','em uma primeira analise','sob essa otica','sob esse vies',
+        'sob esse prisma','nesse sentido','nesse contexto','nesse cenario','diante disso','diante desse cenario',
+        'ademais','outrossim','alem disso','somado a isso','paralelamente','por outro lado','em segundo lugar',
+        'portanto','dessa forma','desse modo','assim sendo','por conseguinte','em suma','em sintese','logo',
+        'destarte','dessarte','consequentemente','cabe ressaltar','convem destacar','vale destacar','urge salientar'
+      ];
+      const temOperador = operadoresIniciais.some(op => inicioNorm.startsWith(op));
+      if(!temOperador){
+        const primeirasPalavras = par.trim().split(/\s+/).slice(0, 4).join(' ');
+        const ehConclusao = (pIdx === paragrafos.length - 1 && paragrafos.length >= 3);
+        ocorrencias.push({
+          id: `coesao-inter-p${pIdx+1}`,
+          severidade: 'fragilidade_argumentativa',
+          tipoGlau: 'coesao',
+          categoria: 'Coesão Interparágrafos (Varredura 2)',
+          trechoOriginal: primeirasPalavras,
+          contextoSentenca: sentencas[0] || par,
+          paragrafo: pIdx + 1,
+          sentenca: 1,
+          localizacao: `Parágrafo ${pIdx + 1} (Início do parágrafo)`,
+          diagnostico: `Parágrafo iniciado "seco" (sem operador argumentativo de transição interparágrafos).`,
+          explicacaoRegra: 'Os parágrafos de Desenvolvimento (D1 e D2) e de Conclusão devem iniciar com operadores argumentativos adequados (ex: "Em primeiro lugar,", "Ademais,", "Outrossim,", "Portanto,"). Iniciar sem conectivo compromete a coesão sequencial.',
+          sugestaoCorrecao: ehConclusao
+            ? `Portanto, ${primeirasPalavras.charAt(0).toLowerCase() + primeirasPalavras.slice(1)}`
+            : (pIdx === 1
+                ? `Nesse contexto, ${primeirasPalavras.charAt(0).toLowerCase() + primeirasPalavras.slice(1)}`
+                : `Ademais, ${primeirasPalavras.charAt(0).toLowerCase() + primeirasPalavras.slice(1)}`),
+          justificativaCorrecao: 'Estabelece a ligação coesiva explícita exigida entre os blocos do texto.',
+          criterioAfetado: criterioArgumentativoMap[bancaKey],
+          impactoNota: 'Penalização no critério de Coesão Sequencial.'
+        });
+      }
+    }
 
     // Verificar repetição vocabular excessiva dentro do mesmo parágrafo (palavras não-stopwords >= 6 letras repetidas >= 4 vezes no mesmo parágrafo)
     const palavrasPar = norm(par).replace(/[^a-z\s]/g, ' ').split(/\s+/).filter(w => w.length >= 6 && !STOPWORDS_PT.has(w));

@@ -233,7 +233,7 @@ function construirPromptBanca({ texto, tema, comando, bancaKey, spec, linhasReai
 
   const regraEspecifica = instrucoesBanca[bancaKey] || instrucoesBanca.pmpe;
 
-  return `Você é um avaliador de elite e membro sênior da banca examinadora oficial, responsável por corrigir discursivas com extremo rigor técnico, fidelidade à legislação, aos critérios do edital e à norma culta da Língua Portuguesa.
+  return `Você é um Examinador Sênior de Bancas de Concursos Públicos (Cebraspe, Instituto AOCP e Fundação Vunesp). Sua missão é realizar uma auditoria pericial, implacável e 100% detalhada da redação do candidato, sem deixar passar nenhum desvio básico ou avançado.
 
 ${regraEspecifica}
 ${instrucaoLinhas}
@@ -247,14 +247,50 @@ REDAÇÃO DO CANDIDATO PARA AVALIAÇÃO:
 ${texto}
 """
 
-INSTRUÇÕES CRÍTICAS DE AVALIAÇÃO:
-1. Avalie estritamente segundo os critérios da banca especificada. Seja cirúrgico, justo e pedagógico.
-2. Identifique todos os desvios gramaticais reais (norma-padrão) indicando o trecho exato, severidade ('erro_confirmado', 'fragilidade_argumentativa' ou 'sugestao_estilistica'), a regra violada e a forma correta.
-3. MARCAÇÕES VISUAIS INTERATIVAS NO TEXTO (ESTILO GLAU.COM): Forneça o array estruturado "marcacoes_inline", mapeando cada trecho com desvio, melhoria ou destaque positivo com fragmentos literais do texto (1 a 12 palavras), parágrafo (1, 2, 3...), categoria obrigatória entre os 5 tipos ("gramatica", "coesao", "repeticao", "argumentacao", "acerto"), nome da regra/critério, explicação pedagógica direta e sugestão de substituição precisa.
-4. Analise cada parágrafo individualmente (função, relação com a tese, qualidade e versão revisada).
-5. Avalie o repertório sociocultural: se é legitimado, se é pertinente ao tema e se foi usado de forma produtiva (com explicação e ponte com o argumento).
-6. Gere o plano de melhoria em 3 níveis (alta, média e complementar).
-7. Forneça uma reescrita orientada do parágrafo mais frágil e um modelo integral de estudo nota máxima.
+Execute obrigatoriamente a correção em 3 VARREDURAS RIGOROSAS:
+
+=====================================================================
+VARREDURA 1: GRAMÁTICA NORMATIVA E MICROESTRUTURA (CRITÉRIO DE PENALIZAÇÃO DIRETA)
+=====================================================================
+Analise o texto período por período e aponte TODOS os erros nos seguintes pontos:
+1. PONTUAÇÃO E VÍRGULAS (ERRO CRÍTICO):
+   - Proibição Sintática Absoluta: Verifique se há vírgula separando o SUJEITO do VERBO (predicado) ou o VERBO de seus COMPLEMENTOS (objeto direto/indireto). Se houver, marque como "erro_confirmado" e explique claramente: "Na ordem direta da oração (Sujeito + Verbo + Complemento), é proibido usar vírgula entre o sujeito e o verbo ou entre o verbo e o objeto, mesmo que o sujeito seja longo."
+   - Falta de Vírgula Obrigatória: Aponte ausência de vírgula em adjuntos adverbiais deslocados (ex: "No Brasil contemporâneo, ..."), após conectivos iniciais ("Portanto,", "Ademais,", "Nesse sentido,"), antes de conjunções adversativas (", mas", ", contudo", ", porém") e em orações subordinadas antepostas ou explicativas.
+2. CRASE:
+   - Falta de Crase: Identifique ausência do acento grave em locuções femininas ("à medida que", "à luz de", "às vezes") e na fusão de preposição "a" + artigo "a/as" exigida pela regência (ex: "visar à proteção", "obedecer às normas", "acesso à educação").
+   - Crase Proibida: Puna o uso de crase antes de verbos no infinitivo ("a partir", "a combater"), palavras masculinas ("a curto prazo", "a respeito"), pronomes indefinidos/pessoais/demonstrativos ("a todos", "a toda", "a ela", "a essa") e "a" no singular antes de palavra no plural.
+3. CONCORDÂNCIA VERBAL E NOMINAL:
+   - Verbos Impessoais: Puna a pluralização indevida de "haver" no sentido de existir/ocorrer ("Houveram crimes" -> "Houve crimes"; "Devem haver" -> "Deve haver") e "fazer" indicando tempo decorrido ("Fazem dez anos" -> "Faz dez anos").
+   - Voz Passiva Sintética e Sujeito Distante: Verifique se o verbo concorda com o sujeito paciente plural (ex: "Observa-se problemas" -> "Observam-se problemas") e se há discordância de gênero/número entre substantivos, adjetivos e particípios.
+4. REGÊNCIA VERBAL E NOMINAL:
+   - Audite verbos clássicos de prova: "visar" (no sentido de objetivar exige preposição "a": "visar ao bem"), "obedecer/desobedecer" (exige "a"), "assistir" (no sentido de ver exige "a"), "implicar" e "acarretar" (no sentido de causar são transitivos diretos: proibido usar "implicar em" ou "acarretar em"), "chegar/ir" (exigem preposição "a" e não "em").
+   - Uso de "ONDE" vs. "EM QUE": Puna o uso de "onde" quando não se referir a lugar físico (ex: "sociedade onde", "momento onde", "situação onde" -> corrigir para "em que" ou "no qual/na qual").
+5. ORTOGRAFIA, ACENTUAÇÃO E COLOCAÇÃO PRONOMINAL:
+   - Aponte falta de acentos gráficos, erros de grafia, confusão entre parônimos/homônimos ("a fim de" vs "afim", "acerca de" vs "a cerca de", "ao encontro de" vs "de encontro a", "haja vista" vs "haja visto").
+   - Puna início de frase com pronome oblíquo átono ("Se observa..." -> "Observa-se...") e falta de próclise obrigatória após palavras negativas ("não", "nunca"), advérbios sem vírgula, pronomes relativos ("que") e conjunções subordinativas ("quando", "embora", "conforme").
+
+=====================================================================
+VARREDURA 2: COESÃO TEXTUAL (REFERENCIAL E SEQUENCIAL)
+=====================================================================
+1. COESÃO INTERPARÁGRAFOS: Verifique se os parágrafos de Desenvolvimento (D1 e D2) e de Conclusão iniciam com operadores argumentativos adequados (ex: "Em primeiro lugar,", "Ademais,", "Outrossim,", "Portanto,"). Se o parágrafo começar "seco" (sem conectivo), aponte o erro de coesão sequencial.
+2. COESÃO INTRAPARÁGRAFOS: Verifique se os períodos dentro do mesmo parágrafo estão ligados por conectivos ou se são apenas frases soltas/justapostas.
+3. ADEQUAÇÃO SEMÂNTICA DO CONECTIVO: Aponte se o candidato usou um conectivo com sentido errado (ex: usar "Portanto" sem haver conclusão lógica, ou "Contudo" quando as ideias não se opõem).
+4. COESÃO REFERENCIAL E ECO VOCABULAR: Aponte repetições viciosas da mesma palavra em linhas próximas, uso ambíguo de pronomes possessivos ("seu/sua") e mau uso de demonstrativos ("este" vs "esse").
+
+=====================================================================
+VARREDURA 3: COERÊNCIA E CONSISTÊNCIA ARGUMENTATIVA (MACROESTRUTURA)
+=====================================================================
+1. CONTRADIÇÃO INTERNA E EXTERNA: Aponte qualquer contradição entre a tese da introdução e os argumentos do desenvolvimento, ou afirmações que violem a Constituição Federal e os Direitos Humanos.
+2. PROGRESSÃO TEMÁTICA VS. CIRCULARIDADE: Verifique se o texto avança nas ideias ou se apenas repete a mesma frase com palavras diferentes (argumentação circular / "encher linguiça").
+3. FRAGMENTAÇÃO E TRUNCAMENTO SINTÁTICO: Aponte períodos incompletos (subordinadas sem oração principal) ou períodos excessivamente longos (mais de 45 palavras sem ponto final) que comprometem a coerência e a clareza.
+4. GENERALIZAÇÕES E SENSO COMUM: Aponte expressões absolutas ou coloquiais ("ninguém faz nada", "todo mundo sabe", "nos dias de hoje", "cada um fazer sua parte") e exija modalização dissertativa formal.
+
+INSTRUÇÕES ADICIONAIS DE MAPEAMENTO PARA O RELATÓRIO E RAIO-X INTERATIVO:
+1. Avalie estritamente segundo os critérios da banca especificada. Seja cirúrgico, implacável e pedagógico.
+2. Todos os desvios detectados nas Varreduras 1, 2 e 3 devem constar obrigatoriamente tanto em "ocorrencias" quanto em "marcacoes_inline" (com fragmentos literais de 1 a 12 palavras, parágrafo 1, 2, 3..., categoria entre "gramatica", "coesao", "repeticao", "argumentacao", "acerto", regra/critério, explicação pedagógica direta e sugestão de substituição precisa).
+3. Analise cada parágrafo individualmente (função, relação com a tese, qualidade e versão revisada).
+4. Avalie o repertório sociocultural: se é legitimado, se é pertinente ao tema e se foi usado de forma produtiva (com explicação e ponte com o argumento).
+5. Gere o plano de melhoria em 3 níveis (alta, média e complementar), uma reescrita orientada do parágrafo mais frágil e um modelo integral de estudo nota máxima.
 
 Retorne EXCLUSIVAMENTE um objeto JSON válido (sem comentários adicionais fora do JSON) com a seguinte estrutura exata:
 {
@@ -513,35 +549,108 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
       }
 
       if (jsonResult && (jsonResult.total !== undefined || jsonResult.espelhoCriterios)) {
-        console.log(`[IA Cascade] Sucesso com modelo: ${item.label}!`);
-        // Completar campos essenciais caso o modelo omita algum metadado
-        jsonResult.dataHora = new Date().toISOString();
-        jsonResult.bancaKey = bancaKey;
-        jsonResult.bancaNome = spec.banca;
-        jsonResult.concursoNome = spec.name;
-        jsonResult.rubricaVersion = spec.rubricaVersion;
-        jsonResult.tema = tema;
-        jsonResult.comando = comando;
-        jsonResult.max = spec.maxScore;
-        jsonResult.minPass = spec.minPass;
-        jsonResult.minPassRule = spec.minPassRule;
-        jsonResult.modeloUtilizado = item.label;
-        jsonResult.tentativasFalhadas = failedAttempts;
-        jsonResult.origem = 'ia';
+        console.log(`[IA Cascade] Sucesso com modelo: ${item.label}! Mesclando com Motor Local...`);
 
-        if (!jsonResult.desvios && Array.isArray(jsonResult.ocorrencias)) {
-          jsonResult.desvios = jsonResult.ocorrencias
-            .filter(o => o.severidade === 'erro_confirmado')
-            .map(e => ({
-              termo: e.trechoOriginal,
-              correcao: e.sugestaoCorrecao,
-              motivo: e.explicacaoRegra,
-              categoria: e.categoria,
-              localizacao: e.localizacao
-            }));
+        // 1. Executa SEMPRE o motor determinístico local para garantir 100% das regras fixas
+        const baseLocal = global.MotorCorrecao.avaliarRedacao(texto, tema, bancaKey, comando, { linhasReais });
+
+        // 2. Mescla as ocorrências (Seção D): une o que a IA achou com o que o motor local cravou
+        const ocorrenciasIA = Array.isArray(jsonResult.ocorrencias) ? jsonResult.ocorrencias : [];
+        ocorrenciasIA.forEach((o, idx) => {
+          o.id = o.id || `ia_occ_${idx}`;
+          o.contextoSentenca = o.contextoSentenca || o.trechoOriginal || '';
+          o.diagnostico = o.diagnostico || o.explicacaoRegra || 'Desvio identificado na análise.';
+          o.justificativaCorrecao = o.justificativaCorrecao || 'Adequação exigida pela rubrica da banca.';
+          o.criterioAfetado = o.criterioAfetado || 'Modalidade Gramatical / Coesão';
+          o.impactoNota = o.impactoNota || 'Impacto direto na pontuação do critério.';
+        });
+
+        baseLocal.ocorrencias.forEach(ocLocal => {
+          const jaExiste = ocorrenciasIA.some(o =>
+            String(o.trechoOriginal || '').toLowerCase().trim() === String(ocLocal.trechoOriginal || '').toLowerCase().trim()
+          );
+          if (!jaExiste) {
+            ocorrenciasIA.push(ocLocal);
+          }
+        });
+
+        // 3. Mescla os grifos clicáveis do Raio-X Interativo (Padrão Glau)
+        const marksIA = Array.isArray(jsonResult.marcacoes_inline) ? jsonResult.marcacoes_inline : [];
+        (baseLocal.marcacoes_inline || []).forEach(mLocal => {
+          const jaExiste = marksIA.some(m =>
+            String(m.trecho_exato || '').toLowerCase().trim() === String(mLocal.trecho_exato || '').toLowerCase().trim()
+          );
+          if (!jaExiste) {
+            marksIA.push(mLocal);
+          }
+        });
+
+        const repListaUnificada = jsonResult.repertorio?.lista || jsonResult.repertorio?.identificados || baseLocal.repertorio.lista;
+
+        // 4. Garante compatibilidade total de propriedades com o renderizador do app.js
+        const relatorioHibrido = {
+          ...baseLocal,
+          ...jsonResult,
+          dataHora: new Date().toISOString(),
+          bancaKey,
+          bancaNome: spec.banca,
+          concursoNome: spec.name,
+          rubricaVersion: spec.rubricaVersion,
+          tema,
+          comando,
+          max: spec.maxScore,
+          minPass: spec.minPass,
+          minPassRule: spec.minPassRule,
+          palavras: baseLocal.palavras,
+          linhas: baseLocal.linhas,
+          numParagrafos: baseLocal.numParagrafos,
+          ocorrencias: ocorrenciasIA,
+          marcacoes_inline: marksIA,
+          repertorio: {
+            lista: repListaUnificada,
+            quantidade: repListaUnificada.length,
+            temAlgum: Boolean(jsonResult.repertorio?.temAlgum ?? jsonResult.repertorio?.temLegitimo ?? baseLocal.repertorio.temAlgum),
+            temProdutivo: Boolean(jsonResult.repertorio?.temProdutivo ?? baseLocal.repertorio.temProdutivo),
+            resumoGeral: jsonResult.repertorio?.resumoGeral || baseLocal.repertorio.resumoGeral
+          },
+          modeloUtilizado: `${item.label} + Motor Determinístico da Banca`,
+          tentativasFalhadas: failedAttempts,
+          origem: 'hibrido_blindado'
+        };
+
+        // 5. Recalcula a penalidade de erros confirmados (NE) no Cebraspe para manter precisão matemática
+        const errosConfirmadosTotal = ocorrenciasIA.filter(o => o.severidade === 'erro_confirmado');
+        relatorioHibrido.desvios = errosConfirmadosTotal.map(e => ({
+          termo: e.trechoOriginal,
+          correcao: e.sugestaoCorrecao,
+          motivo: e.explicacaoRegra,
+          categoria: e.categoria,
+          localizacao: e.localizacao
+        }));
+
+        if (bancaKey === 'pcpe' || bancaKey === 'pppe') {
+          const ncVal = Number(relatorioHibrido.nc) || baseLocal.nc;
+          const tlVal = baseLocal.linhas || 1;
+          const neVal = errosConfirmadosTotal.length;
+          const penVal = Math.round(((2 * neVal) / tlVal) * 100) / 100;
+          relatorioHibrido.nc = ncVal;
+          relatorioHibrido.ne = neVal;
+          relatorioHibrido.tl = tlVal;
+          relatorioHibrido.penalidade = penVal;
+          relatorioHibrido.total = Math.max(0, Math.round((ncVal - penVal) * 100) / 100);
+          relatorioHibrido.percentual = Math.round((relatorioHibrido.total / spec.maxScore) * 1000) / 10;
         }
 
-        return jsonResult;
+        // 6. Gera o HTML interativo de grifos com a lista unificada
+        relatorioHibrido.textoAnotadoGlau = global.MotorCorrecao.gerarTextoAnotadoGlau(
+          texto,
+          relatorioHibrido.ocorrencias,
+          relatorioHibrido.repertorio,
+          relatorioHibrido.analiseParagrafos,
+          relatorioHibrido.marcacoes_inline
+        );
+
+        return relatorioHibrido;
       }
     } catch (err) {
       const cleanError = String(err.message || '')
@@ -556,7 +665,7 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
 
   // 4. FALLBACK ABSOLUTO: MOTOR CONTEXTUAL DETERMINÍSTICO ESPECIALIZADO
   console.log('[IA Cascade] Todas as chamadas de IA externas falharam ou nenhuma chave estava configurada. Acionando Motor Contextual Especializado Determinístico.');
-  const fallbackResult = global.MotorCorrecao.avaliarRedacao(texto, tema, bancaKey, comando);
+  const fallbackResult = global.MotorCorrecao.avaliarRedacao(texto, tema, bancaKey, comando, { linhasReais });
   fallbackResult.modeloUtilizado = 'Motor Contextual Especializado da Banca (Modo Contingência)';
   fallbackResult.tentativasFalhadas = failedAttempts;
   fallbackResult.fallbackLocal = true;
