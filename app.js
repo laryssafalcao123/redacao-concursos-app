@@ -3949,6 +3949,36 @@ function inicializarApp(){
 
   window.addEventListener('hashchange', () => go(location.hash.slice(1)));
 
+  // Modo Diurno (☀️ Sol) e Modo Noturno (🌙 Lua)
+  function aplicarModoTema(modo){
+    const isDark = modo === 'dark';
+    document.body.classList.toggle('dark-mode', isDark);
+    document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    const iconEl = $('#themeToggleIcon');
+    const labelEl = $('#themeToggleLabel');
+    const btnEl = $('#btnThemeToggle');
+    if(iconEl) iconEl.textContent = isDark ? '🌙' : '☀️';
+    if(labelEl) labelEl.textContent = isDark ? 'Noturno' : 'Diurno';
+    if(btnEl){
+      btnEl.title = isDark
+        ? 'Modo Noturno ativo (🌙 Lua) — Clique para mudar para Modo Diurno (☀️ Sol)'
+        : 'Modo Diurno ativo (☀️ Sol) — Clique para mudar para Modo Noturno (🌙 Lua)';
+    }
+  }
+
+  function alternarModoTema(){
+    const atual = store.get('redacao_theme_mode', 'light');
+    const novo = atual === 'dark' ? 'light' : 'dark';
+    store.set('redacao_theme_mode', novo);
+    aplicarModoTema(novo);
+    toast(novo === 'dark' ? '🌙 Modo Noturno ativado' : '☀️ Modo Diurno ativado');
+  }
+
+  aplicarModoTema(store.get('redacao_theme_mode', 'light'));
+  if($('#btnThemeToggle')){
+    $('#btnThemeToggle').onclick = alternarModoTema;
+  }
+
   // Inicialização
   aplicarVisibilidadeAdmin();
   renderGoogleAuthUI();

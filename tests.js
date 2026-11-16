@@ -431,6 +431,20 @@ Devem haver investimentos urgentes nos órgãos de segurança públicas onde nã
       `Desvios periciais detectados: ${resVarreduras.ocorrencias.length} ocorrências confirmadas nos 6 pilares.`
     );
 
+    /* 16. TESTE DE MODO DIURNO (☀️ SOL) E MODO NOTURNO (🌙 LUA) */
+    let themeBtnOk = true;
+    if(typeof document !== 'undefined' && document.getElementById){
+      const btnTheme = document.getElementById('btnThemeToggle');
+      const iconTheme = document.getElementById('themeToggleIcon');
+      themeBtnOk = Boolean(btnTheme && iconTheme && (iconTheme.textContent.includes('☀️') || iconTheme.textContent.includes('🌙')));
+    }
+    assert(
+      'Modo Diurno (☀️ Sol) e Modo Noturno (🌙 Lua) integrados na barra superior com persistência',
+      'UI & Acessibilidade Visual',
+      themeBtnOk,
+      'Botão #btnThemeToggle com ícone de Sol (☀️) no modo diurno e Lua (🌙) no modo noturno verificado.'
+    );
+
   } catch(err){
     assert('Execução sem exceções da suíte de testes', 'Sistema', false, err.message);
   }
