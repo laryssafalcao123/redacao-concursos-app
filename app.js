@@ -1247,7 +1247,7 @@ function renderizarResultado(res, nome, tema, bancaKey){
 
       <div class="rewrite-box" style="margin-top:18px">
         <h4>📘 Versão Integral Revisada — Modelo de Estudo Completo (Padrão ${esc(spec.banca)})</h4>
-        <div style="white-space:pre-line;font-size:14px;line-height:1.75;color:#1e293b;margin-top:8px">${esc(res.reescritaOrientada.modeloIntegralEstudo)}</div>
+        <div style="white-space:pre-line;font-size:14px;line-height:1.75;color:var(--ink);margin-top:8px">${esc(res.reescritaOrientada.modeloIntegralEstudo)}</div>
         <small style="display:block;margin-top:10px;color:var(--muted)">
           <b>Nota Pedagógica:</b> Este texto integral é fornecido exclusivamente como <b>Modelo de Estudo</b> estrutural para demonstrar como articular introdução, desenvolvimento com repertório produtivo e conclusão sobre o tema avaliado.
         </small>
