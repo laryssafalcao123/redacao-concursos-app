@@ -796,7 +796,7 @@ const REGRAS_CONTEXTUAIS = [
     id: 'g-falta-acento-grafico',
     severidade: 'erro_confirmado',
     categoria: 'Acentuação Gráfica Oficial',
-    re: /\b(policia|publica|publico|publicos|publicas|seguranca|constituicao|tambem|alem|atraves|necessario|necessaria|violencia|cidadao|cidadaos|individuo|individuos|epoca|porem|sera|serao|pais|paises|indice|indices|numero|numeros|unico|unica|etico|etica|pratica|praticas|politica|politicas|economico|economica|historico|historica|psicologico|psicologica|juizo|saude|educacao|populacao|informacao|corrupcao|acao|acoes|situacao|solucao|prevencao|repressao|instrucao|execucao|protecao|funcoes|condicoes|instituicoes|organizacoes|faccoes|presidios|penitenciario|penitenciaria|familia|familias|vitima|vitimas|inumeros|inumeras)\b/gi,
+    re: /\b(policia|publica|publico|publicos|publicas|seguranca|constituicao|tambem|alem|atraves|necessario|necessaria|violencia|cidadao|cidadaos|individuo|individuos|epoca|porem|sera|serao|pais|paises|indice|indices|numero|numeros|unico|unica|etico|etica|pratica|praticas|politica|politicas|economico|economica|historico|historica|psicologico|psicologica|juizo|saude|educacao|populacao|informacao|corrupcao|acao|acoes|situacao|solucao|prevencao|repressao|instrucao|execucao|protecao|funcoes|condicoes|instituicoes|organizacoes|faccoes|presidios|penitenciario|penitenciaria|familia|familias|vitima|vitimas|inumeros|inumeras|problematica|problematicas|ministerio|cibernetico|ciberneticos|cibernetica|ciberneticas)\b/gi,
     validarContexto: (match, frase) => {
       const original = frase.slice(match.index, match.index + match[0].length).toLowerCase();
       if (original === 'pais') {
@@ -822,7 +822,9 @@ const REGRAS_CONTEXTUAIS = [
         protecao: 'proteção', funcoes: 'funções', condicoes: 'condições', instituicoes: 'instituições',
         organizacoes: 'organizações', faccoes: 'facções', presidios: 'presídios', penitenciario: 'penitenciário',
         penitenciaria: 'penitenciária', familia: 'família', familias: 'famílias', vitima: 'vítima', vitimas: 'vítimas',
-        inumeros: 'inúmeros', inumeras: 'inúmeras'
+        inumeros: 'inúmeros', inumeras: 'inúmeras', problematica: 'problemática', problematicas: 'problemáticas',
+        ministerio: 'ministério', cibernetico: 'cibernético', ciberneticos: 'cibernéticos',
+        cibernetica: 'cibernética', ciberneticas: 'cibernéticas'
       };
       return Boolean(mapaExato[original]);
     },
@@ -844,11 +846,118 @@ const REGRAS_CONTEXTUAIS = [
         protecao: 'proteção', funcoes: 'funções', condicoes: 'condições', instituicoes: 'instituições',
         organizacoes: 'organizações', faccoes: 'facções', presidios: 'presídios', penitenciario: 'penitenciário',
         penitenciaria: 'penitenciária', familia: 'família', familias: 'famílias', vitima: 'vítima', vitimas: 'vítimas',
-        inumeros: 'inúmeros', inumeras: 'inúmeras'
+        inumeros: 'inúmeros', inumeras: 'inúmeras', problematica: 'problemática', problematicas: 'problemáticas',
+        ministerio: 'ministério', cibernetico: 'cibernético', ciberneticos: 'cibernéticos',
+        cibernetica: 'cibernética', ciberneticas: 'cibernéticas'
       };
       return mapa[m.toLowerCase()] || m;
     },
     justificativa: 'Penalização direta em ortografia e microestrutura.'
+  },
+  {
+    id: 'g-falta-crase-regencia-feminina-plural',
+    severidade: 'erro_confirmado',
+    categoria: 'Crase Obrigatória',
+    re: /\b(acesso|combate|prote[cç][aã]o|respeito|direito|incentivo|apoio|assist[eê]ncia|frente|devido|gra[cç]as|referente|inerente|quanto|relativo|submetid[oa]s?|associad[oa]s?|integrado|integra[cç][aã]o|atendimento|obedi[eê]ncia|amea[cç]a|ofensa|agress[aã]o|visar|obedecer|atender)\s+as\s+([a-záàâãéêíóôõúç]{3,}(?:[oõ]es|as|dades|rizes|leis|normas|regras|v[ií]timas|pessoas|mulheres|fam[ií]lias))\b/gi,
+    validarContexto: (match, frase) => !/\s+[àÀ]s\s+/.test(frase.slice(match.index, match.index + match[0].length)),
+    diagnostico: 'Ausência de crase obrigatória ("às") diante de termo feminino plural regido por preposição "a".',
+    explicacao: 'O substantivo ou verbo regente exige a preposição "a" e o substantivo feminino seguinte está determinado pelo artigo plural "as", exigindo o acento grave indicador de crase ("às").',
+    sugestao: (m) => m.replace(/\s+as\s+/i, ' às '),
+    justificativa: 'Omissão de crase obrigatória em regência nominal/verbal no plural.'
+  },
+  {
+    id: 'g-concordancia-que-singular-plural',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância Verbal',
+    re: /\b(software|sistema|programa|mecanismo|dispositivo|ferramenta|aplicativo|meio|recurso|[oó]rg[aã]o|poder|institui[cç][aã]o)\s+(?:[a-záàâãéêíóôõúç]+\s+)*(?:\([a-z\s]+\)\s+)?que\s+(criptografam|roubam|bloqueiam|invadem|prejudicam|causam|geram|afetam|violam|comprometem|garantem|promovem|exigem)(?:\s+e\s+(criptografam|roubam|bloqueiam|invadem|prejudicam|causam|geram|afetam|violam|comprometem|garantem|promovem|exigem))?\b/gi,
+    diagnostico: 'Erro de concordância verbal com o pronome relativo "que".',
+    explicacao: 'O pronome relativo "que" refere-se a um núcleo antecedente no singular, de modo que o verbo subsequente deve ser flexionado obrigatoriamente na 3ª pessoa do singular.',
+    sugestao: (m) => {
+      const verbosSing = {
+        criptografam: 'criptografa', roubam: 'rouba', bloqueiam: 'bloqueia', invadem: 'invade',
+        prejudicam: 'prejudica', causam: 'causa', geram: 'gera', afetam: 'afeta', violam: 'viola',
+        comprometem: 'compromete', garantem: 'garante', promovem: 'promove', exigem: 'exige'
+      };
+      return m.replace(/\b(criptografam|roubam|bloqueiam|invadem|prejudicam|causam|geram|afetam|violam|comprometem|garantem|promovem|exigem)\b/gi, (v) => verbosSing[v.toLowerCase()] || v);
+    },
+    justificativa: 'Concordância verbal com núcleo antecedente singular.'
+  },
+  {
+    id: 'g-concordancia-sujeito-plural-verbo-singular',
+    severidade: 'erro_confirmado',
+    categoria: 'Concordância Verbal',
+    re: /\b(esses|estes|aqueles|os|muitos|diversos|v[aá]rios)\s+(casos|crimes|problemas|delitos|golpes|ataques|processos|epis[oó]dios)\s+(?:de\s+[a-záàâãéêíóôõúç]+\s+)*(?:virtuais\s+|digitais\s+|eletr[oô]nicos\s+)?(est[aá]|vem|tem|continua|permanece)(?![a-záàâãéêíóôõúç])/gi,
+    diagnostico: 'Erro de concordância verbal entre o núcleo do sujeito plural e o verbo no singular.',
+    explicacao: 'O sujeito plural ("casos", "crimes", "golpes") exige que o verbo principal ou auxiliar seja flexionado na 3ª pessoa do plural ("estão", "vêm", "têm", "continuam").',
+    sugestao: (m) => {
+      const mapaVerboPlural = { 'está': 'estão', 'esta': 'estão', 'vem': 'vêm', 'tem': 'têm', 'continua': 'continuam', 'permanece': 'permanecem' };
+      return m.replace(/\b(est[aá]|vem|tem|continua|permanece)(?![a-záàâãéêíóôõúç])/i, (v) => mapaVerboPlural[v.toLowerCase()] || v);
+    },
+    justificativa: 'Ajuste de concordância entre sujeito plural e verbo.'
+  },
+  {
+    id: 'g-maiusculas-orgaos-leis',
+    severidade: 'erro_confirmado',
+    categoria: 'Convenção Ortográfica (Letras Maiúsculas)',
+    re: /\b(lei\s+carolina\s+dieckmann|lei\s+maria\s+da\s+penha|minist[eé]rio\s+p[uú]blico|minist[eé]rio\s+da\s+educa[cç][aã]o|minist[eé]rio\s+da\s+justi[cç]a|minist[eé]rio\s+da\s+sa[uú]de|poder\s+p[uú]blico|poder\s+judici[aá]rio|poder\s+executivo|poder\s+legislativo)\b/gi,
+    diagnostico: 'Uso incorreto de letras minúsculas em nome próprio de diploma legal ou órgão de Estado.',
+    explicacao: 'Nomes de leis específicas ("Lei Carolina Dieckmann") e de instituições de Estado ("Ministério Público", "Poder Público") devem ser grafados com iniciais maiúsculas.',
+    sugestao: (m) => {
+      const normKey = norm(m);
+      if (normKey.includes('dieckmann')) return 'Lei Carolina Dieckmann';
+      if (normKey.includes('penha')) return 'Lei Maria da Penha';
+      if (normKey.includes('ministerio publico')) return 'Ministério Público';
+      if (normKey.includes('ministerio da educacao')) return 'Ministério da Educação';
+      if (normKey.includes('ministerio da justica')) return 'Ministério da Justiça';
+      if (normKey.includes('ministerio da saude')) return 'Ministério da Saúde';
+      if (normKey.includes('poder publico')) return 'Poder Público';
+      if (normKey.includes('poder judiciario')) return 'Poder Judiciário';
+      if (normKey.includes('poder executivo')) return 'Poder Executivo';
+      if (normKey.includes('poder legislativo')) return 'Poder Legislativo';
+      return m;
+    },
+    justificativa: 'Padronização oficial de iniciais maiúsculas para órgãos e diplomas legais.'
+  },
+  {
+    id: 'g-virgula-sujeito-gerundio-verbo',
+    severidade: 'erro_confirmado',
+    categoria: 'Pontuação Sintática (Vírgula Proibida)',
+    re: /\b(O\s+pagamento\s+sendo\s+efetuado|A\s+medida\s+sendo\s+adotada|A\s+a[cç][aã]o\s+sendo\s+feita),\s+(n[aã]o\s+)?([eé]|s[aã]o|gera|garante)\b/gi,
+    diagnostico: 'Uso proibido de vírgula separando o sujeito do predicado.',
+    explicacao: 'É proibido separar o sujeito de seu predicado por vírgula, mesmo que o sujeito contenha uma forma verbal reduzida.',
+    sugestao: (m) => m.replace(/,\s+/, ' '),
+    justificativa: 'Elimina pontuação indevida na ordem sintática direta.'
+  },
+  {
+    id: 's-atraves-de-instrumento',
+    severidade: 'fragilidade_argumentativa',
+    categoria: 'Precisão Vocabular / Regência Semântica',
+    re: /\batrav[eé]s\s+de\s+(links|campanhas|leis|recursos|softwares|programas|a[cç][oõ]es|pol[ií]ticas|projetos|medidas|comunica[cç][oõ]es|mecanismos)\b/gi,
+    diagnostico: 'Emprego semanticamente inadequado da locução "através de" com sentido de meio ou instrumento.',
+    explicacao: '"Através de" denota ideia de atravessamento físico. Quando se indica o meio ou modo de uma ação, a norma culta e as bancas exigem "por meio de", "mediante" ou "por intermédio de".',
+    sugestao: (m) => m.replace(/\batrav[eé]s\s+de\b/i, 'por meio de'),
+    justificativa: 'Substituição pelo operador de meio/instrumento exigido na prosa formal.'
+  },
+  {
+    id: 's-alem-do-mais',
+    severidade: 'sugestao_estilistica',
+    categoria: 'Refinamento Coesivo / Oralidade',
+    re: /\b(al[eé]m\s+do\s+mais)\b/gi,
+    diagnostico: 'Uso de conectivo coloquial ("além do mais") desgastado e inadequado ao registro formal de concursos.',
+    explicacao: 'Substitua "além do mais" por operadores coesivos de padrão culto, como "Ademais,", "Outrossim," ou "Nessa perspectiva,".',
+    sugestao: () => 'Ademais',
+    justificativa: 'Elevação do padrão de formalidade dissertativa.'
+  },
+  {
+    id: 's-junto-a-vicio',
+    severidade: 'fragilidade_argumentativa',
+    categoria: 'Precisão Vocabular / Regência',
+    re: /\b([a-záàâãéêíóôõúç]+)\s+junto\s+a(?:o|s|os)?\s+([a-záàâãéêíóôõúç]+)\b/gi,
+    validarContexto: (match) => !/\b(estar|ficar|posicionar|morar|residir)\b/i.test(match[1]),
+    diagnostico: 'Emprego vicioso da expressão "junto a" no sentido de "em conjunto com", "com" ou "perante".',
+    explicacao: '"Junto a" significa proximidade física ("estar junto à parede"). Para indicar articulação ou parceria, deve-se usar "em conjunto com", "em cooperação com" ou "perante".',
+    sugestao: (m) => m.replace(/\s+junto\s+a(?:o|s|os)?\s+/i, ' em cooperação com '),
+    justificativa: 'Adequação da regência semântica exigida em provas discursivas.'
   },
   {
     id: 'f-mesmo-pronome-pessoal',
@@ -1388,7 +1497,7 @@ function analisarParagrafosDetalhadamente(paragrafos, tema, bancaKey, repertorio
 
     // Conectivos presentes no parágrafo
     const conectivosNoPar = CONECTIVOS_LISTA.filter(c => nPar.includes(c));
-    const iniciaComConectivo = idx > 0 && /^(portanto|ademais|alem disso|outrossim|contudo|entretanto|todavia|no entanto|nesse sentido|sob essa otica|sob esse vies|em primeiro lugar|em segundo lugar|por outro lado|diante disso|dessa forma|desse modo|por conseguinte|em suma|por fim|cabe ressaltar|convem destacar|paralelamente)\b/i.test(nPar);
+    const iniciaComConectivo = idx > 0 && /^(portanto|ademais|alem disso|outrossim|contudo|entretanto|todavia|no entanto|nesse sentido|nesse contexto|nesse cenario|sob essa otica|sob essa perspectiva|sob esse vies|em primeiro lugar|em primeira analise|em segundo lugar|por outro lado|diante disso|dessa forma|desse modo|por conseguinte|em suma|por fim|cabe ressaltar|convem destacar|paralelamente)\b/i.test(nPar);
 
     // Verificar tese / relação com a tese
     const temMarcadorTese = /\b(desafio|problema|necessidade|urgente|imperativo|deve|compromete|ameaca|fundamental|essencial|entrave|negligencia|omissao|precariedade|importancia|garantir|combater|enfrentar|evidencia-se|constata-se)\b/.test(nPar);
@@ -1479,11 +1588,15 @@ function analisarParagrafosDetalhadamente(paragrafos, tema, bancaKey, repertorio
     // Exemplo de versão revisada do parágrafo (aplicando as correções reais do aluno + aprimoramento)
     let versaoRevisada = par.trim();
     errosNoPar.forEach(e => {
-      if(e.severidade === 'erro_confirmado' && e.trechoOriginal && !e.sugestaoCorrecao.includes('(')){
-        versaoRevisada = versaoRevisada.replace(e.trechoOriginal, e.sugestaoCorrecao);
+      if(e.severidade === 'erro_confirmado' && e.trechoOriginal){
+        let limpaSugestao = e.sugestaoCorrecao.replace(/\s*\((?:sugest[aã]o|da banca|recomendad[oa]|ex:|ou|nota)[^)]*\)$/i, '').trim();
+        if(limpaSugestao && !/^(Substituir|Alternar|Usar|Antepor|Dividir|Especificar|Empregar|Flexionar|Corrigir)/i.test(limpaSugestao)){
+          versaoRevisada = versaoRevisada.replace(e.trechoOriginal, limpaSugestao);
+        }
       }
     });
-    if(idx > 0 && !iniciaComConectivo && palavras >= 15 && totalP <= 6){
+    const jaTemConectivoNoTexto = /^(portanto|ademais|alem disso|outrossim|contudo|entretanto|todavia|no entanto|nesse sentido|nesse contexto|nesse cenario|sob essa otica|sob essa perspectiva|sob esse vies|em primeiro lugar|em primeira analise|em segundo lugar|por outro lado|diante disso|dessa forma|desse modo|por conseguinte|em suma|por fim|cabe ressaltar|convem destacar|paralelamente)\b/i.test(versaoRevisada.trim());
+    if(idx > 0 && !iniciaComConectivo && !jaTemConectivoNoTexto && palavras >= 15 && totalP <= 6){
       const conSugerido = idx === totalP - 1 ? 'Portanto, ' : (idx === 1 ? 'Nesse contexto, ' : 'Ademais, ');
       versaoRevisada = conSugerido + versaoRevisada.charAt(0).toLowerCase() + versaoRevisada.slice(1);
     }
