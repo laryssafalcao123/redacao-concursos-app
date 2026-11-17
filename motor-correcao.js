@@ -2312,8 +2312,10 @@ function gerarTextoAnotadoGlau(texto, ocorrencias = [], repertorios = [], analis
         <div class="glau-line-gutter" title="Linhas estimadas da folha oficial">
           ${gutterHtml}
         </div>
-        <div class="glau-par-text">
+        <div class="glau-par-badge-container">
           <span class="glau-par-badge">§ ${numP} · Linhas ${String(startLine).padStart(2, '0')}–${String(endLine).padStart(2, '0')}</span>
+        </div>
+        <div class="glau-par-text">
           ${pResult}
         </div>
       </div>
