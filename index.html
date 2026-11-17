@@ -1678,6 +1678,19 @@ body.dark-mode .loading-step-item {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
+/* Corrige fundos claros inline e cores escuras de texto no Modo Noturno */
+body.dark-mode div[style*="background:#f8fafc"],
+body.dark-mode div[style*="background:#ffffff"],
+body.dark-mode tr[style*="background:#f8fafc"] {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f1f5f9 !important;
+}
+
+body.dark-mode b[style*="color:#15803d"] {
+    color: #4ade80 !important;
+}
+
 body.dark-mode .avaliacao-loading-card {
   background: linear-gradient(135deg, #111827 0%, #0f172a 100%) !important;
   border-color: #1e293b !important;
