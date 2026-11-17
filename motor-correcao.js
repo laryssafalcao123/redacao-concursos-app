@@ -2331,13 +2331,18 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = '', opcoes 
     versaoRevisada: ''
   };
 
+  const principaisDesvios = errosConfirmados.slice(0, 5).map(e => {
+    return `${e.categoria || 'Desvio Gramatical'}: "${e.trechoOriginal}" corrigido para "${e.sugestaoCorrecao}" (${e.diagnostico || e.explicacaoRegra})`;
+  });
+
   const reescritaOrientada = {
     paragrafoReferencia: parAlvo.numero,
     trechoOriginal: parAlvo.textoOriginal,
     versaoRevisada: parAlvo.versaoRevisada,
     explicacaoAlteracoes: 'Foram corrigidos os desvios gramaticais identificados no parágrafo, inserido operador argumentativo adequado à posição do bloco e reforçado o vínculo explícito com os núcleos do tema.',
     motivoAdequacao: `A versão revisada atende simultaneamente às exigências de coesão sequencial, impessoalidade dissertativa e precisão normativa cobradas pela banca ${spec.banca}.`,
-    modeloIntegralEstudo: gerarModeloIntegralEstudo(tema, bancaKey)
+    modeloIntegralEstudo: gerarModeloIntegralEstudo(tema, bancaKey, analiseParagrafos),
+    principaisDesviosCorrigidos: principaisDesvios
   };
 
   // Seção I: Próxima Atividade Recomendada
@@ -2442,7 +2447,19 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = '', opcoes 
   };
 }
 
-function gerarModeloIntegralEstudo(tema, bancaKey){
+function gerarModeloIntegralEstudo(tema, bancaKey, analiseParagrafos){
+  // 1. Prioridade Pericial: Reconstrução fiel a partir dos parágrafos revisados do próprio aluno
+  if(Array.isArray(analiseParagrafos) && analiseParagrafos.length >= 2){
+    const revisados = analiseParagrafos
+      .map(p => (p && p.versaoRevisada ? p.versaoRevisada.trim() : (p && p.textoOriginal ? p.textoOriginal.trim() : '')))
+      .filter(Boolean);
+
+    if(revisados.length >= 2){
+      return revisados.join('\n\n');
+    }
+  }
+
+  // 2. Modelo Temático Exemplar (Fallback de Alta Densidade Argumentativa)
   const t = esc(tema);
 
   if(bancaKey === 'pppe'){

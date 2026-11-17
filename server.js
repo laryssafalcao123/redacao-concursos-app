@@ -251,6 +251,25 @@ EXECUTE OBRIGATORIAMENTE OS 6 PILARES DE AUDITORIA ANTES DE GERAR O JSON:
    - CRASE: Puna falta de crase obrigatória ("à medida que", "à luz de", "acesso à", "combate à", "proteção à", "visar à", "obedecer às") e crase proibida (antes de verbo, palavra masculina, pronome indefinido ou singular antes de plural).
    - REGÊNCIA, ORTOGRAFIA, ACENTUAÇÃO E PRONOMES: Puna desvios em "visar a", "obedecer a", "implicar" (sem "em"), "acarretar" (sem "em"), "chegar a" (sem "em"), falta de acentos gráficos, acento diferencial ("tem/têm", "vem/vêm"), confusão entre "a fim de / afim", "haja vista / haja visto", "mas / mais", "mal / mau", próclise inicial e falta de próclise após palavras atrativas.
 
+=====================================================================
+DIRETRIZES RÍGIDAS DE REESCRITA PERICIAL (GERAÇÃO DE "modeloIntegralEstudo" NO PADRÃO NOTA MÁXIMA):
+=====================================================================
+1. ADAPTAÇÃO ESTRUTURAL (CRÍTICO):
+   - Se a banca for AOCP (PMPE/CBMPE) ou VUNESP (PMSP): O texto final de "modeloIntegralEstudo" DEVE ter exatamente 4 parágrafos (Introdução, Desenvolvimento 1, Desenvolvimento 2 e Conclusão). A introdução deve terminar com uma tese explícita em dois eixos.
+   - Se a banca for CEBRASPE (PCPE/PPPE): O texto deve ser dissertativo-expositivo, estruturado para responder diretamente aos tópicos e aspectos da proposta, sem forçar conclusão clássica se não exigida pelo tema.
+2. TRAVA ANTI-BUGS DE COESÃO E QUEBRA DE LINHA:
+   - IGNORE quebras de linha acidentais no meio das frases originadas por leitura de imagem (OCR) ou formatação do input. Trate o texto como parágrafos contínuos.
+   - NUNCA injete conectivos (ex: "Ademais", "Portanto") no meio de um período original de forma abrupta. Conectivos só devem ser inseridos no INÍCIO de parágrafos (coesão interparágrafos) ou após pontos finais (coesão intraparágrafos).
+3. CORREÇÃO GRAMATICAL IMPLACÁVEL:
+   - Corrija 100% dos desvios de concordância verbal/nominal (ex: garanta que o verbo concorde com o sujeito, como em "casos estão" em vez de "casos está").
+   - Corrija falta de crase, acentuação, ortografia, uso de maiúsculas/minúsculas e pontuação (elimine vírgula separando sujeito e verbo).
+4. PRESERVAÇÃO DA AUTORIA:
+   - Mantenha os argumentos, repertórios e ideias originais do candidato, apenas elevando a precisão vocabular e a clareza lógica para o nível de nota máxima da banca.
+5. NO CAMPO "reescritaOrientada.modeloIntegralEstudo":
+   - Insira o texto do candidato integralmente corrigido e estruturado com base nas 4 regras acima.
+6. NO CAMPO "reescritaOrientada.principaisDesviosCorrigidos":
+   - Forneça uma lista de strings sucintas apontando o erro original e como foi corrigido na reescrita.
+
 Retorne EXCLUSIVAMENTE um objeto JSON válido (sem markdown \`\`\`json) seguindo EXATAMENTE esta estrutura:
 {
   "total": number,
@@ -357,7 +376,8 @@ Retorne EXCLUSIVAMENTE um objeto JSON válido (sem markdown \`\`\`json) seguindo
     "versaoRevisada": string,
     "explicacaoAlteracoes": string,
     "motivoAdequacao": string,
-    "modeloIntegralEstudo": string
+    "modeloIntegralEstudo": string,
+    "principaisDesviosCorrigidos": [string]
   },
   "proximaAtividade": {
     "exercicioGramatica": string,
@@ -612,6 +632,19 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
           tentativasFalhadas: failedAttempts,
           origem: 'hibrido_blindado'
         };
+
+        const reescritaFinal = {
+          paragrafoReferencia: jsonResult.reescritaOrientada?.paragrafoReferencia || baseLocal.reescritaOrientada?.paragrafoReferencia || 1,
+          trechoOriginal: jsonResult.reescritaOrientada?.trechoOriginal || baseLocal.reescritaOrientada?.trechoOriginal || '',
+          versaoRevisada: jsonResult.reescritaOrientada?.versaoRevisada || baseLocal.reescritaOrientada?.versaoRevisada || '',
+          explicacaoAlteracoes: jsonResult.reescritaOrientada?.explicacaoAlteracoes || baseLocal.reescritaOrientada?.explicacaoAlteracoes || '',
+          motivoAdequacao: jsonResult.reescritaOrientada?.motivoAdequacao || baseLocal.reescritaOrientada?.motivoAdequacao || '',
+          modeloIntegralEstudo: jsonResult.reescritaOrientada?.modeloIntegralEstudo || baseLocal.reescritaOrientada?.modeloIntegralEstudo || '',
+          principaisDesviosCorrigidos: Array.isArray(jsonResult.reescritaOrientada?.principaisDesviosCorrigidos) && jsonResult.reescritaOrientada.principaisDesviosCorrigidos.length > 0
+            ? jsonResult.reescritaOrientada.principaisDesviosCorrigidos
+            : (baseLocal.reescritaOrientada?.principaisDesviosCorrigidos || [])
+        };
+        relatorioHibrido.reescritaOrientada = reescritaFinal;
 
         const errosConfirmadosTotal = ocorrenciasIA.filter(o => o.severidade === 'erro_confirmado');
         relatorioHibrido.desvios = errosConfirmadosTotal.map(e => ({

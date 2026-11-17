@@ -1252,6 +1252,15 @@ function renderizarResultado(res, nome, tema, bancaKey){
           <b>Nota Pedagógica:</b> Este texto integral é fornecido exclusivamente como <b>Modelo de Estudo</b> estrutural para demonstrar como articular introdução, desenvolvimento com repertório produtivo e conclusão sobre o tema avaliado.
         </small>
       </div>
+
+      ${(Array.isArray(res.reescritaOrientada.principaisDesviosCorrigidos) && res.reescritaOrientada.principaisDesviosCorrigidos.length > 0) ? `
+        <div style="margin-top:14px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:12px 14px">
+          <b style="color:#0f172a;font-size:13px;display:block;margin-bottom:6px">🔍 Principais Desvios Corrigidos na Reescrita:</b>
+          <ul style="margin:0;padding-left:18px;font-size:12.5px;color:#334155;line-height:1.6">
+            ${res.reescritaOrientada.principaisDesviosCorrigidos.map(d => `<li>${esc(d)}</li>`).join('')}
+          </ul>
+        </div>
+      ` : ''}
     </div>
 
     <!-- ================= SEÇÃO I — PRÓXIMA ATIVIDADE ================= -->
