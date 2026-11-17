@@ -1371,12 +1371,12 @@ function getSemanaRefId(){
   return `${dUtc.getUTCFullYear()}-W${String(weekNo).padStart(2, '0')}`;
 }
 
-const COTA_SEMANAL_PADRAO = 10;
+const COTA_SEMANAL_PADRAO = 20;
 
 function obterCreditosSemana(){
   const semanaAtual = getSemanaRefId();
   let cred = getUserData('redacao_creditos', null);
-  // Renova automaticamente a cada nova semana ou atualiza perfil legado para 10 créditos semanais
+  // Renova automaticamente a cada nova semana ou atualiza perfil legado para 20 créditos semanais
   if(!cred || cred.semanaRef !== semanaAtual || typeof cred.restantes !== 'number' || cred.total < COTA_SEMANAL_PADRAO){
     cred = {
       restantes: COTA_SEMANAL_PADRAO,
@@ -3813,7 +3813,7 @@ function inicializarApp(){
       };
       salvarCreditosSemana(c);
       exibirModalCreditos();
-      toast('Créditos resetados para o padrão semanal (10/10)!');
+      toast('Créditos resetados para o padrão semanal (20/20)!');
     };
   }
 

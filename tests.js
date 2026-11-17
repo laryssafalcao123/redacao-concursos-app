@@ -343,7 +343,7 @@ function executarSuiteTestes(){
       'SaaS B2B Cursinho: Sistema de créditos semanais e gestão centralizada de IA integrados',
       'SaaS B2B & Créditos',
       true,
-      'Cota semanal de 10 correções por aluno (com renovação automática semanal) e centralização de chaves operacionais.'
+      'Cota semanal de 20 correções por aluno (com renovação automática semanal) e centralização de chaves operacionais.'
     );
 
     /* 11. TESTES DO PAINEL DO GESTOR / PROFESSOR (B2B CURSINHOS) */
