@@ -530,6 +530,8 @@ function initGlauInteractiveInspector(res){
     if(!regra) regra = cfg.regraPadrao;
     if(!explicacao) explicacao = cfg.explicacaoPadrao;
 
+    const podeAplicar = sugestao && !isResolvido && !/^(Substituir|Alternar|Usar|Antepor|Dividir|Especificar|Empregar|Flexionar|Corrigir)/i.test(sugestao) && categoria !== 'repeticao' && categoria !== 'argumentacao';
+
     cardBox.innerHTML = `
       <div class="glau-card-header">
         <span class="glau-pill-legend ${cfg.badgeClass}">${cfg.badgeTxt}</span>
@@ -562,7 +564,7 @@ function initGlauInteractiveInspector(res){
           <b>Critério da Banca:</b> ${esc(cfg.criterio)} · <b>Impacto:</b> <span style="font-weight:700;color:${cfg.corImpacto}">${esc(cfg.impacto)}</span>
         </div>
 
-        ${sugestao && !isResolvido ? `
+        ${podeAplicar ? `
           <div style="margin-top:8px;display:flex;justify-content:flex-end">
             <button type="button" class="btn-aplicar-correcao" id="btnAplicarCorrecao">
               <span>✨ Aplicar correção no texto</span>
