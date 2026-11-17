@@ -1304,6 +1304,12 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
           }
           trechoExato = trechoExato.trim();
 
+          const sugestaoCalculada = typeof regra.sugestao === 'function' ? regra.sugestao(trechoExato) : regra.sugestao;
+          // TRAVA ANTI-ALUCINAÇÃO (NÃO INVENTE ERROS): Se o trecho já estiver correto no original, não penaliza nem lista
+          if(trechoExato === String(sugestaoCalculada || '').trim()){
+            continue;
+          }
+
           const isErro = regra.severidade === 'erro_confirmado';
           const isFrag = regra.severidade === 'fragilidade_argumentativa';
 
@@ -1328,7 +1334,7 @@ function analisarOcorrenciasPorSentenca(paragrafos, bancaKey){
             localizacao: `Parágrafo ${pIdx + 1}, Sentença ${sIdx + 1}`,
             diagnostico: regra.diagnostico,
             explicacaoRegra: regra.explicacao,
-            sugestaoCorrecao: typeof regra.sugestao === 'function' ? regra.sugestao(trechoExato) : regra.sugestao,
+            sugestaoCorrecao: sugestaoCalculada,
             justificativaCorrecao: regra.justificativa,
             criterioAfetado: isErro ? criterioGramaticalMap[bancaKey] : (isFrag ? criterioArgumentativoMap[bancaKey] : 'Refinamento Estilístico (Não penalizado)'),
             impactoNota
@@ -2444,9 +2450,10 @@ function avaliarRedacao(textoRaw, temaRaw, bancaKeyRaw, comandoRaw = '', opcoes 
     versaoRevisada: ''
   };
 
-  const principaisDesvios = errosConfirmados.slice(0, 5).map(e => {
-    return `${e.categoria || 'Desvio Gramatical'}: "${e.trechoOriginal}" corrigido para "${e.sugestaoCorrecao}" (${e.diagnostico || e.explicacaoRegra})`;
-  });
+  const principaisDesvios = errosConfirmados
+    .filter(e => e.trechoOriginal && e.sugestaoCorrecao && e.trechoOriginal.trim() !== e.sugestaoCorrecao.trim())
+    .slice(0, 8)
+    .map(e => `"${e.trechoOriginal}" -> Corrigido para "${e.sugestaoCorrecao}" (${e.categoria || 'Gramática'})`);
 
   const reescritaOrientada = {
     paragrafoReferencia: parAlvo.numero,

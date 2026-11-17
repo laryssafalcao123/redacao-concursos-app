@@ -265,10 +265,14 @@ DIRETRIZES RÍGIDAS DE REESCRITA PERICIAL (GERAÇÃO DE "modeloIntegralEstudo" N
    - Corrija falta de crase, acentuação, ortografia, uso de maiúsculas/minúsculas e pontuação (elimine vírgula separando sujeito e verbo).
 4. PRESERVAÇÃO DA AUTORIA:
    - Mantenha os argumentos, repertórios e ideias originais do candidato, apenas elevando a precisão vocabular e a clareza lógica para o nível de nota máxima da banca.
-5. NO CAMPO "reescritaOrientada.modeloIntegralEstudo":
-   - Insira o texto do candidato integralmente corrigido e estruturado com base nas 4 regras acima.
-6. NO CAMPO "reescritaOrientada.principaisDesviosCorrigidos":
-   - Forneça uma lista de strings sucintas apontando o erro original e como foi corrigido na reescrita.
+5. TRAVA ANTI-ALUCINAÇÃO (NÃO INVENTE ERROS):
+   - É TERMINANTEMENTE PROIBIDO apontar um erro ou aplicar correção se a palavra já estiver correta no texto original.
+   - Se o candidato já escreveu termos institucionais ou leis com as iniciais maiúsculas corretas (ex: "Lei Carolina Dieckmann", "Poder Público", "Ministério Público"), NÃO altere, NÃO penalize e NÃO liste isso nos desvios corrigidos.
+   - Só liste em "principaisDesviosCorrigidos" aquilo que você de fato alterou na reescrita.
+6. NO CAMPO "reescritaOrientada.modeloIntegralEstudo":
+   - Insira o texto do candidato integralmente corrigido e estruturado com base nas regras acima.
+7. NO CAMPO "reescritaOrientada.principaisDesviosCorrigidos":
+   - Liste no formato: "[Erro original] -> [Como foi corrigido na gramática ou estrutura]", contendo apenas os desvios que de fato foram alterados.
 
 Retorne EXCLUSIVAMENTE um objeto JSON válido (sem markdown \`\`\`json) seguindo EXATAMENTE esta estrutura:
 {
@@ -633,6 +637,18 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
           origem: 'hibrido_blindado'
         };
 
+        const listaDesviosFiltrada = (Array.isArray(jsonResult.reescritaOrientada?.principaisDesviosCorrigidos) && jsonResult.reescritaOrientada.principaisDesviosCorrigidos.length > 0
+          ? jsonResult.reescritaOrientada.principaisDesviosCorrigidos
+          : (baseLocal.reescritaOrientada?.principaisDesviosCorrigidos || []))
+          .filter(d => {
+            if (typeof d !== 'string') return false;
+            if (d.includes('->')) {
+              const partes = d.split('->').map(p => p.replace(/^["'\s]+|["'\s]+$/g, '').trim());
+              if (partes.length >= 2 && partes[0].toLowerCase() === partes[1].toLowerCase()) return false;
+            }
+            return true;
+          });
+
         const reescritaFinal = {
           paragrafoReferencia: jsonResult.reescritaOrientada?.paragrafoReferencia || baseLocal.reescritaOrientada?.paragrafoReferencia || 1,
           trechoOriginal: jsonResult.reescritaOrientada?.trechoOriginal || baseLocal.reescritaOrientada?.trechoOriginal || '',
@@ -640,13 +656,11 @@ async function executarCascataIA({ texto, tema, comando, bancaKey, spec, linhasR
           explicacaoAlteracoes: jsonResult.reescritaOrientada?.explicacaoAlteracoes || baseLocal.reescritaOrientada?.explicacaoAlteracoes || '',
           motivoAdequacao: jsonResult.reescritaOrientada?.motivoAdequacao || baseLocal.reescritaOrientada?.motivoAdequacao || '',
           modeloIntegralEstudo: jsonResult.reescritaOrientada?.modeloIntegralEstudo || baseLocal.reescritaOrientada?.modeloIntegralEstudo || '',
-          principaisDesviosCorrigidos: Array.isArray(jsonResult.reescritaOrientada?.principaisDesviosCorrigidos) && jsonResult.reescritaOrientada.principaisDesviosCorrigidos.length > 0
-            ? jsonResult.reescritaOrientada.principaisDesviosCorrigidos
-            : (baseLocal.reescritaOrientada?.principaisDesviosCorrigidos || [])
+          principaisDesviosCorrigidos: listaDesviosFiltrada
         };
         relatorioHibrido.reescritaOrientada = reescritaFinal;
 
-        const errosConfirmadosTotal = ocorrenciasIA.filter(o => o.severidade === 'erro_confirmado');
+        const errosConfirmadosTotal = ocorrenciasIA.filter(o => o.severidade === 'erro_confirmado' && o.trechoOriginal && o.sugestaoCorrecao && o.trechoOriginal.trim() !== o.sugestaoCorrecao.trim());
         relatorioHibrido.desvios = errosConfirmadosTotal.map(e => ({
           termo: e.trechoOriginal,
           correcao: e.sugestaoCorrecao,
