@@ -1483,8 +1483,8 @@ function analisarParagrafosDetalhadamente(paragrafos, tema, bancaKey, repertorio
         versaoRevisada = versaoRevisada.replace(e.trechoOriginal, e.sugestaoCorrecao);
       }
     });
-    if(idx > 0 && !iniciaComConectivo){
-      const conSugerido = idx === totalP - 1 ? 'Portanto, ' : (idx === 1 ? 'Em primeiro lugar, ' : 'Ademais, ');
+    if(idx > 0 && !iniciaComConectivo && palavras >= 15 && totalP <= 6){
+      const conSugerido = idx === totalP - 1 ? 'Portanto, ' : (idx === 1 ? 'Nesse contexto, ' : 'Ademais, ');
       versaoRevisada = conSugerido + versaoRevisada.charAt(0).toLowerCase() + versaoRevisada.slice(1);
     }
     if(idx === 0 && !temMarcadorTese){

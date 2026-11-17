@@ -1540,7 +1540,8 @@ function configurarCorretor(){
   if(!btnEval) return;
 
   btnEval.onclick = async () => {
-    const texto = $('#essay').value.trim();
+    let textoRaw = $('#essay').value.trim();
+    const texto = textoRaw.replace(/([^\n])\n([^\n])/g, '$1 $2');
     const tema = $('#inTema').value.trim() || 'Tema Geral de Segurança Pública, Direitos e Cidadania';
     const comando = ($('#inComando') ? $('#inComando').value.trim() : '');
     const nome = $('#inNome').value.trim() || (currentGoogleUser ? currentGoogleUser.nome : 'Aluno(a)');
